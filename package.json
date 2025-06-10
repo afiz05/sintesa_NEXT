@@ -1,0 +1,40 @@
+{
+  "name": "dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbo",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@heroui/react": "^2.7.9",
+    "@svgr/webpack": "^8.1.0",
+    "@types/react-google-recaptcha": "^2.1.9",
+    "apexcharts": "^4.7.0",
+    "axios": "^1.9.0",
+    "clsx": "^2.1.1",
+    "formik": "^2.4.6",
+    "framer-motion": "^12.16.0",
+    "lucide-react": "^0.513.0",
+    "next": "^15.3.3",
+    "next-themes": "^0.4.6",
+    "react": "^19.1.0",
+    "react-apexcharts": "^1.7.0",
+    "react-dom": "^19.1.0",
+    "react-google-recaptcha": "^3.1.0",
+    "yup": "^1.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.30",
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.6",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.28.0",
+    "eslint-config-next": "^15.3.3",
+    "postcss": "^8.5.4",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.8.3"
+  }
+}
