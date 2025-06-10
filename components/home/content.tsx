@@ -91,9 +91,40 @@ const ministryData = [
   },
 ];
 
+const jenbelData = [
+  {
+    name: "Belanja Pegawai",
+    budget: 548.7,
+    realized: 495.2,
+    percentage: 90.2,
+    status: "on-track",
+  },
+  {
+    name: "Belanja Barang",
+    budget: 325.4,
+    realized: 298.9,
+    percentage: 91.9,
+    status: "on-track",
+  },
+  {
+    name: "Belanja Modal",
+    budget: 284.3,
+    realized: 248.1,
+    percentage: 87.3,
+    status: "warning",
+  },
+  {
+    name: "Belanja Bansos",
+    budget: 198.2,
+    realized: 189.4,
+    percentage: 95.6,
+    status: "excellent",
+  },
+];
+
 const quickStats = [
   {
-    title: "Total Anggaran 2024",
+    title: "Pagu DIPA",
     value: "Rp 3.156,1 T",
     change: "+5.8%",
     trend: "up",
@@ -101,7 +132,7 @@ const quickStats = [
     color: "primary",
   },
   {
-    title: "Realisasi s.d Hari Ini",
+    title: "Realisasi",
     value: "Rp 2.847,3 T",
     change: "90.2%",
     trend: "up",
@@ -169,16 +200,16 @@ const kanwilList = [
 ];
 
 export const Content = () => (
-  <div className="h-full lg:px-6 pt-4">
+  <div className="h-full lg:px-4 pt-2 pb-6">
     {/* Header Section */}
-    <div className="flex flex-col gap-2 pt-2 px-4 lg:px-0 max-w-[90rem] mx-auto w-full">
-      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
+    <div className="flex flex-col gap-1 pt-1 px-3 lg:px-0 max-w-[90rem] mx-auto w-full">
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-2">
         <div>
-          <h1 className="text-2xl md:text-3xl font-medium text-foreground tracking-wide">
+          <h1 className="text-xl md:text-2xl font-medium text-foreground tracking-wide">
             Dashboard Realisasi APBN
           </h1>
         </div>
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+        <div className="flex flex-col sm:flex-row gap-1 sm:gap-2">
           <Autocomplete
             placeholder="Pilih Kementerian"
             className="w-full sm:w-44 lg:w-52 h-10"
@@ -225,7 +256,7 @@ export const Content = () => (
       </div>
 
       {/* Quick Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mt-4 md:mt-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-12 gap-2 md:gap-3 mt-2 md:mt-3">
         {quickStats.map((stat, index) => (
           <Card
             key={index}
@@ -237,21 +268,30 @@ export const Content = () => (
                 : stat.color === "warning"
                 ? "from-warning-50 to-warning-100 border-warning-200"
                 : "from-secondary-50 to-secondary-100 border-secondary-200"
+            } ${
+              // Custom width for each card on large screens
+              index === 0
+                ? "lg:col-span-2" // Pagu DIPA - largest
+                : index === 1
+                ? "lg:col-span-2" // Realisasi - medium-large
+                : index === 2
+                ? "lg:col-span-2" // Sisa Anggaran - medium
+                : "lg:col-span-6" // K/L Aktif - smallest
             }`}
           >
-            <CardBody className="p-3 md:p-4">
+            <CardBody className="p-2 md:p-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
+                <div className="flex items-center gap-1 md:gap-2 min-w-0 flex-1">
                   <div
-                    className={`p-1.5 md:p-2 rounded-xl bg-${stat.color}/20 border border-${stat.color}/30 flex-shrink-0`}
+                    className={`p-1 md:p-1.5 rounded-lg bg-${stat.color}/20 border border-${stat.color}/30 flex-shrink-0`}
                   >
                     <stat.icon
-                      className={`h-4 w-4 md:h-5 md:w-5 text-${stat.color}`}
+                      className={`h-3 w-3 md:h-4 md:w-4 text-${stat.color}`}
                     />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p
-                      className={`text-xs md:text-small ${
+                      className={`text-xs ${
                         stat.color === "warning"
                           ? "text-warning-600"
                           : "text-default-600"
@@ -259,16 +299,16 @@ export const Content = () => (
                     >
                       {stat.title}
                     </p>
-                    <p className="text-lg md:text-xl font-semibold text-default-900 truncate">
+                    <p className="text-sm md:text-lg font-semibold text-default-900 truncate">
                       {stat.value}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-1 flex-shrink-0">
                   {stat.trend === "up" ? (
-                    <ArrowUpRight className="h-3 w-3 md:h-4 md:w-4 text-success-600" />
+                    <ArrowUpRight className="h-2 w-2 md:h-3 md:w-3 text-success-600" />
                   ) : (
-                    <ArrowDownRight className="h-3 w-3 md:h-4 md:w-4 text-danger-600" />
+                    <ArrowDownRight className="h-2 w-2 md:h-3 md:w-3 text-danger-600" />
                   )}
                   <span
                     className={`text-xs font-medium ${
@@ -288,73 +328,137 @@ export const Content = () => (
     </div>
 
     {/* Main Content Grid */}
-    <div className="flex flex-col gap-6 pt-6 px-4 lg:px-0 max-w-[90rem] mx-auto w-full">
+    <div className="flex flex-col gap-3 pt-3 px-3 lg:px-0 max-w-[90rem] mx-auto w-full">
       {/* Three Card Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-6 xl:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-6 xl:grid-cols-12 gap-3">
         {/* Overall Summary - Responsive */}
-        <Card className="border-none shadow-sm bg-gradient-to-br from-primary-50 to-secondary-50 lg:col-span-6 xl:col-span-2">
-          <CardBody className="p-4 md:p-6">
-            <div className="text-center space-y-3 md:space-y-4">
-              <div className="mx-auto w-16 h-16 md:w-20 md:h-20 bg-primary/10 rounded-full flex items-center justify-center">
-                <Target className="h-8 w-8 md:h-10 md:w-10 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-xl md:text-2xl font-bold text-primary">
-                  90.2%
-                </h3>
-                <p className="text-xs md:text-sm text-default-600">
-                  Realisasi APBN 2024
-                </p>
-              </div>
-              <Progress
-                value={90.2}
-                color="primary"
-                size="lg"
-                className="w-full"
-                showValueLabel
-              />
-              <div className="grid grid-cols-2 gap-2 md:gap-4 pt-2">
-                <div className="text-center">
-                  <p className="text-xs text-default-500">Target</p>
-                  <p className="text-sm font-semibold text-primary">95%</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-xs text-default-500">Deadline</p>
-                  <p className="text-sm font-semibold text-warning">31 Des</p>
-                </div>
-              </div>
-            </div>
-          </CardBody>
-        </Card>
-
-        {/* Ministry Performance - Responsive */}
-        <Card className="border-none shadow-sm bg-gradient-to-br from-default-50 to-default-100 lg:col-span-6 xl:col-span-4">
-          <CardHeader className="pb-3 md:pb-4 px-4 md:px-6">
+        <Card className="border-none shadow-sm bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 lg:col-span-6 xl:col-span-3">
+          <CardHeader className="pb-2 px-4 md:px-6">
             <div className="flex justify-between items-center w-full">
-              <h3 className="text-base md:text-lg font-semibold">
-                Performa K/L Terbesar
+              <h3 className="text-sm md:text-base font-semibold">
+                Jenis Belanja Terbesar
               </h3>
               <Link
                 href="/mbg/data-update"
                 as={NextLink}
-                className="text-xs md:text-sm text-primary"
+                className="text-xs text-primary"
               >
                 Lihat Semua
               </Link>
             </div>
           </CardHeader>
           <CardBody className="pt-0 px-4 md:px-6">
-            <div className="space-y-2 md:space-y-3">
+            <div className="space-y-0">
+              {jenbelData.slice(0, 4).map((jenbel, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-0.5 md:p-1 rounded-lg"
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="mb-0.5">
+                      <h4 className="font-medium text-xs truncate pr-2">
+                        {jenbel.name}
+                      </h4>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="relative flex-1">
+                        <Progress
+                          value={jenbel.percentage}
+                          color={
+                            jenbel.status === "excellent"
+                              ? "success"
+                              : jenbel.status === "on-track"
+                              ? "primary"
+                              : "warning"
+                          }
+                          size="md"
+                          className="w-full h-5"
+                          classNames={{
+                            track: "h-5",
+                            indicator: "h-5",
+                          }}
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-xs font-medium text-white">
+                            Rp {jenbel.realized}T / Rp {jenbel.budget}T
+                          </span>
+                        </div>
+                      </div>
+                      <Chip
+                        size="sm"
+                        variant="flat"
+                        color={
+                          jenbel.status === "excellent"
+                            ? "success"
+                            : jenbel.status === "on-track"
+                            ? "primary"
+                            : "warning"
+                        }
+                        className="text-xs flex-shrink-0"
+                      >
+                        {jenbel.percentage}%
+                      </Chip>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardBody>
+        </Card>
+
+        {/* Ministry Performance - Responsive */}
+        <Card className="border-none shadow-sm bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 lg:col-span-6 xl:col-span-3">
+          <CardHeader className="pb-2 px-4 md:px-6">
+            <div className="flex justify-between items-center w-full">
+              <h3 className="text-sm md:text-base font-semibold">
+                Performa K/L Terbesar
+              </h3>
+              <Link
+                href="/mbg/data-update"
+                as={NextLink}
+                className="text-xs text-primary"
+              >
+                Lihat Semua
+              </Link>
+            </div>
+          </CardHeader>
+          <CardBody className="pt-0 px-4 md:px-6">
+            <div className="space-y-0">
               {ministryData.slice(0, 4).map((ministry, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-2 md:p-3 bg-default-50 rounded-lg"
+                  className="flex items-center justify-between p-0.5 md:p-1 rounded-lg"
                 >
                   <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-center mb-1 md:mb-2">
-                      <h4 className="font-medium text-xs md:text-sm truncate pr-2">
+                    <div className="mb-0.5">
+                      <h4 className="font-medium text-xs truncate pr-2">
                         {ministry.name}
                       </h4>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="relative flex-1">
+                        <Progress
+                          value={ministry.percentage}
+                          color={
+                            ministry.status === "excellent"
+                              ? "success"
+                              : ministry.status === "on-track"
+                              ? "primary"
+                              : "warning"
+                          }
+                          size="md"
+                          className="w-full h-5"
+                          classNames={{
+                            track: "h-5",
+                            indicator: "h-5",
+                          }}
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-xs font-medium text-white">
+                            Rp {ministry.realized}T / Rp {ministry.budget}T
+                          </span>
+                        </div>
+                      </div>
                       <Chip
                         size="sm"
                         variant="flat"
@@ -370,23 +474,6 @@ export const Content = () => (
                         {ministry.percentage}%
                       </Chip>
                     </div>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-xs text-default-500">
-                        Rp {ministry.realized}T / Rp {ministry.budget}T
-                      </span>
-                    </div>
-                    <Progress
-                      value={ministry.percentage}
-                      color={
-                        ministry.status === "excellent"
-                          ? "success"
-                          : ministry.status === "on-track"
-                          ? "primary"
-                          : "warning"
-                      }
-                      size="sm"
-                      className="w-full"
-                    />
                   </div>
                 </div>
               ))}
@@ -395,14 +482,14 @@ export const Content = () => (
         </Card>
 
         {/* Realization Chart - Responsive */}
-        <Card className="border-none shadow-sm bg-gradient-to-br from-default-50 to-default-100 lg:col-span-12 xl:col-span-6">
-          <CardHeader className="pb-2 px-4 md:px-6">
+        <Card className="border-none shadow-sm bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 lg:col-span-12 xl:col-span-6">
+          <CardHeader className="pb-1 px-4 md:px-6">
             <div className="flex flex-col gap-1">
-              <h3 className="text-base md:text-lg font-semibold">
+              <h3 className="text-sm md:text-base font-semibold">
                 Tren Realisasi APBN 2024
               </h3>
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-                <p className="text-xs md:text-small text-default-500">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
+                <p className="text-xs text-default-500">
                   Target vs realisasi bulanan
                 </p>
                 <Chip
@@ -416,8 +503,8 @@ export const Content = () => (
               </div>
             </div>
           </CardHeader>
-          <CardBody className="pt-0 px-2 pb-2">
-            <div className="h-[200px] md:h-[280px] w-full flex flex-col overflow-hidden">
+          <CardBody className="pt-0 px-2 md:px-4 pb-1">
+            <div className="h-[150px] md:h-[200px] w-full flex flex-col overflow-hidden">
               <APBNChart />
             </div>
           </CardBody>
@@ -425,38 +512,38 @@ export const Content = () => (
       </div>
 
       {/* Bottom Row - Activities and Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         {/* Recent Activities */}
-        <Card className="border-none shadow-sm bg-gradient-to-br from-default-50 to-default-100">
-          <CardHeader className="pb-3 md:pb-4 px-4 md:px-6">
+        <Card className="border-none shadow-sm bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700">
+          <CardHeader className="pb-2 px-4 md:px-6">
             <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-default-500" />
-              <h3 className="text-base md:text-lg font-semibold">
+              <Clock className="h-3 w-3 text-default-500" />
+              <h3 className="text-sm md:text-base font-semibold">
                 Aktivitas Terkini
               </h3>
             </div>
           </CardHeader>
           <CardBody className="pt-0 px-4 md:px-6">
-            <div className="space-y-3 md:space-y-4">
+            <div className="space-y-2">
               {recentActivities.map((activity, index) => (
-                <div key={index} className="flex gap-3">
-                  <div className="flex-shrink-0 mt-1">
+                <div key={index} className="flex gap-2">
+                  <div className="flex-shrink-0 mt-0.5">
                     {activity.status === "completed" ? (
-                      <CheckCircle2 className="h-4 w-4 text-success" />
+                      <CheckCircle2 className="h-3 w-3 text-success" />
                     ) : activity.status === "pending" ? (
-                      <Clock className="h-4 w-4 text-warning" />
+                      <Clock className="h-3 w-3 text-warning" />
                     ) : (
-                      <AlertTriangle className="h-4 w-4 text-primary" />
+                      <AlertTriangle className="h-3 w-3 text-primary" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">
+                    <p className="text-xs font-medium truncate">
                       {activity.title}
                     </p>
                     <p className="text-xs text-default-500">
                       {activity.ministry}
                     </p>
-                    <div className="flex justify-between items-center mt-1">
+                    <div className="flex justify-between items-center mt-0.5">
                       <span className="text-xs font-medium text-primary">
                         {activity.amount}
                       </span>
@@ -468,7 +555,7 @@ export const Content = () => (
                 </div>
               ))}
             </div>
-            <Divider className="my-4" />
+            <Divider className="my-2" />
             <Button
               variant="flat"
               color="primary"
@@ -483,17 +570,17 @@ export const Content = () => (
         </Card>
 
         {/* Quick Actions */}
-        <Card className="border-none shadow-sm bg-gradient-to-br from-default-50 to-default-100">
-          <CardHeader className="pb-3 md:pb-4 px-4 md:px-6">
-            <h3 className="text-base md:text-lg font-semibold">Aksi Cepat</h3>
+        <Card className="border-none shadow-sm bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700">
+          <CardHeader className="pb-2 px-4 md:px-6">
+            <h3 className="text-sm md:text-base font-semibold">Aksi Cepat</h3>
           </CardHeader>
-          <CardBody className="pt-0 space-y-3 px-4 md:px-6">
+          <CardBody className="pt-0 space-y-2 px-4 md:px-6">
             <Button
               variant="flat"
               color="primary"
               size="sm"
               className="w-full justify-start"
-              startContent={<BarChart3 size={16} />}
+              startContent={<BarChart3 size={14} />}
               as={NextLink}
               href="/mbg/dashboard-mbg"
             >
@@ -504,7 +591,7 @@ export const Content = () => (
               color="secondary"
               size="sm"
               className="w-full justify-start"
-              startContent={<FileText size={16} />}
+              startContent={<FileText size={14} />}
               as={NextLink}
               href="/mbg/kertas-kerja"
             >
@@ -515,7 +602,7 @@ export const Content = () => (
               color="warning"
               size="sm"
               className="w-full justify-start"
-              startContent={<Users size={16} />}
+              startContent={<Users size={14} />}
               as={NextLink}
               href="/mbg/data-update"
             >
