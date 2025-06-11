@@ -138,7 +138,7 @@ export const MyContextProvider: React.FC<MyContextProviderProps> = ({
       }
 
       localStorage.removeItem("status");
-      navigate.push("/authentication/login");
+      navigate.push("/v3/next/login");
       //setStat("true")
     } catch (error) {
       Swal.fire({
@@ -185,7 +185,7 @@ export const MyContextProvider: React.FC<MyContextProviderProps> = ({
     } catch (error) {
       if (error.response) {
         localStorage.removeItem("status");
-        navigate.push("/authentication/login");
+        navigate.push("/v3/next/login");
         // return <ToastError message="error mendapatkan token" />;
       }
     }
@@ -256,7 +256,7 @@ export const MyContextProvider: React.FC<MyContextProviderProps> = ({
       setstatusLogin(false);
       setTampil(false);
       setTampilverify(false);
-      navigate.push("/authentication/login");
+      navigate.push("/v3/next/login");
     }
   };
   useEffect(() => {

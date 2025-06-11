@@ -1,37 +1,42 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const basePath = "/v3/next"; // Sesuai next.config.js
+// Tetapkan basePath default "" jika tidak ada
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const hasAuthCookie = request.cookies.has("userAuth");
+  const hasAuth = request.cookies.has("userAuth");
 
-  // Hapus basePath dari pathname untuk perbandingan route internal
-  const cleanedPath = pathname.startsWith(basePath)
+  // Bersihkan pathname dari basePath
+  const path = pathname.startsWith(basePath)
     ? pathname.slice(basePath.length) || "/"
     : pathname;
 
-  // Tanpa basePath karena cleanedPath sudah dihilangkan prefix-nya
   const publicRoutes = ["/login", "/register"];
-  const isPublicRoute = publicRoutes.includes(cleanedPath);
+  const isPublic = publicRoutes.includes(path);
 
-  // Jika sudah login dan coba akses login/register, redirect ke dashboard
-  if (isPublicRoute && hasAuthCookie) {
-    return NextResponse.redirect(new URL(`${basePath}/dashboard`, request.url));
+  // Cegah akses halaman private tanpa login
+  if (!isPublic && !hasAuth) {
+    return NextResponse.redirect(new URL(`${basePath}/login`, request.url));
   }
 
-  // Jika belum login dan coba akses halaman private, redirect ke login
-  if (!isPublicRoute && !hasAuthCookie) {
-    return NextResponse.redirect(new URL(`${basePath}/login`, request.url));
+  // Cegah akses login/register saat sudah login
+  if (isPublic && hasAuth) {
+    return NextResponse.redirect(new URL(`${basePath}/dashboard`, request.url));
   }
 
   return NextResponse.next();
 }
-
 export const config = {
   matcher: [
-    // Jalankan middleware hanya pada rute di bawah basePath
-    "/v3/next/:path*",
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
 };

@@ -95,103 +95,6 @@ export const Login = () => {
     setTelp("");
   };
 
-  const getUser = async (values) => {
-    if (chap === "1" && recaptchaValue === "") {
-      setError("Captcha belum Diverifikasi");
-      return false;
-    } else if (chap === "0") {
-      const cleanedCaptcha = values.captcha.replace(/\s/g, "");
-      if (cleanedCaptcha !== captcha.replace(/\s/g, "")) {
-        setError("Angka Tidak Sesuai");
-        return false;
-      }
-    } else if (chap === "") {
-      setError("Captcha Error");
-      return false;
-    }
-
-    try {
-      setLoading(true);
-      const response = await axios.post(
-        process.env.NEXT_PUBLIC_LOCAL_LOGIN ?? "",
-        values,
-        { withCredentials: true }
-      );
-      const data = response.data;
-
-      if (!data.success) {
-        if (data.msg === "Password Anda Tidak Sesuai") {
-          setError("Password Anda Tidak Sesuai");
-        } else if (data.msg === "User tidak ditemukan") {
-          setError("User tidak ditemukan");
-        } else {
-          setError("Terjadi kesalahan saat login");
-        }
-        setLoading(false);
-      } else {
-        resetState();
-        const decrypted = decryptData(data.tokenSetLogin);
-        const decoded = jwtDecode(decrypted);
-        setTelp(decoded.telp);
-        setToken(data.tokenSetLogin);
-        setstatusLogin(true);
-        setLoading(false);
-        setName(decoded.name);
-        setExpire(decoded.exp);
-        setRole(decoded.role);
-        setKdkanwil(decoded.kdkanwil);
-        setKdkppn(decoded.kdkppn);
-        setKdlokasi(decoded.kdlokasi);
-        setActive(decoded.active);
-        setDeptlimit(decoded.dept_limit);
-        setNmrole(decoded.namarole);
-        setIduser(decoded.userId);
-        setUrl(decoded.url);
-        setUsername(decoded.username);
-        setMode(decoded.mode);
-        setTampil(decoded.tampil);
-        setTampilverify(decoded.tampilverify);
-        setSession(decoded.session);
-        setVerified(decoded.verified);
-        localStorage.setItem("status", "true");
-
-        Cookies.set("token", JSON.stringify(true));
-
-        // toast.success("login successful");
-
-        // setOffline(true);
-        if (
-          decoded.role === "X" ||
-          decoded.role === "0" ||
-          decoded.role === "1"
-        ) {
-          // router.push("/v3/landing/profile");
-          router.push("/sample-page");
-        } else {
-          // router.push("/v3/data/form/belanja");
-          router.push("/sample-page");
-        }
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      setLoading(false);
-      // console.log(error);
-      // console.log(error);
-      const { status, data } = error.response || {};
-      // handleHttpError(
-      //   status,
-      //   (data && data.error) ||
-      //     "Terjadi Permasalahan Koneksi atau Server Backend "
-      // );
-
-      // setError(
-      //   <>
-      //     Terjadi kesalahan saat melakukan permintaan login <br />
-      //     {error.request.statusText ? `(${error.request.statusText})` : ""}
-      //   </>
-      // );
-    }
-  };
   const initialValues: LoginFormType = {
     username: "",
     password: "",
@@ -288,10 +191,13 @@ export const Login = () => {
         if (!data.success) {
           if (data.msg === "Password Anda Tidak Sesuai") {
             setError("Password Anda Tidak Sesuai");
+            showToast("Password Anda Tidak Sesuai", "error");
           } else if (data.msg === "User tidak ditemukan") {
             setError("User tidak ditemukan");
+            showToast("User Tidak Ditemukan", "error");
           } else {
             setError("Terjadi kesalahan saat login");
+            showToast("Terjadi Kesalahan saat login", "error");
           }
           setLoading(false);
         } else {
@@ -468,12 +374,6 @@ export const Login = () => {
                   }
                 }}
               />
-
-              {/* Show temporary credentials hint */}
-              <div className="text-warning text-xs text-center p-2 bg-warning-50 rounded-lg">
-                <strong>Demo Login:</strong> Username: admin | Password:
-                admin123
-              </div>
             </div>
 
             {/* Dynamic Captcha Section */}
@@ -572,11 +472,6 @@ export const Login = () => {
                 {isPinLoading ? "Logging in..." : "Login PIN"}
               </Button>
             </div>
-
-            {/* Show temporary PIN hint */}
-            <div className="text-danger text-xs text-center p-2 bg-danger-50 rounded-lg w-2/3 md:w-1/4 mt-2">
-              <strong>Demo PIN:</strong> 123456
-            </div>
           </>
         )}
       </Formik>
@@ -584,7 +479,7 @@ export const Login = () => {
       <div className="text-slate-400 mt-6 text-sm tracking-wider font-sans">
         Belum Punya Akun ?{" "}
         <Link href="/register" className="font-bold">
-          Hubungi Restu
+          Hubungi Admin
         </Link>
       </div>
       <Divider className="w-2/3 md:w-1/4 my-6" />
