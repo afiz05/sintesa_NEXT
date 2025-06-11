@@ -16,6 +16,10 @@ export function middleware(request: NextRequest) {
   const publicRoutes = ["/login", "/register"];
   const isPublic = publicRoutes.includes(path);
 
+  // ✅ Redirect root "/" ke dashboard
+  if (path === "/") {
+    return NextResponse.redirect(new URL(`${basePath}/dashboard`, request.url));
+  }
   // Cegah akses halaman private tanpa login
   if (!isPublic && !hasAuth) {
     return NextResponse.redirect(new URL(`${basePath}/login`, request.url));
