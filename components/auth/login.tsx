@@ -9,15 +9,52 @@ import SintesaLogoDark from "../icons/logo/snext_dark.svg";
 import { Formik } from "formik";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useContext } from "react";
 import { Copyright } from "lucide-react";
 import axios from "axios";
-import ReCAPTCHA from "react-google-recaptcha";
+// import ReCAPTCHA from "react-google-recaptcha";
 import { LoginSuccessAnimation } from "./LoginSuccessAnimation";
 import { SimpleLoginSuccess } from "./SimpleLoginSuccess";
 import { PageTransitionSuccess } from "./PageTransitionSuccess";
+import MyContext from "@/utils/Contex";
+import { decryptData } from "@/utils/Decrypt";
+import { jwtDecode } from "jwt-decode";
 
 export const Login = () => {
+  const {
+    setVerified,
+    setNmrole,
+    setRole,
+    setName,
+    setActive,
+    setKdlokasi,
+    setKdkanwil,
+    setKdprov,
+    setDeptlimit,
+    setKdkppn,
+    setExpire,
+    setToken,
+    setIduser,
+    setUrl,
+    setstatusLogin,
+    setUsername,
+    setMode,
+    setTampil,
+    setTampilverify,
+    setStatus,
+    setPersentase,
+    setSession,
+    setNamelogin,
+    setLoggedInUser2,
+    setLoggedinUsers,
+    telp,
+    setTelp,
+    offline,
+    setOffline,
+    offlinest,
+    setOfflinest,
+  } = useContext(MyContext);
+
   const router = useRouter();
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -28,10 +65,136 @@ export const Login = () => {
   const [recaptchaValue, setRecaptchaValue] = useState("");
   const [error, setError] = useState("");
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
+  const [loading, setLoading] = useState(false);
 
+  const resetState = () => {
+    setName("");
+    setRole("");
+    setNmrole("");
+    setActive("");
+    setKdlokasi("");
+    setKdkanwil("");
+    setVerified("");
+    setDeptlimit("");
+    setKdkppn("");
+    setToken("");
+    setExpire("");
+    setIduser("");
+    setUrl("");
+    setstatusLogin(false);
+    setUsername("");
+    setMode("");
+    setTampil("");
+    setTampilverify("");
+    setStatus("");
+    setPersentase([]);
+    setCaptcha("");
+    setNamelogin(null);
+    setLoggedInUser2(null);
+    setLoggedinUsers([]);
+    setTelp("");
+  };
+
+  const getUser = async (values) => {
+    if (chap === "1" && recaptchaValue === "") {
+      setError("Captcha belum Diverifikasi");
+      return false;
+    } else if (chap === "0") {
+      const cleanedCaptcha = values.captcha.replace(/\s/g, "");
+      if (cleanedCaptcha !== captcha.replace(/\s/g, "")) {
+        setError("Angka Tidak Sesuai");
+        return false;
+      }
+    } else if (chap === "") {
+      setError("Captcha Error");
+      return false;
+    }
+
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        process.env.NEXT_PUBLIC_LOCAL_LOGIN ?? "",
+        values,
+        { withCredentials: true }
+      );
+      const data = response.data;
+
+      if (!data.success) {
+        if (data.msg === "Password Anda Tidak Sesuai") {
+          setError("Password Anda Tidak Sesuai");
+        } else if (data.msg === "User tidak ditemukan") {
+          setError("User tidak ditemukan");
+        } else {
+          setError("Terjadi kesalahan saat login");
+        }
+        setLoading(false);
+      } else {
+        resetState();
+        const decrypted = decryptData(data.tokenSetLogin);
+        const decoded = jwtDecode(decrypted);
+        setTelp(decoded.telp);
+        setToken(data.tokenSetLogin);
+        setstatusLogin(true);
+        setLoading(false);
+        setName(decoded.name);
+        setExpire(decoded.exp);
+        setRole(decoded.role);
+        setKdkanwil(decoded.kdkanwil);
+        setKdkppn(decoded.kdkppn);
+        setKdlokasi(decoded.kdlokasi);
+        setActive(decoded.active);
+        setDeptlimit(decoded.dept_limit);
+        setNmrole(decoded.namarole);
+        setIduser(decoded.userId);
+        setUrl(decoded.url);
+        setUsername(decoded.username);
+        setMode(decoded.mode);
+        setTampil(decoded.tampil);
+        setTampilverify(decoded.tampilverify);
+        setSession(decoded.session);
+        setVerified(decoded.verified);
+        localStorage.setItem("status", "true");
+
+        Cookies.set("token", JSON.stringify(true));
+
+        // toast.success("login successful");
+
+        // setOffline(true);
+        if (
+          decoded.role === "X" ||
+          decoded.role === "0" ||
+          decoded.role === "1"
+        ) {
+          // router.push("/v3/landing/profile");
+          router.push("/sample-page");
+        } else {
+          // router.push("/v3/data/form/belanja");
+          router.push("/sample-page");
+        }
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      setLoading(false);
+      // console.log(error);
+      // console.log(error);
+      const { status, data } = error.response || {};
+      // handleHttpError(
+      //   status,
+      //   (data && data.error) ||
+      //     "Terjadi Permasalahan Koneksi atau Server Backend "
+      // );
+
+      // setError(
+      //   <>
+      //     Terjadi kesalahan saat melakukan permintaan login <br />
+      //     {error.request.statusText ? `(${error.request.statusText})` : ""}
+      //   </>
+      // );
+    }
+  };
   const initialValues: LoginFormType = {
-    username: "admin",
-    password: "admin123",
+    username: "",
+    password: "",
     captcha: "",
   };
 
@@ -56,9 +219,9 @@ export const Login = () => {
   };
 
   // Handle reCAPTCHA change
-  const handleRecaptchaChange = (value: string | null) => {
-    setRecaptchaValue(value || "");
-  };
+  // const handleRecaptchaChange = (value: string | null) => {
+  //   setRecaptchaValue(value || "");
+  // };
 
   // Check captcha mode from backend
   const cekMode = async () => {
@@ -114,33 +277,87 @@ export const Login = () => {
 
       setIsLoading(true);
 
-      // Temporary hardcoded credentials for testing
-      const TEMP_USERNAME = "admin";
-      const TEMP_PASSWORD = "admin123";
-
       try {
-        // Check if both fields are filled
-        if (!values.username || !values.password) {
-          showToast("Please enter both username and password.", "warning");
-          return;
+        const response = await axios.post(
+          process.env.NEXT_PUBLIC_LOCAL_LOGIN ?? "",
+          values,
+          { withCredentials: true }
+        );
+        const data = response.data;
+
+        if (!data.success) {
+          if (data.msg === "Password Anda Tidak Sesuai") {
+            setError("Password Anda Tidak Sesuai");
+          } else if (data.msg === "User tidak ditemukan") {
+            setError("User tidak ditemukan");
+          } else {
+            setError("Terjadi kesalahan saat login");
+          }
+          setLoading(false);
+        } else {
+          resetState();
+          const decrypted = decryptData(data.tokenSetLogin);
+          const decoded = jwtDecode(decrypted);
+          setTelp(decoded.telp);
+          setToken(data.tokenSetLogin);
+          setstatusLogin(true);
+          setLoading(false);
+          setName(decoded.name);
+          setExpire(decoded.exp);
+          setRole(decoded.role);
+          setKdkanwil(decoded.kdkanwil);
+          setKdkppn(decoded.kdkppn);
+          setKdlokasi(decoded.kdlokasi);
+          setActive(decoded.active);
+          setDeptlimit(decoded.dept_limit);
+          setNmrole(decoded.namarole);
+          setIduser(decoded.userId);
+          setUrl(decoded.url);
+          setUsername(decoded.username);
+          setMode(decoded.mode);
+          setTampil(decoded.tampil);
+          setTampilverify(decoded.tampilverify);
+          setSession(decoded.session);
+          setVerified(decoded.verified);
+
+          // Cookies.set("token", JSON.stringify(true));
+
+          // toast.success("login successful");
+          // If both are correct
+          setShowSuccessAnimation(true);
+          await createAuthCookie("token", JSON.stringify(true));
+          // Router navigation will be handled after animation completes
+          // setOffline(true);
+          // if (
+          //   decoded.role === "X" ||
+          //   decoded.role === "0" ||
+          //   decoded.role === "1"
+          // ) {
+          //   // router.push("/v3/landing/profile");
+          //   router.push("/sample-page");
+          // } else {
+          //   // router.push("/v3/data/form/belanja");
+          //   router.push("/sample-page");
+          // }
         }
+
+        // Check if both fields are filled
+        // if (!values.username || !values.password) {
+        //   showToast("Please enter both username and password.", "warning");
+        //   return;
+        // }
 
         // Check username first
-        if (values.username !== TEMP_USERNAME) {
-          showToast("Username doesn't exist in our database.", "error");
-          return;
-        }
+        // if (values.username !== TEMP_USERNAME) {
+        //   showToast("Username doesn't exist in our database.", "error");
+        //   return;
+        // }
 
         // Check password if username is valid
-        if (values.password !== TEMP_PASSWORD) {
-          showToast("Password is incorrect. Please try again.", "error");
-          return;
-        }
-
-        // If both are correct
-        setShowSuccessAnimation(true);
-        await createAuthCookie();
-        // Router navigation will be handled after animation completes
+        // if (values.password !== TEMP_PASSWORD) {
+        //   showToast("Password is incorrect. Please try again.", "error");
+        //   return;
+        // }
       } catch (error) {
         showToast("Login failed. Please try again.", "error");
       } finally {
@@ -306,10 +523,10 @@ export const Login = () => {
 
             {chap === "1" && (
               <div className="flex w-2/3 md:w-1/2 justify-center mb-4">
-                <ReCAPTCHA
+                {/* <ReCAPTCHA
                   sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
                   onChange={handleRecaptchaChange}
-                />
+                /> */}
               </div>
             )}
 

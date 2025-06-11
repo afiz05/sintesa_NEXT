@@ -1,22 +1,29 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+const basePath = "/v3/next"; // Sesuai next.config.js
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const hasAuthCookie = request.cookies.has("userAuth");
 
-  // Define public routes that don't require authentication
-  const publicRoutes = ["/login", "/register"];
-  const isPublicRoute = publicRoutes.includes(pathname);
+  // Hapus basePath dari pathname untuk perbandingan route internal
+  const cleanedPath = pathname.startsWith(basePath)
+    ? pathname.slice(basePath.length) || "/"
+    : pathname;
 
-  // If user is authenticated and trying to access login/register, redirect to dashboard
+  // Tanpa basePath karena cleanedPath sudah dihilangkan prefix-nya
+  const publicRoutes = ["/login", "/register"];
+  const isPublicRoute = publicRoutes.includes(cleanedPath);
+
+  // Jika sudah login dan coba akses login/register, redirect ke dashboard
   if (isPublicRoute && hasAuthCookie) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL(`${basePath}/dashboard`, request.url));
   }
 
-  // If user is not authenticated and trying to access protected route, redirect to login
+  // Jika belum login dan coba akses halaman private, redirect ke login
   if (!isPublicRoute && !hasAuthCookie) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    return NextResponse.redirect(new URL(`${basePath}/login`, request.url));
   }
 
   return NextResponse.next();
@@ -24,13 +31,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+    // Jalankan middleware hanya pada rute di bawah basePath
+    "/v3/next/:path*",
   ],
 };

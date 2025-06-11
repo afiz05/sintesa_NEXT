@@ -7,6 +7,7 @@ import {
 } from "next-themes";
 import { NotificationProvider } from "@/components/context/NotificationContext";
 import { ToastProvider } from "@/components/context/ToastContext";
+import { MyContextProvider } from "@/utils/Contex";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -15,16 +16,18 @@ export interface ProvidersProps {
 
 export function Providers({ children, themeProps }: ProvidersProps) {
   return (
-    <HeroUIProvider>
-      <NextThemesProvider
-        defaultTheme="system"
-        attribute="class"
-        {...themeProps}
-      >
-        <NotificationProvider>
-          <ToastProvider>{children}</ToastProvider>
-        </NotificationProvider>
-      </NextThemesProvider>
-    </HeroUIProvider>
+    <MyContextProvider>
+      <HeroUIProvider>
+        <NextThemesProvider
+          defaultTheme="system"
+          attribute="class"
+          {...themeProps}
+        >
+          <NotificationProvider>
+            <ToastProvider>{children}</ToastProvider>
+          </NotificationProvider>
+        </NextThemesProvider>
+      </HeroUIProvider>
+    </MyContextProvider>
   );
 }
