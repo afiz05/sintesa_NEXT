@@ -29,19 +29,19 @@ export const NavbarWrapper = ({ children }: Props) => {
           wrapper: "w-full max-w-full",
         }}
       >
-        <NavbarContent className="md:hidden" justify="start">
+        <NavbarContent className="xl:hidden" justify="start">
           <span className="flex items-center mr-4">
             <SintesaLogoOnlyDark className="h-6 w-auto block dark:hidden" />
             <SintesaLogoOnlyLight className="h-6 w-auto hidden dark:block" />
           </span>
           <BurguerButton />
         </NavbarContent>
-        <NavbarContent className="md:hidden" justify="end">
+        <NavbarContent className="xl:hidden" justify="end">
           <NotificationBell />
           <NotificationTester />
           <DarkModeSwitch />
         </NavbarContent>
-        <NavbarContent className="w-full max-md:hidden">
+        <NavbarContent className="w-full max-xl:hidden">
           {/* <CompaniesDropdown /> */}
           <div className="flex-shrink-0"></div>
           <span className="flex items-center mr-4">
@@ -63,7 +63,7 @@ export const NavbarWrapper = ({ children }: Props) => {
         </NavbarContent>
         <NavbarContent
           justify="end"
-          className="w-fit data-[justify=end]:flex-grow-0 max-md:hidden"
+          className="w-fit data-[justify=end]:flex-grow-0 max-xl:hidden"
         >
           <div className="flex items-center gap-2">
             <FeedbackIcon />

@@ -1,12 +1,26 @@
+"use client";
+import { useEffect } from "react";
 import type { NextPage } from "next";
 import { Content } from "@/components/home/content";
 
-// Simulate slow loading to test loading component
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const Dashboard: NextPage = () => {
+  useEffect(() => {
+    // Scroll to bottom when component mounts - only on XL screens (1280px and wider)
+    const scrollToBottom = () => {
+      // Check if screen width is XL (1280px or wider)
+      if (window.innerWidth >= 1280) {
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          behavior: "smooth",
+        });
+      }
+    };
 
-const Dashboard: NextPage = async () => {
-  // Add 2 second delay to see loading animation
-  await delay(2000);
+    // Add a small delay to ensure content is fully rendered
+    const timer = setTimeout(scrollToBottom, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return <Content />;
 };

@@ -33,7 +33,7 @@ export const SidebarWrapper = () => {
   return (
     <>
       {/* Mobile Sidebar (Vertical) */}
-      <aside className="lg:hidden h-screen z-[20] sticky top-0">
+      <aside className="xl:hidden h-screen z-[20] sticky top-0">
         {collapsed ? (
           <div className={Sidebar.Overlay()} onClick={setCollapsed} />
         ) : null}
@@ -87,40 +87,9 @@ export const SidebarWrapper = () => {
                   title="Inquiry Data"
                   isActive={pathname.startsWith("/inquiry-data")}
                 />
-                <SidebarItem
-                  isActive={pathname === "/accounts"}
-                  title="Accounts"
-                  icon={<AccountsIcon />}
-                  href="/accounts"
-                />
               </SidebarMenu>
 
               <SidebarMenu title="General">
-                <SidebarItem
-                  isActive={pathname === "/customers"}
-                  title="Customers"
-                  icon={<CustomersIcon />}
-                  href="/customers"
-                />
-                <SidebarItem
-                  isActive={pathname === "/products"}
-                  title="Products"
-                  icon={<ProductsIcon />}
-                  href="/products"
-                />
-                <SidebarItem
-                  isActive={pathname === "/reports"}
-                  title="Reports"
-                  icon={<ReportsIcon />}
-                  href="/reports"
-                />
-                <SidebarItem
-                  isActive={pathname === "/developers"}
-                  title="Developers"
-                  icon={<DevIcon />}
-                  href="/developers"
-                />
-
                 <SidebarItem
                   isActive={pathname === "/settings"}
                   title="Settings"
@@ -130,12 +99,6 @@ export const SidebarWrapper = () => {
               </SidebarMenu>
 
               <SidebarMenu title="Updates">
-                <SidebarItem
-                  isActive={pathname === "/changelog"}
-                  title="Changelog"
-                  icon={<ChangeLogIcon />}
-                  href="/changelog"
-                />
                 <SidebarItem
                   isActive={pathname === "/test-loading"}
                   title="Test Loading"
@@ -155,8 +118,8 @@ export const SidebarWrapper = () => {
         </div>
       </aside>
 
-      {/* Desktop Horizontal Navbar */}
-      <nav className="hidden lg:block w-full z-[50] bg-white dark:bg-black border-b border-gray-200 dark:border-gray-700 shadow-sm">
+      {/* Desktop Horizontal Navbar - Only for XL screens */}
+      <nav className="hidden xl:block w-full z-[50] bg-white dark:bg-black border-b border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="px-6 py-3">
           <div className="flex items-center justify-between">
             {/* Center - Navigation Items */}
@@ -207,24 +170,7 @@ export const SidebarWrapper = () => {
               >
                 <ChevronDown size={16} className="text-default-500" />
               </InqHorizontalDD>
-              <SidebarItem
-                isActive={pathname === "/accounts"}
-                title="Accounts"
-                icon={<AccountsIcon />}
-                href="/accounts"
-              />
-              <SidebarItem
-                isActive={pathname === "/settings"}
-                title="Settings"
-                icon={<SettingsIcon />}
-                href="/settings"
-              />
-              <SidebarItem
-                isActive={pathname === "/changelog"}
-                title="Changelog"
-                icon={<ChangeLogIcon />}
-                href="/changelog"
-              />
+
               <SidebarItem
                 isActive={pathname === "/test-loading"}
                 title="Test Loading"
