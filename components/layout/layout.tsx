@@ -26,16 +26,16 @@ export const Layout = ({ children }: Props) => {
       }}
     >
       <div className="flex">
-        {/* Mobile Sidebar */}
-        <div className="lg:hidden">
+        {/* Hamburger Sidebar for all screens except XL */}
+        <div className="xl:hidden">
           <SidebarWrapper />
         </div>
 
         {/* Main content area with navbar and desktop sidebar */}
         <div className="flex-1">
           <NavbarWrapper>
-            {/* Desktop Horizontal Sidebar - positioned below navbar */}
-            <div className="hidden lg:block">
+            {/* Desktop Horizontal Sidebar - positioned below navbar (XL screens only) */}
+            <div className="hidden xl:block">
               <SidebarWrapper />
             </div>
             {children}

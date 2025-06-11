@@ -98,8 +98,8 @@ export const MbgVertikalDD = ({
       router.push(item.href);
     }
 
-    // Close the sidebar after navigation (only on mobile)
-    if (collapsed) {
+    // Close the sidebar after navigation (for screens below XL)
+    if (window.innerWidth < 1280) {
       setCollapsed();
     }
   };

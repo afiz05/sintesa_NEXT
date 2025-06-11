@@ -1,7 +1,7 @@
 import { tv } from "@heroui/react";
 
 export const SidebarWrapper = tv({
-  base: "bg-background transition-transform h-full fixed -translate-x-full w-64 shrink-0 z-[202] overflow-y-auto border-r border-divider flex-col py-6 px-3 md:ml-0 md:flex md:static md:h-screen md:translate-x-0 [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-default-300/30 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-default-300/40 [&::-webkit-scrollbar-thumb]:transition-colors",
+  base: "bg-background transition-transform h-full fixed -translate-x-full w-64 shrink-0 z-[202] overflow-y-auto border-r border-divider flex-col py-6 px-3 xl:ml-0 xl:flex xl:static xl:h-screen xl:translate-x-0 [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-default-300/30 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-default-300/40 [&::-webkit-scrollbar-thumb]:transition-colors",
 
   variants: {
     collapsed: {
@@ -27,7 +27,7 @@ export const SidebarWrapper = tv({
   //   },
 });
 export const Overlay = tv({
-  base: "bg-[rgb(15_23_42/0.1)] fixed inset-0 z-[201] opacity-40 transition-opacity md:hidden md:z-auto md:opacity-100",
+  base: "bg-[rgb(15_23_42/0.1)] fixed inset-0 z-[201] opacity-40 transition-opacity xl:hidden xl:z-auto xl:opacity-100",
 });
 
 export const Header = tv({
@@ -39,7 +39,7 @@ export const Body = tv({
 });
 
 export const Footer = tv({
-  base: "flex items-center justify-center gap-6 pt-16 pb-8 px-8 md:pt-10 md:pb-0",
+  base: "flex items-center justify-center gap-6 pt-16 pb-8 px-8 xl:pt-10 xl:pb-0",
 });
 
 export const Sidebar = Object.assign(SidebarWrapper, {
