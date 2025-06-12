@@ -9,15 +9,52 @@ import SintesaLogoDark from "../icons/logo/snext_dark.svg";
 import { Formik } from "formik";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useContext } from "react";
 import { Copyright } from "lucide-react";
 import axios from "axios";
-import ReCAPTCHA from "react-google-recaptcha";
+// import ReCAPTCHA from "react-google-recaptcha";
 import { LoginSuccessAnimation } from "./LoginSuccessAnimation";
 import { SimpleLoginSuccess } from "./SimpleLoginSuccess";
 import { PageTransitionSuccess } from "./PageTransitionSuccess";
+import MyContext from "@/utils/Contex";
+import { decryptData } from "@/utils/Decrypt";
+import { jwtDecode } from "jwt-decode";
 
 export const Login = () => {
+  const {
+    setVerified,
+    setNmrole,
+    setRole,
+    setName,
+    setActive,
+    setKdlokasi,
+    setKdkanwil,
+    setKdprov,
+    setDeptlimit,
+    setKdkppn,
+    setExpire,
+    setToken,
+    setIduser,
+    setUrl,
+    setstatusLogin,
+    setUsername,
+    setMode,
+    setTampil,
+    setTampilverify,
+    setStatus,
+    setPersentase,
+    setSession,
+    setNamelogin,
+    setLoggedInUser2,
+    setLoggedinUsers,
+    telp,
+    setTelp,
+    offline,
+    setOffline,
+    offlinest,
+    setOfflinest,
+  } = useContext(MyContext);
+
   const router = useRouter();
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -28,10 +65,39 @@ export const Login = () => {
   const [recaptchaValue, setRecaptchaValue] = useState("");
   const [error, setError] = useState("");
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const resetState = () => {
+    setName("");
+    setRole("");
+    setNmrole("");
+    setActive("");
+    setKdlokasi("");
+    setKdkanwil("");
+    setVerified("");
+    setDeptlimit("");
+    setKdkppn("");
+    setToken("");
+    setExpire("");
+    setIduser("");
+    setUrl("");
+    setstatusLogin(false);
+    setUsername("");
+    setMode("");
+    setTampil("");
+    setTampilverify("");
+    setStatus("");
+    setPersentase([]);
+    setCaptcha("");
+    setNamelogin(null);
+    setLoggedInUser2(null);
+    setLoggedinUsers([]);
+    setTelp("");
+  };
 
   const initialValues: LoginFormType = {
-    username: "admin",
-    password: "admin123",
+    username: "",
+    password: "",
     captcha: "",
   };
 
@@ -56,9 +122,9 @@ export const Login = () => {
   };
 
   // Handle reCAPTCHA change
-  const handleRecaptchaChange = (value: string | null) => {
-    setRecaptchaValue(value || "");
-  };
+  // const handleRecaptchaChange = (value: string | null) => {
+  //   setRecaptchaValue(value || "");
+  // };
 
   // Check captcha mode from backend
   const cekMode = async () => {
@@ -114,33 +180,90 @@ export const Login = () => {
 
       setIsLoading(true);
 
-      // Temporary hardcoded credentials for testing
-      const TEMP_USERNAME = "admin";
-      const TEMP_PASSWORD = "admin123";
-
       try {
-        // Check if both fields are filled
-        if (!values.username || !values.password) {
-          showToast("Please enter both username and password.", "warning");
-          return;
+        const response = await axios.post(
+          process.env.NEXT_PUBLIC_LOCAL_LOGIN ?? "",
+          values,
+          { withCredentials: true }
+        );
+        const data = response.data;
+
+        if (!data.success) {
+          if (data.msg === "Password Anda Tidak Sesuai") {
+            setError("Password Anda Tidak Sesuai");
+            showToast("Password Anda Tidak Sesuai", "error");
+          } else if (data.msg === "User tidak ditemukan") {
+            setError("User tidak ditemukan");
+            showToast("User Tidak Ditemukan", "error");
+          } else {
+            setError("Terjadi kesalahan saat login");
+            showToast("Terjadi Kesalahan saat login", "error");
+          }
+          setLoading(false);
+        } else {
+          resetState();
+          const decrypted = decryptData(data.tokenSetLogin);
+          const decoded = jwtDecode(decrypted);
+          setTelp(decoded.telp);
+          setToken(data.tokenSetLogin);
+          setstatusLogin(true);
+          setLoading(false);
+          setName(decoded.name);
+          setExpire(decoded.exp);
+          setRole(decoded.role);
+          setKdkanwil(decoded.kdkanwil);
+          setKdkppn(decoded.kdkppn);
+          setKdlokasi(decoded.kdlokasi);
+          setActive(decoded.active);
+          setDeptlimit(decoded.dept_limit);
+          setNmrole(decoded.namarole);
+          setIduser(decoded.userId);
+          setUrl(decoded.url);
+          setUsername(decoded.username);
+          setMode(decoded.mode);
+          setTampil(decoded.tampil);
+          setTampilverify(decoded.tampilverify);
+          setSession(decoded.session);
+          setVerified(decoded.verified);
+
+          // Cookies.set("token", JSON.stringify(true));
+
+          // toast.success("login successful");
+          // If both are correct
+          setShowSuccessAnimation(true);
+          await createAuthCookie("token", JSON.stringify(true));
+          // Router navigation will be handled after animation completes
+          // setOffline(true);
+          // if (
+          //   decoded.role === "X" ||
+          //   decoded.role === "0" ||
+          //   decoded.role === "1"
+          // ) {
+          //   // router.push("/v3/landing/profile");
+          //   router.push("/sample-page");
+          // } else {
+          //   // router.push("/v3/data/form/belanja");
+          //   router.push("/sample-page");
+          // }
         }
+
+        // Check if both fields are filled
+        // if (!values.username || !values.password) {
+        //   showToast("Please enter both username and password.", "warning");
+        //   return;
+        // }
 
         // Check username first
-        if (values.username !== TEMP_USERNAME) {
-          showToast("Username doesn't exist in our database.", "error");
-          return;
-        }
+        // if (values.username !== TEMP_USERNAME) {
+        //   showToast("Username doesn't exist in our database.", "error");
+        //   return;
+        // }
 
         // Check password if username is valid
-        if (values.password !== TEMP_PASSWORD) {
-          showToast("Password is incorrect. Please try again.", "error");
-          return;
-        }
-
-        // If both are correct
-        setShowSuccessAnimation(true);
-        await createAuthCookie();
-        // Router navigation will be handled after animation completes
+        // if (values.password !== TEMP_PASSWORD) {
+        //   showToast("Password is incorrect. Please try again.", "error");
+        //   return;
+        // }
       } catch (error) {
         showToast("Login failed. Please try again.", "error");
       } finally {
@@ -251,12 +374,6 @@ export const Login = () => {
                   }
                 }}
               />
-
-              {/* Show temporary credentials hint */}
-              <div className="text-warning text-xs text-center p-2 bg-warning-50 rounded-lg">
-                <strong>Demo Login:</strong> Username: admin | Password:
-                admin123
-              </div>
             </div>
 
             {/* Dynamic Captcha Section */}
@@ -306,10 +423,10 @@ export const Login = () => {
 
             {chap === "1" && (
               <div className="flex w-2/3 md:w-1/2 justify-center mb-4">
-                <ReCAPTCHA
+                {/* <ReCAPTCHA
                   sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
                   onChange={handleRecaptchaChange}
-                />
+                /> */}
               </div>
             )}
 
@@ -355,11 +472,6 @@ export const Login = () => {
                 {isPinLoading ? "Logging in..." : "Login PIN"}
               </Button>
             </div>
-
-            {/* Show temporary PIN hint */}
-            <div className="text-danger text-xs text-center p-2 bg-danger-50 rounded-lg w-2/3 md:w-1/4 mt-2">
-              <strong>Demo PIN:</strong> 123456
-            </div>
           </>
         )}
       </Formik>
@@ -367,7 +479,7 @@ export const Login = () => {
       <div className="text-slate-400 mt-6 text-sm tracking-wider font-sans">
         Belum Punya Akun ?{" "}
         <Link href="/register" className="font-bold">
-          Hubungi Restu
+          Hubungi Admin
         </Link>
       </div>
       <Divider className="w-2/3 md:w-1/4 my-6" />

@@ -1,8 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || "",
   // Turbopack configuration (now stable)
+  async redirects() {
+    return [
+      {
+        source: "/authentication/login",
+        destination: "/v3/next/login",
+        permanent: true,
+        // basePath: true,
+      },
+    ];
+  },
+
   turbopack: {
     rules: {
       "*.svg": {

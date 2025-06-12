@@ -1,27 +1,37 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+// Tetapkan basePath default "" jika tidak ada
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const hasAuthCookie = request.cookies.has("userAuth");
+  const hasAuth = request.cookies.has("userAuth");
 
-  // Define public routes that don't require authentication
+  // Bersihkan pathname dari basePath
+  const path = pathname.startsWith(basePath)
+    ? pathname.slice(basePath.length) || "/"
+    : pathname;
+
   const publicRoutes = ["/login", "/register"];
-  const isPublicRoute = publicRoutes.includes(pathname);
+  const isPublic = publicRoutes.includes(path);
 
-  // If user is authenticated and trying to access login/register, redirect to dashboard
-  if (isPublicRoute && hasAuthCookie) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+  // ✅ Redirect root "/" ke dashboard
+  if (path === "/") {
+    return NextResponse.redirect(new URL(`${basePath}/dashboard`, request.url));
+  }
+  // Cegah akses halaman private tanpa login
+  if (!isPublic && !hasAuth) {
+    return NextResponse.redirect(new URL(`${basePath}/login`, request.url));
   }
 
-  // If user is not authenticated and trying to access protected route, redirect to login
-  if (!isPublicRoute && !hasAuthCookie) {
-    return NextResponse.redirect(new URL("/login", request.url));
+  // Cegah akses login/register saat sudah login
+  if (isPublic && hasAuth) {
+    return NextResponse.redirect(new URL(`${basePath}/dashboard`, request.url));
   }
 
   return NextResponse.next();
 }
-
 export const config = {
   matcher: [
     /*
