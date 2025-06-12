@@ -13,12 +13,14 @@ export const deleteAuthCookie = async () => {
   cookieStore.delete("userAuth");
   cookieStore.delete("token");
   cookieStore.delete("accessToken");
+  cookieStore.delete("nextToken");
 };
 
 export const checkAuthStatus = async (): Promise<{
   userAuth: boolean;
   token: boolean;
   accessToken: boolean;
+  nextToken: boolean;
 }> => {
   const cookieStore = await cookies();
 
@@ -26,5 +28,6 @@ export const checkAuthStatus = async (): Promise<{
     userAuth: cookieStore.has("userAuth"),
     token: cookieStore.has("token"),
     accessToken: cookieStore.has("accessToken"),
+    nextToken: cookieStore.has("nextToken"),
   };
 };

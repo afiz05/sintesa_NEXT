@@ -1,28 +1,22 @@
-"use client";
-import { useEffect } from "react";
 import type { NextPage } from "next";
-import { Content } from "@/components/home/content";
+import { getDipa } from "@/app/lib/dashboard/getDipa";
+import { ScrollkeBawah } from "@/components/home/scrollKeBawah";
 
-const Dashboard: NextPage = () => {
-  useEffect(() => {
-    // Scroll to bottom when component mounts - only on XL screens (1280px and wider)
-    const scrollToBottom = () => {
-      // Check if screen width is XL (1280px or wider)
-      if (window.innerWidth >= 1280) {
-        window.scrollTo({
-          top: document.documentElement.scrollHeight,
-          behavior: "smooth",
-        });
-      }
-    };
+import ContentHeader from "./ContentHeader";
+import { getKanwil } from "@/app/lib/referensi/getKanwil";
+import { Kanwil } from "@/components/home/kanwil";
 
-    // Add a small delay to ensure content is fully rendered
-    const timer = setTimeout(scrollToBottom, 100);
+const Dashboard: NextPage = async () => {
+  const dataDipa = await getDipa();
+  const dataKanwil = await getKanwil();
 
-    return () => clearTimeout(timer);
-  }, []);
-
-  return <Content />;
+  return (
+    <>
+      <ScrollkeBawah />
+      <ContentHeader dataDipa={dataDipa} dataKanwil={dataKanwil} />
+      {/* <Kanwil dataKanwil={dataKanwil} /> */}
+    </>
+  );
 };
 
 export default Dashboard;
