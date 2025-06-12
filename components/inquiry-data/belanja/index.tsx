@@ -2,7 +2,7 @@
 import React from "react";
 import { Header } from "./header";
 import { Radio } from "./radio";
-import { Form } from "./form";
+import { FormSummary } from "./form-summary";
 import { BelanjaProvider } from "./context";
 
 export const Belanja = () => {
@@ -13,11 +13,9 @@ export const Belanja = () => {
           <Header
             title="Belanja Query Selection"
             description="Configure your data query parameters for belanja analysis"
-          />
-
+          />{" "}
           <Radio />
-
-          <Form />
+          <FormSummary />
         </div>
       </div>
     </BelanjaProvider>
