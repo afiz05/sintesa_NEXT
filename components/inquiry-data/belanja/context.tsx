@@ -49,6 +49,13 @@ interface BelanjaContextType {
   handleSwitchChange: (key: keyof SwitchState, value: boolean) => void;
   handleResetAll: () => void;
   activeFiltersCount: number;
+  // Header selections
+  selectedTahun: string;
+  selectedJenisLaporan: string;
+  selectedPembulatan: string;
+  setSelectedTahun: (value: string) => void;
+  setSelectedJenisLaporan: (value: string) => void;
+  setSelectedPembulatan: (value: string) => void;
 }
 
 // Create the context
@@ -99,6 +106,11 @@ export const BelanjaProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [switches, setSwitches] = useState<SwitchState>(initialSwitches);
+  const [selectedTahun, setSelectedTahun] = useState<string>("2025");
+  const [selectedJenisLaporan, setSelectedJenisLaporan] =
+    useState<string>("Pagu Realisasi");
+  const [selectedPembulatan, setSelectedPembulatan] =
+    useState<string>("Rupiah");
 
   const handleSwitchChange = (key: keyof SwitchState, value: boolean) => {
     setSwitches((prev) => ({
@@ -119,6 +131,12 @@ export const BelanjaProvider: React.FC<{ children: ReactNode }> = ({
     handleSwitchChange,
     handleResetAll,
     activeFiltersCount,
+    selectedTahun,
+    selectedJenisLaporan,
+    selectedPembulatan,
+    setSelectedTahun,
+    setSelectedJenisLaporan,
+    setSelectedPembulatan,
   };
 
   return (
