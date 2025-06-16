@@ -1,48 +1,123 @@
 "use client";
 
-import React from "react";
-import { Card, CardBody, CardHeader, Skeleton } from "@heroui/react";
+import React, { useState } from "react";
+import { useTheme } from "next-themes";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Chip,
+  Divider,
+  Skeleton,
+} from "@heroui/react";
+import { Thang } from "@/components/referensi/Thang";
+import { Kddept } from "@/components/referensi/Kddept";
+import { Kanwil } from "@/components/referensi/Kanwil";
+import { GetDipa } from "@/components/home/dataDipa/getDipa";
+import { GetBelanjaTerbesar } from "@/components/home/dataDipa/getBelanjaTerbesar";
+import { GetPerformaTerbesar } from "@/components/home/dataDipa/getPerformaTerbesar";
+import dynamic from "next/dynamic";
+import { AlertTriangle, BarChart3, CheckCircle2, Clock } from "lucide-react";
+import NextLink from "next/link";
+import { Fungsi } from "@/components/charts/fungsi";
+import { DukmanTeknis } from "@/components/charts/dukmanteknis";
+
+const realizationProgramData = [
+  { name: "Infrastruktur", pagu: 450, realisasi: 390 },
+  { name: "Pendidikan", pagu: 380, realisasi: 342 },
+  { name: "Kesehatan", pagu: 320, realisasi: 294 },
+  { name: "Sosial", pagu: 280, realisasi: 268 },
+  { name: "Pertahanan", pagu: 250, realisasi: 218 },
+  { name: "Ekonomi", pagu: 220, realisasi: 210 },
+];
+
+const recentActivities = [
+  {
+    title: "Pencairan Anggaran Pendidikan",
+    ministry: "Kemendikbud",
+    amount: "Rp 125.4 M",
+    time: "2 jam lalu",
+    status: "completed",
+  },
+  {
+    title: "Revisi DIPA Kesehatan",
+    ministry: "Kemenkes",
+    amount: "Rp 89.2 M",
+    time: "4 jam lalu",
+    status: "pending",
+  },
+  {
+    title: "Penyesuaian Alokasi PUPR",
+    ministry: "Kemen PUPR",
+    amount: "Rp 67.8 M",
+    time: "6 jam lalu",
+    status: "in-review",
+  },
+];
 
 export default function DashboardLoading() {
+  const { theme } = useTheme();
+  const [selectedKanwil, setSelectedKanwil] = useState<string>("00");
+  const [selectedKddept, setSelectedKddept] = useState<string>("000");
+
+  // Handler untuk menerima perubahan nilai kanwil dari komponen Kanwil
+  const handleKanwilChange = (kanwilValue: string) => {
+    setSelectedKanwil(kanwilValue);
+  };
+
+  // Handler untuk menerima perubahan nilai kddept dari komponen Kddept
+  const handleKddeptChange = (kddeptValue: string) => {
+    setSelectedKddept(kddeptValue);
+  };
+
+  // Theme-aware class function
+  const getCardClasses = () => {
+    const isDark = theme === "dark";
+    return isDark
+      ? "bg-gradient-to-br from-slate-800 to-slate-700"
+      : "bg-gradient-to-br from-slate-100 to-slate-200";
+  };
+
+  const cardClasses = getCardClasses();
+
+  const TrenApbn = dynamic(
+    () =>
+      import("../../../components/charts/trenApbn").then((mod) => mod.TrenApbn),
+    {
+      ssr: false,
+    }
+  );
+
   return (
     <div className="h-full lg:px-6 pt-4">
       {/* Header Section Skeleton */}
       <div className="flex flex-col gap-2 pt-2 px-4 lg:px-0 max-w-[90rem] mx-auto w-full">
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
           <div>
-            <Skeleton className="h-8 md:h-10 w-80 rounded-lg" />
+            {" "}
+            <h1 className="text-xl md:text-2xl font-medium text-foreground tracking-wide">
+              Dashboard Realisasi APBN
+            </h1>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-            <Skeleton className="w-full sm:w-44 lg:w-52 h-10 rounded-lg" />
-            <Skeleton className="w-full sm:w-44 lg:w-52 h-10 rounded-lg" />
+            <Thang />
+            <Kddept
+              onKddeptChange={handleKddeptChange}
+              selectedKddept={selectedKddept}
+            />
+            <Kanwil
+              onKanwilChange={handleKanwilChange}
+              selectedKanwil={selectedKanwil}
+            />
           </div>
         </div>
 
         {/* Quick Stats Cards Skeleton */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mt-4 md:mt-6">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <Card
-              key={index}
-              className="border-none shadow-sm bg-gradient-to-br from-default-50 to-default-100"
-            >
-              <CardBody className="p-3 md:p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
-                    <Skeleton className="w-10 h-10 md:w-12 md:h-12 rounded-xl flex-shrink-0" />
-                    <div className="min-w-0 flex-1 space-y-2">
-                      <Skeleton className="h-3 w-20 rounded" />
-                      <Skeleton className="h-5 w-24 rounded" />
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 flex-shrink-0">
-                    <Skeleton className="h-4 w-4 rounded" />
-                    <Skeleton className="h-3 w-8 rounded" />
-                  </div>
-                </div>
-              </CardBody>
-            </Card>
-          ))}
-        </div>
+        <GetDipa
+          selectedKanwil={selectedKanwil}
+          selectedKddept={selectedKddept}
+        />
       </div>
 
       {/* Main Content Grid Skeleton */}
@@ -50,58 +125,19 @@ export default function DashboardLoading() {
         {/* Three Card Row Skeleton */}
         <div className="grid grid-cols-1 lg:grid-cols-6 xl:grid-cols-12 gap-6">
           {/* Overall Summary Skeleton */}
-          <Card className="border-none shadow-sm bg-gradient-to-br from-primary-50 to-secondary-50 lg:col-span-6 xl:col-span-2">
-            <CardBody className="p-4 md:p-6">
-              <div className="text-center space-y-3 md:space-y-4">
-                <Skeleton className="mx-auto w-16 h-16 md:w-20 md:h-20 rounded-full" />
-                <div className="space-y-2">
-                  <Skeleton className="h-6 md:h-8 w-16 mx-auto rounded" />
-                  <Skeleton className="h-3 md:h-4 w-32 mx-auto rounded" />
-                </div>
-                <Skeleton className="h-2 w-full rounded-full" />
-                <div className="grid grid-cols-2 gap-2 md:gap-4 pt-2">
-                  <div className="text-center space-y-1">
-                    <Skeleton className="h-3 w-12 mx-auto rounded" />
-                    <Skeleton className="h-4 w-8 mx-auto rounded" />
-                  </div>
-                  <div className="text-center space-y-1">
-                    <Skeleton className="h-3 w-16 mx-auto rounded" />
-                    <Skeleton className="h-4 w-12 mx-auto rounded" />
-                  </div>
-                </div>
-              </div>
-            </CardBody>
-          </Card>
+          <GetBelanjaTerbesar
+            selectedKanwil={selectedKanwil}
+            selectedKddept={selectedKddept}
+          />
 
           {/* Ministry Performance Skeleton */}
-          <Card className="border-none shadow-sm bg-gradient-to-br from-default-50 to-default-100 lg:col-span-6 xl:col-span-4">
-            <CardHeader className="pb-3 md:pb-4 px-4 md:px-6">
-              <div className="flex justify-between items-center w-full">
-                <Skeleton className="h-5 md:h-6 w-40 rounded" />
-                <Skeleton className="h-4 w-20 rounded" />
-              </div>
-            </CardHeader>
-            <CardBody className="pt-0 px-4 md:px-6">
-              <div className="space-y-2 md:space-y-3">
-                {Array.from({ length: 4 }).map((_, index) => (
-                  <div
-                    key={index}
-                    className="p-2 md:p-3 bg-default-50 rounded-lg space-y-2"
-                  >
-                    <div className="flex justify-between items-center">
-                      <Skeleton className="h-4 w-40 rounded" />
-                      <Skeleton className="h-6 w-12 rounded-full" />
-                    </div>
-                    <Skeleton className="h-3 w-32 rounded" />
-                    <Skeleton className="h-2 w-full rounded-full" />
-                  </div>
-                ))}
-              </div>
-            </CardBody>
-          </Card>
+          <GetPerformaTerbesar
+            selectedKanwil={selectedKanwil}
+            selectedKddept={selectedKddept}
+          />
 
           {/* Chart Skeleton */}
-          <Card className="border-none shadow-sm bg-gradient-to-br from-default-50 to-default-100 lg:col-span-12 xl:col-span-6">
+          {/* <Card className="border-none shadow-sm bg-gradient-to-br from-default-50 to-default-100 lg:col-span-12 xl:col-span-6">
             <CardHeader className="pb-2 px-4 md:px-6">
               <div className="flex flex-col gap-2 w-full">
                 <Skeleton className="h-5 md:h-6 w-48 rounded" />
@@ -116,12 +152,160 @@ export default function DashboardLoading() {
                 <Skeleton className="h-full w-full rounded-lg" />
               </div>
             </CardBody>
+          </Card> */}
+          <Card
+            className={`border-none shadow-sm ${cardClasses} sm:col-span-2 lg:col-span-12 xl:col-span-6`}
+          >
+            <CardHeader className="pb-1 px-4 md:px-6">
+              <div className="flex flex-col gap-1">
+                <h3 className="text-sm md:text-base font-semibold">
+                  Tren Realisasi APBN
+                </h3>
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
+                  <p className="text-xs text-default-500">
+                    Target vs realisasi bulanan
+                  </p>
+                  <Chip
+                    color="success"
+                    variant="flat"
+                    size="sm"
+                    className="w-fit"
+                  >
+                    Real-time
+                  </Chip>
+                </div>
+              </div>
+            </CardHeader>
+            <CardBody className="pt-0 px-2 md:px-4 pb-1">
+              <div className="h-[150px] md:h-[200px] w-full flex flex-col overflow-hidden">
+                <TrenApbn
+                  selectedKanwil={selectedKanwil}
+                  selectedKddept={selectedKddept}
+                />
+              </div>
+            </CardBody>
           </Card>
         </div>
 
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+          {/* Realisasi Fungsi Chart */}
+          <Card
+            className={`border-none shadow-sm ${cardClasses} lg:col-span-2`}
+          >
+            <CardHeader className="pb-2 px-4 md:px-6">
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="h-3 w-3 text-default-500" />
+                  <h3 className="text-sm md:text-base font-semibold">
+                    Realisasi Fungsi
+                  </h3>
+                </div>
+                <Chip
+                  color="primary"
+                  variant="flat"
+                  size="sm"
+                  className="w-fit"
+                >
+                  Per Sektor
+                </Chip>
+              </div>
+            </CardHeader>
+            <CardBody className="pt-0 px-2 md:px-4 pb-1">
+              <div className="h-[200px] md:h-[250px] w-full flex flex-col overflow-hidden">
+                <Fungsi
+                  selectedKanwil={selectedKanwil}
+                  selectedKddept={selectedKddept}
+                />
+              </div>
+            </CardBody>
+          </Card>
+
+          {/* Pagu Dukman vs Teknis Chart */}
+          <Card className={`border-none shadow-sm ${cardClasses}`}>
+            <CardHeader className="pb-2 px-4 md:px-6">
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="h-3 w-3 text-default-500" />
+                  <h3 className="text-sm md:text-base font-semibold">
+                    Pagu Dukman vs Teknis
+                  </h3>
+                </div>
+                <Chip
+                  color="primary"
+                  variant="flat"
+                  size="sm"
+                  className="w-fit"
+                >
+                  2024
+                </Chip>
+              </div>
+            </CardHeader>
+            <CardBody className="pt-0 px-2 md:px-4 pb-1">
+              <div className="h-[200px] md:h-[250px] w-full flex flex-col overflow-hidden">
+                <DukmanTeknis
+                  selectedKanwil={selectedKanwil}
+                  selectedKddept={selectedKddept}
+                />
+              </div>
+            </CardBody>
+          </Card>
+          <Card className={`border-none shadow-sm ${cardClasses}`}>
+            <CardHeader className="pb-2 px-4 md:px-6">
+              <div className="flex items-center gap-2">
+                <Clock className="h-3 w-3 text-default-500" />
+                <h3 className="text-sm md:text-base font-semibold">
+                  Aktivitas Terkini
+                </h3>
+              </div>
+            </CardHeader>
+            <CardBody className="pt-0 px-4 md:px-6">
+              <div className="space-y-2">
+                {recentActivities.map((activity, index) => (
+                  <div key={index} className="flex gap-2">
+                    <div className="flex-shrink-0 mt-0.5">
+                      {activity.status === "completed" ? (
+                        <CheckCircle2 className="h-3 w-3 text-success" />
+                      ) : activity.status === "pending" ? (
+                        <Clock className="h-3 w-3 text-warning" />
+                      ) : (
+                        <AlertTriangle className="h-3 w-3 text-primary" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium truncate">
+                        {activity.title}
+                      </p>
+                      <p className="text-xs text-default-500">
+                        {activity.ministry}
+                      </p>
+                      <div className="flex justify-between items-center mt-0.5">
+                        <span className="text-xs font-medium text-primary">
+                          {activity.amount}
+                        </span>
+                        <span className="text-xs text-default-400">
+                          {activity.time}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <Divider className="my-2" />
+              <Button
+                variant="flat"
+                color="primary"
+                size="sm"
+                className="w-full"
+                as={NextLink}
+                href="/mbg/kertas-kerja"
+              >
+                Lihat Semua Aktivitas
+              </Button>
+            </CardBody>
+          </Card>
+        </div>
         {/* Bottom Row Skeleton */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Recent Activities Skeleton */}
+        {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="border-none shadow-sm bg-gradient-to-br from-default-50 to-default-100">
             <CardHeader className="pb-3 md:pb-4 px-4 md:px-6">
               <div className="flex items-center gap-2">
@@ -152,7 +336,6 @@ export default function DashboardLoading() {
             </CardBody>
           </Card>
 
-          {/* Quick Actions Skeleton */}
           <Card className="border-none shadow-sm bg-gradient-to-br from-default-50 to-default-100">
             <CardHeader className="pb-3 md:pb-4 px-4 md:px-6">
               <Skeleton className="h-5 md:h-6 w-24 rounded" />
@@ -163,7 +346,7 @@ export default function DashboardLoading() {
               ))}
             </CardBody>
           </Card>
-        </div>
+        </div> */}
       </div>
     </div>
   );

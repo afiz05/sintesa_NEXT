@@ -12,15 +12,42 @@ import { useRouter } from "next/navigation";
 import { useCallback, useState, useEffect, useContext } from "react";
 import { Copyright } from "lucide-react";
 import axios from "axios";
-// import ReCAPTCHA from "react-google-recaptcha";
-import { LoginSuccessAnimation } from "./LoginSuccessAnimation";
-import { SimpleLoginSuccess } from "./SimpleLoginSuccess";
+
 import { PageTransitionSuccess } from "./PageTransitionSuccess";
 import MyContext from "@/utils/Contex";
 import { decryptData } from "@/utils/Decrypt";
 import { jwtDecode } from "jwt-decode";
+import { handleHttpError } from "@/utils/handleError";
+
+// Define the JWT payload interface
+interface CustomJwtPayload {
+  telp: string;
+  name: string;
+  exp: number;
+  role: string;
+  kdkanwil: string;
+  kdkppn: string;
+  kdlokasi: string;
+  active: string;
+  dept_limit: string;
+  namarole: string;
+  userId: string;
+  url: string;
+  username: string;
+  mode: string;
+  tampil: string;
+  tampilverify: string;
+  session: string;
+  verified: string;
+}
 
 export const Login = () => {
+  const context = useContext(MyContext);
+
+  if (!context) {
+    throw new Error("Login must be used within MyContextProvider");
+  }
+
   const {
     setVerified,
     setNmrole,
@@ -53,7 +80,7 @@ export const Login = () => {
     setOffline,
     offlinest,
     setOfflinest,
-  } = useContext(MyContext);
+  } = context;
 
   const router = useRouter();
   const { showToast } = useToast();
@@ -136,8 +163,13 @@ export const Login = () => {
     } catch (error) {
       console.log(error);
       setError("Captcha mode check failed");
-      // Fallback to custom captcha mode for demo
       setChap("0");
+
+      // error && router.replace("/v3/next/offline");
+      setOffline(true);
+      // setOfflinest(error);
+      window.location.href = "/v3/next/offline";
+      showToast("Mode Offline", "error");
     }
   };
 
@@ -187,6 +219,9 @@ export const Login = () => {
           { withCredentials: true }
         );
         const data = response.data;
+        // console.log("Login response data:", data);
+        // console.log("Login response status:", response.status);
+        // console.log("Login response headers:", response.headers);
 
         if (!data.success) {
           if (data.msg === "Password Anda Tidak Sesuai") {
@@ -202,14 +237,18 @@ export const Login = () => {
           setLoading(false);
         } else {
           resetState();
+
           const decrypted = decryptData(data.tokenSetLogin);
-          const decoded = jwtDecode(decrypted);
+
+          const decoded = jwtDecode<CustomJwtPayload>(decrypted);
+          // console.log("Decoded JWT Payload:", decoded);
+
           setTelp(decoded.telp);
           setToken(data.tokenSetLogin);
           setstatusLogin(true);
           setLoading(false);
           setName(decoded.name);
-          setExpire(decoded.exp);
+          setExpire(decoded.exp.toString());
           setRole(decoded.role);
           setKdkanwil(decoded.kdkanwil);
           setKdkppn(decoded.kdkppn);
@@ -226,44 +265,10 @@ export const Login = () => {
           setSession(decoded.session);
           setVerified(decoded.verified);
 
-          // Cookies.set("token", JSON.stringify(true));
-
-          // toast.success("login successful");
-          // If both are correct
           setShowSuccessAnimation(true);
+          localStorage.setItem("status", "true");
           await createAuthCookie("token", JSON.stringify(true));
-          // Router navigation will be handled after animation completes
-          // setOffline(true);
-          // if (
-          //   decoded.role === "X" ||
-          //   decoded.role === "0" ||
-          //   decoded.role === "1"
-          // ) {
-          //   // router.push("/v3/landing/profile");
-          //   router.push("/sample-page");
-          // } else {
-          //   // router.push("/v3/data/form/belanja");
-          //   router.push("/sample-page");
-          // }
         }
-
-        // Check if both fields are filled
-        // if (!values.username || !values.password) {
-        //   showToast("Please enter both username and password.", "warning");
-        //   return;
-        // }
-
-        // Check username first
-        // if (values.username !== TEMP_USERNAME) {
-        //   showToast("Username doesn't exist in our database.", "error");
-        //   return;
-        // }
-
-        // Check password if username is valid
-        // if (values.password !== TEMP_PASSWORD) {
-        //   showToast("Password is incorrect. Please try again.", "error");
-        //   return;
-        // }
       } catch (error) {
         showToast("Login failed. Please try again.", "error");
       } finally {
@@ -298,7 +303,7 @@ export const Login = () => {
 
       // If PIN is correct
       setShowSuccessAnimation(true);
-      await createAuthCookie();
+      await createAuthCookie("token", JSON.stringify(true));
       // Router navigation will be handled after animation completes
     } catch (error) {
       showToast("PIN login failed. Please try again.", "error");
@@ -314,23 +319,6 @@ export const Login = () => {
 
   return (
     <div className="flex flex-col items-center w-full">
-      {/* Login Success Animation - Choose one of the three options below */}
-
-      {/* Option 1: Full-featured animation with particles and confetti
-      <LoginSuccessAnimation
-        isVisible={showSuccessAnimation}
-        onComplete={handleAnimationComplete}
-        duration={3000}
-      /> */}
-
-      {/* Option 2: Simple and clean animation (uncomment to use) */}
-      {/* <SimpleLoginSuccess
-        isVisible={showSuccessAnimation}
-        onComplete={handleAnimationComplete}
-        duration={2000}
-      /> */}
-
-      {/* Option 3: Full page transition animation (uncomment to use) */}
       <PageTransitionSuccess
         isVisible={showSuccessAnimation}
         onComplete={handleAnimationComplete}
@@ -376,7 +364,6 @@ export const Login = () => {
               />
             </div>
 
-            {/* Dynamic Captcha Section */}
             {chap === "0" && (
               <div className="w-2/3 md:w-1/4 mb-4">
                 <div className="flex flex-col sm:flex-row gap-3">

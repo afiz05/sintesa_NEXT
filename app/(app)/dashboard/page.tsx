@@ -1,28 +1,17 @@
-"use client";
-import { useEffect } from "react";
 import type { NextPage } from "next";
-import { Content } from "@/components/home/content";
+import { ScrollkeBawah } from "@/components/home/scrollKeBawah";
 
-const Dashboard: NextPage = () => {
-  useEffect(() => {
-    // Scroll to bottom when component mounts - only on XL screens (1280px and wider)
-    const scrollToBottom = () => {
-      // Check if screen width is XL (1280px or wider)
-      if (window.innerWidth >= 1280) {
-        window.scrollTo({
-          top: document.documentElement.scrollHeight,
-          behavior: "smooth",
-        });
-      }
-    };
+import { CekToken } from "@/utils/cekToken";
 
-    // Add a small delay to ensure content is fully rendered
-    const timer = setTimeout(scrollToBottom, 100);
+import DashboardLoading from "./loading";
 
-    return () => clearTimeout(timer);
-  }, []);
-
-  return <Content />;
+const Dashboard: NextPage = async () => {
+  return (
+    <CekToken>
+      <DashboardLoading />
+      {/* <ScrollkeBawah /> */}
+    </CekToken>
+  );
 };
 
 export default Dashboard;
