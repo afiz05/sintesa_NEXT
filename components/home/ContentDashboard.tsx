@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
-
 import dynamic from "next/dynamic";
+import { useTheme } from "next-themes";
 import {
   Card,
   CardBody,
@@ -37,16 +37,13 @@ import {
   AlertTriangle,
   FileText,
 } from "lucide-react";
-import { HeaderDashboard } from "./header";
-import DashboardLoading from "@/app/(app)/dashboard/loading";
-import { Kanwil } from "./kanwil";
-
-const APBNChart = dynamic(
-  () => import("../charts/steam").then((mod) => mod.Steam),
-  {
-    ssr: false,
-  }
-);
+import { Kanwil } from "../referensi/Kanwil";
+import { Kddept } from "../referensi/Kddept";
+import { GetDipa } from "./dataDipa/getDipa";
+import { Thang } from "../referensi/Thang";
+import { GetBelanjaTerbesar } from "./dataDipa/getBelanjaTerbesar";
+import { GetPerformaTerbesar } from "./dataDipa/getPerformaTerbesar";
+import { DukmanTeknis } from "../charts/dukmanteknis";
 
 const RealizationChart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
@@ -54,7 +51,7 @@ const RealizationChart = dynamic(() => import("react-apexcharts"), {
 
 // Sample data for realisasi APBN
 const budgetStats = {
-  totalBudget: 999.1,
+  totalBudget: 3156.1,
   realized: 2847.3,
   remaining: 308.8,
   realizationPercentage: 90.2,
@@ -130,6 +127,49 @@ const jenbelData = [
   },
 ];
 
+const quickStats = [
+  {
+    title: "Pagu DIPA",
+    value: "Rp 3.156,1 T",
+    change: "+5.8%",
+    trend: "up",
+    icon: DollarSign,
+    color: "primary",
+  },
+  {
+    title: "Realisasi",
+    value: "Rp 2.847,3 T",
+    change: "90.2%",
+    trend: "up",
+    icon: TrendingUp,
+    color: "success",
+  },
+  {
+    title: "Sisa Anggaran",
+    value: "Rp 308,8 M",
+    change: "9.8%",
+    trend: "down",
+    icon: Target,
+    color: "warning",
+  },
+  {
+    title: "K/L Aktif",
+    value: "86 Lembaga",
+    change: "+2",
+    trend: "up",
+    icon: Building2,
+    color: "secondary",
+  },
+  {
+    title: "Efisiensi Anggaran",
+    value: "92.4%",
+    change: "+1.2%",
+    trend: "up",
+    icon: Calendar,
+    color: "primary",
+  },
+];
+
 const recentActivities = [
   {
     title: "Pencairan Anggaran Pendidikan",
@@ -164,36 +204,39 @@ const realizationProgramData = [
   { name: "Ekonomi", pagu: 220, realisasi: 210 },
 ];
 
-// Filter data
-const kementerianList = [
-  { key: "kemenkeu", label: "Kemenkeu" },
-  { key: "kemhan", label: "Kemhan" },
-  { key: "kemenag", label: "Kemenag" },
-  { key: "kemenkes", label: "Kemenkes" },
-  { key: "polri", label: "POLRI" },
-];
+export const ContentDashboard = () => {
+  const { theme } = useTheme();
 
-// const kanwilList = [
-//   { key: "dki", label: "DKI Jakarta" },
-//   { key: "jabar", label: "Jawa Barat" },
-//   { key: "jateng", label: "Jawa Tengah" },
-//   { key: "jatim", label: "Jawa Timur" },
-//   { key: "bengkulu", label: "Bengkulu" },
-//   { key: "gorontalo", label: "Gorontalo" },
-// ];
-interface ContentProps {
-  dataDipa: any;
-  dataKanwil: any;
-  loading: boolean;
-}
-export const Content: React.FC<ContentProps> = ({
-  dataDipa,
-  dataKanwil,
-  loading,
-}) => {
-  if (loading) {
-    return <DashboardLoading />;
-  }
+  // Theme-aware color and class functions
+  const getThemeColors = () => {
+    const isDark = theme === "dark";
+    return {
+      // Chart colors
+      primary: isDark ? "#60A5FA" : "#3B82F6",
+      success: isDark ? "#34D399" : "#10B981",
+      warning: isDark ? "#FBBF24" : "#F59E0B",
+      background: isDark ? "#1F2937" : "#FFFFFF",
+      surface: isDark ? "#374151" : "#F8FAFC",
+      // Text colors
+      textPrimary: isDark ? "#F1F5F9" : "#1F2937",
+      textSecondary: isDark ? "#CBD5E1" : "#64748B",
+      textMuted: isDark ? "#94A3B8" : "#94A3B8",
+      // Grid and borders
+      gridColor: isDark ? "#374151" : "#E2E8F0",
+      borderColor: isDark ? "#4B5563" : "#E2E8F0",
+      strokeColor: isDark ? "#374151" : "#F1F5F9",
+    };
+  };
+
+  const getCardClasses = () => {
+    const isDark = theme === "dark";
+    return isDark
+      ? "bg-gradient-to-br from-slate-800 to-slate-700"
+      : "bg-gradient-to-br from-slate-100 to-slate-200";
+  };
+
+  const colors = getThemeColors();
+  const cardClasses = getCardClasses();
 
   return (
     <div className="h-full lg:px-4 pt-2 pb-6">
@@ -206,33 +249,14 @@ export const Content: React.FC<ContentProps> = ({
             </h1>
           </div>
           <div className="flex flex-col sm:flex-row gap-1 sm:gap-2">
-            <Autocomplete
-              placeholder="Pilih Kementerian"
-              className="w-full sm:w-44 lg:w-52 h-10"
-              size="md"
-              variant="flat"
-              color="default"
-              classNames={{
-                base: "rounded-lg bg-slate-50/80 dark:bg-slate-800/80",
-                selectorButton:
-                  "rounded-lg bg-slate-50/80 dark:bg-slate-800/80 border-slate-200/60 dark:border-slate-700/60 hover:bg-slate-100/80 dark:hover:bg-slate-700/80 data-[hover=true]:bg-slate-100/80 dark:data-[hover=true]:bg-slate-700/80",
-                listbox: "rounded-lg bg-slate-50/95 dark:bg-slate-800/95",
-                popoverContent:
-                  "rounded-lg bg-slate-50/95 dark:bg-slate-800/95 backdrop-blur-sm border-slate-200/60 dark:border-slate-700/60",
-              }}
-              allowsCustomValue
-              defaultItems={kementerianList}
-            >
-              {(item) => (
-                <AutocompleteItem key={item.key}>{item.label}</AutocompleteItem>
-              )}
-            </Autocomplete>
-            <Kanwil dataKanwil={dataKanwil} />
+            {/* <Thang /> */}
+            <Kddept />
+            <Kanwil />
           </div>
         </div>
 
         {/* Quick Stats Cards */}
-        <HeaderDashboard dataDipa={dataDipa} />
+        <GetDipa />
       </div>
 
       {/* Main Content Grid */}
@@ -240,164 +264,15 @@ export const Content: React.FC<ContentProps> = ({
         {/* Three Card Row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 xl:grid-cols-12 gap-3">
           {/* Overall Summary - Responsive */}
-          <Card className="border-none shadow-sm bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 lg:col-span-6 xl:col-span-3">
-            <CardHeader className="pb-2 px-4 md:px-6">
-              <div className="flex justify-between items-center w-full">
-                <h3 className="text-sm md:text-base font-semibold">
-                  Jenis Belanja Terbesar
-                </h3>
-                <Link
-                  href="/mbg/data-update"
-                  as={NextLink}
-                  className="text-xs text-primary"
-                >
-                  Lihat Semua
-                </Link>
-              </div>
-            </CardHeader>
-            <CardBody className="pt-0 px-4 md:px-6">
-              <div className="space-y-0">
-                {jenbelData.slice(0, 4).map((jenbel, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-0.5 md:p-1 rounded-lg"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="mb-0.5">
-                        <h4 className="font-medium text-xs truncate pr-2">
-                          {jenbel.name}
-                        </h4>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {" "}
-                        <div className="relative flex-1">
-                          <Progress
-                            aria-label={`Realisasi anggaran ${jenbel.name}`}
-                            aria-valuemin={0}
-                            aria-valuemax={100}
-                            aria-valuenow={jenbel.percentage}
-                            value={jenbel.percentage}
-                            color={
-                              jenbel.status === "excellent"
-                                ? "success"
-                                : jenbel.status === "on-track"
-                                ? "primary"
-                                : "warning"
-                            }
-                            size="md"
-                            className="w-full h-5"
-                            classNames={{
-                              track: "h-5",
-                              indicator: "h-5",
-                            }}
-                          />
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="text-xs font-medium text-white">
-                              Rp {jenbel.realized}T / Rp {jenbel.budget}T
-                            </span>
-                          </div>
-                        </div>
-                        <Chip
-                          size="sm"
-                          variant="flat"
-                          color={
-                            jenbel.status === "excellent"
-                              ? "success"
-                              : jenbel.status === "on-track"
-                              ? "primary"
-                              : "warning"
-                          }
-                          className="text-xs flex-shrink-0"
-                        >
-                          {jenbel.percentage}%
-                        </Chip>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardBody>
-          </Card>
+          <GetBelanjaTerbesar />
 
           {/* Ministry Performance - Responsive */}
-          <Card className="border-none shadow-sm bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 lg:col-span-6 xl:col-span-3">
-            <CardHeader className="pb-2 px-4 md:px-6">
-              <div className="flex justify-between items-center w-full">
-                <h3 className="text-sm md:text-base font-semibold">
-                  Performa K/L Terbesar
-                </h3>
-                <Link
-                  href="/mbg/data-update"
-                  as={NextLink}
-                  className="text-xs text-primary"
-                >
-                  Lihat Semua
-                </Link>
-              </div>
-            </CardHeader>
-            <CardBody className="pt-0 px-4 md:px-6">
-              <div className="space-y-0">
-                {ministryData.slice(0, 4).map((ministry, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-0.5 md:p-1 rounded-lg"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="mb-0.5">
-                        <h4 className="font-medium text-xs truncate pr-2">
-                          {ministry.name}
-                        </h4>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {" "}
-                        <div className="relative flex-1">
-                          <Progress
-                            aria-label={`Performa realisasi anggaran ${ministry.name}`}
-                            value={ministry.percentage}
-                            color={
-                              ministry.status === "excellent"
-                                ? "success"
-                                : ministry.status === "on-track"
-                                ? "primary"
-                                : "warning"
-                            }
-                            size="md"
-                            className="w-full h-5"
-                            classNames={{
-                              track: "h-5",
-                              indicator: "h-5",
-                            }}
-                          />
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="text-xs font-medium text-white">
-                              Rp {ministry.realized}T / Rp {ministry.budget}T
-                            </span>
-                          </div>
-                        </div>
-                        <Chip
-                          size="sm"
-                          variant="flat"
-                          color={
-                            ministry.status === "excellent"
-                              ? "success"
-                              : ministry.status === "on-track"
-                              ? "primary"
-                              : "warning"
-                          }
-                          className="text-xs flex-shrink-0"
-                        >
-                          {ministry.percentage}%
-                        </Chip>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardBody>
-          </Card>
+          <GetPerformaTerbesar />
 
           {/* Realization Chart - Responsive */}
-          <Card className="border-none shadow-sm bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 sm:col-span-2 lg:col-span-12 xl:col-span-6">
+          <Card
+            className={`border-none shadow-sm ${cardClasses} sm:col-span-2 lg:col-span-12 xl:col-span-6`}
+          >
             <CardHeader className="pb-1 px-4 md:px-6">
               <div className="flex flex-col gap-1">
                 <h3 className="text-sm md:text-base font-semibold">
@@ -420,7 +295,7 @@ export const Content: React.FC<ContentProps> = ({
             </CardHeader>
             <CardBody className="pt-0 px-2 md:px-4 pb-1">
               <div className="h-[150px] md:h-[200px] w-full flex flex-col overflow-hidden">
-                <APBNChart />
+                {/* <APBNChart /> */}
               </div>
             </CardBody>
           </Card>
@@ -429,7 +304,9 @@ export const Content: React.FC<ContentProps> = ({
         {/* Bottom Row - Activities and Quick Actions */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
           {/* Realisasi Program Chart */}
-          <Card className="border-none shadow-sm bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 lg:col-span-2">
+          <Card
+            className={`border-none shadow-sm ${cardClasses} lg:col-span-2`}
+          >
             <CardHeader className="pb-2 px-4 md:px-6">
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-2">
@@ -451,20 +328,21 @@ export const Content: React.FC<ContentProps> = ({
             <CardBody className="pt-0 px-2 md:px-4 pb-1">
               <div className="h-[200px] md:h-[250px] w-full flex flex-col overflow-hidden">
                 <RealizationChart
+                  key={theme}
                   type="bar"
                   height="100%"
                   series={[
                     {
                       name: "Pagu",
                       data: realizationProgramData.map((item) => item.pagu),
-                      color: "#3B82F6",
+                      color: colors.primary,
                     },
                     {
                       name: "Realisasi",
                       data: realizationProgramData.map(
                         (item) => item.realisasi
                       ),
-                      color: "#10B981",
+                      color: colors.success,
                     },
                   ]}
                   options={{
@@ -500,6 +378,7 @@ export const Content: React.FC<ContentProps> = ({
                         style: {
                           fontSize: "10px",
                           fontWeight: 500,
+                          colors: colors.textSecondary,
                         },
                         rotate: -45,
                       },
@@ -510,6 +389,7 @@ export const Content: React.FC<ContentProps> = ({
                       labels: {
                         style: {
                           fontSize: "10px",
+                          colors: colors.textSecondary,
                         },
                         formatter: (value) => `${value}T`,
                       },
@@ -518,6 +398,10 @@ export const Content: React.FC<ContentProps> = ({
                       opacity: 0.8,
                     },
                     tooltip: {
+                      theme: theme === "dark" ? "dark" : "light",
+                      style: {
+                        fontSize: "12px",
+                      },
                       y: {
                         formatter: (val) => `Rp ${val} Triliun`,
                       },
@@ -527,12 +411,15 @@ export const Content: React.FC<ContentProps> = ({
                       horizontalAlign: "right",
                       fontSize: "11px",
                       fontWeight: 500,
+                      labels: {
+                        colors: colors.textPrimary,
+                      },
                       markers: {
                         size: 8,
                       },
                     },
                     grid: {
-                      borderColor: "#e2e8f0",
+                      borderColor: colors.gridColor,
                       strokeDashArray: 3,
                       xaxis: {
                         lines: { show: false },
@@ -541,7 +428,7 @@ export const Content: React.FC<ContentProps> = ({
                         lines: { show: true },
                       },
                     },
-                    colors: ["#3B82F6", "#10B981"],
+                    colors: [colors.primary, colors.success],
                   }}
                 />
               </div>
@@ -549,7 +436,7 @@ export const Content: React.FC<ContentProps> = ({
           </Card>
 
           {/* Pagu Dukman vs Teknis Chart */}
-          <Card className="border-none shadow-sm bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700">
+          <Card className={`border-none shadow-sm ${cardClasses}`}>
             <CardHeader className="pb-2 px-4 md:px-6">
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-2">
@@ -570,78 +457,11 @@ export const Content: React.FC<ContentProps> = ({
             </CardHeader>
             <CardBody className="pt-0 px-2 md:px-4 pb-1">
               <div className="h-[200px] md:h-[250px] w-full flex flex-col overflow-hidden">
-                <RealizationChart
-                  type="pie"
-                  height="100%"
-                  series={[65, 35]}
-                  options={{
-                    chart: {
-                      type: "pie",
-                      toolbar: { show: false },
-                      background: "transparent",
-                      fontFamily: "inherit",
-                    },
-                    labels: ["Dukman", "Teknis"],
-                    colors: ["#3B82F6", "#10B981"],
-                    stroke: {
-                      width: 4,
-                      colors: ["#F1F5F9"],
-                    },
-                    plotOptions: {
-                      pie: {
-                        expandOnClick: false,
-                        customScale: 0.9,
-                      },
-                    },
-                    dataLabels: {
-                      enabled: true,
-                      style: {
-                        fontSize: "12px",
-                        fontWeight: 600,
-                        colors: ["#1F2937"],
-                      },
-                      formatter: (val) => `${Number(val).toFixed(1)}%`,
-                    },
-                    legend: {
-                      position: "bottom",
-                      horizontalAlign: "center",
-                      fontSize: "12px",
-                      fontWeight: 500,
-                      markers: {
-                        size: 8,
-                      },
-                      itemMargin: {
-                        horizontal: 10,
-                        vertical: 5,
-                      },
-                    },
-                    tooltip: {
-                      y: {
-                        formatter: (val) => `${val}%`,
-                      },
-                    },
-                    responsive: [
-                      {
-                        breakpoint: 768,
-                        options: {
-                          legend: {
-                            position: "bottom",
-                            fontSize: "10px",
-                          },
-                          dataLabels: {
-                            style: {
-                              fontSize: "10px",
-                            },
-                          },
-                        },
-                      },
-                    ],
-                  }}
-                />
+                {/* <DukmanTeknis /> */}
               </div>
             </CardBody>
           </Card>
-          <Card className="border-none shadow-sm bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700">
+          <Card className={`border-none shadow-sm ${cardClasses}`}>
             <CardHeader className="pb-2 px-4 md:px-6">
               <div className="flex items-center gap-2">
                 <Clock className="h-3 w-3 text-default-500" />

@@ -13,20 +13,26 @@ export function middleware(request: NextRequest) {
     ? pathname.slice(basePath.length) || "/"
     : pathname;
 
-  const publicRoutes = ["/login", "/register"];
+  const publicRoutes = ["/login", "/register", "/offline"];
   const isPublic = publicRoutes.includes(path);
 
   // ✅ Redirect root "/" ke dashboard
   if (path === "/") {
     return NextResponse.redirect(new URL(`${basePath}/dashboard`, request.url));
   }
+
+  // ✅ Jika menuju halaman offline, selalu izinkan (tidak peduli status login)
+  if (path === "/offline") {
+    return NextResponse.next();
+  }
+
   // Cegah akses halaman private tanpa login
   if (!isPublic && !hasAuth) {
     return NextResponse.redirect(new URL(`${basePath}/login`, request.url));
   }
 
-  // Cegah akses login/register saat sudah login
-  if (isPublic && hasAuth) {
+  // Cegah akses login/register saat sudah login (kecuali offline)
+  if ((path === "/login" || path === "/register") && hasAuth) {
     return NextResponse.redirect(new URL(`${basePath}/dashboard`, request.url));
   }
 

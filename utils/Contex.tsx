@@ -6,9 +6,33 @@ import { useRouter } from "next/navigation";
 // import Notifikasi from "@/components/notifikasi/notif";
 // import { handleHttpError } from "@/components/notifikasi/toastError";
 import { io } from "socket.io-client";
+
+// Define the JWT payload interface
+interface CustomJwtPayload {
+  telp: string;
+  name: string;
+  exp: number;
+  role: string;
+  kdkanwil: string;
+  kdkppn: string;
+  kdlokasi: string;
+  active: string;
+  dept_limit: string;
+  namarole: string;
+  userId: string;
+  url: string;
+  username: string;
+  mode: string;
+  tampil: string;
+  tampilverify: string;
+  session: string;
+  verified: string;
+}
 //import Swal from "sweetalert2";
 import { decryptData } from "./Decrypt";
 import Swal from "sweetalert2";
+import { AxiosInstance } from "axios";
+import { handleHttpError } from "./handleError";
 
 // 1. Tentukan tipe context
 interface MyContextType {
@@ -26,11 +50,21 @@ interface MyContextType {
   deptlimit: string;
   kdkppn: string;
   expire: string;
-  token: string;
+  token: string | null;
+  axiosJWT: AxiosInstance;
   iduser: string;
   url: string;
   statusLogin: boolean;
+  isTokenLoading: boolean; // Tambahkan loading state untuk token
   username: string;
+  mode: string;
+  tampil: string;
+  tampilverify: string | boolean;
+  status: string;
+  persentase: any[];
+  offline: boolean;
+  offlinest: string;
+  telp: string;
   setLoggedinUsers: React.Dispatch<React.SetStateAction<any[]>>;
   setLoggedInUser2: React.Dispatch<React.SetStateAction<any>>;
   setNamelogin: React.Dispatch<React.SetStateAction<string | null>>;
@@ -42,6 +76,7 @@ interface MyContextType {
   setKdlokasi: React.Dispatch<React.SetStateAction<string>>;
   setVerified: React.Dispatch<React.SetStateAction<string>>;
   setKdkanwil: React.Dispatch<React.SetStateAction<string>>;
+  setKdprov: React.Dispatch<React.SetStateAction<string>>;
   setDeptlimit: React.Dispatch<React.SetStateAction<string>>;
   setKdkppn: React.Dispatch<React.SetStateAction<string>>;
   setExpire: React.Dispatch<React.SetStateAction<string>>;
@@ -50,6 +85,15 @@ interface MyContextType {
   setUrl: React.Dispatch<React.SetStateAction<string>>;
   setstatusLogin: React.Dispatch<React.SetStateAction<boolean>>;
   setUsername: React.Dispatch<React.SetStateAction<string>>;
+  setMode: React.Dispatch<React.SetStateAction<string>>;
+  setTampil: React.Dispatch<React.SetStateAction<string>>;
+  setTampilverify: React.Dispatch<React.SetStateAction<string | boolean>>;
+  setStatus: React.Dispatch<React.SetStateAction<string>>;
+  setPersentase: React.Dispatch<React.SetStateAction<any[]>>;
+  setOffline: React.Dispatch<React.SetStateAction<boolean>>;
+  setOfflinest: React.Dispatch<React.SetStateAction<string>>;
+  setTelp: React.Dispatch<React.SetStateAction<string>>;
+  logout: () => Promise<void>;
 }
 
 // 2. Buat context dengan tipe
@@ -76,6 +120,7 @@ export const MyContextProvider: React.FC<MyContextProviderProps> = ({
   const [kdlokasi, setKdlokasi] = useState<string>("");
   const [verified, setVerified] = useState<string>("");
   const [kdkanwil, setKdkanwil] = useState<string>("");
+  const [kdprov, setKdprov] = useState<string>("");
   const [deptlimit, setDeptlimit] = useState<string>("");
   const [kdkppn, setKdkppn] = useState<string>("");
   const [expire, setExpire] = useState<string>("");
@@ -91,8 +136,8 @@ export const MyContextProvider: React.FC<MyContextProviderProps> = ({
   const [persentase, setPersentase] = useState<any[]>([]);
   const [logoutLoading, setLogoutLoading] = useState<boolean>(false);
   const [stat, setStat] = useState<string>("");
-  const [processquery, setProccess] = useState<string>("");
-  const [errorprocessquery, seterrorProccess] = useState<string>("");
+  const [processquery, setProccess] = useState<any[]>([]);
+  const [errorprocessquery, seterrorProccess] = useState<any[]>([]);
   const [loadingExcell, setloadingExcell] = useState<boolean>(false);
   const [totNotif, settotNotif] = useState<number>(0);
   const [listNotif, setlistNotif] = useState<any[]>([]);
@@ -106,9 +151,13 @@ export const MyContextProvider: React.FC<MyContextProviderProps> = ({
   const [loginDengan, setloginDengan] = useState<string | null>(null);
   const [dataEpa, setDataEpa] = useState<Record<string, any>>({});
   const [viewMode, setViewMode] = useState<string>("sppg");
+  const [isTokenLoading, setIsTokenLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    localStorage.getItem("status") && refreshToken();
+    const status = localStorage.getItem("status");
+    if (status) {
+      refreshToken();
+    }
   }, []);
 
   const logout = async () => {
@@ -122,7 +171,7 @@ export const MyContextProvider: React.FC<MyContextProviderProps> = ({
       setOffline(false);
       setLoggedinUsers([]);
       setTampil("");
-      setTampilverify(false);
+      setTampilverify("");
       setNamelogin(null);
       setTelp("");
       setloginDengan(null);
@@ -154,16 +203,18 @@ export const MyContextProvider: React.FC<MyContextProviderProps> = ({
   };
 
   const refreshToken = async () => {
+    setIsTokenLoading(true); // Set loading state
     try {
       const response = await axios.get(
         process.env.NEXT_PUBLIC_LOCAL_REFRESH_TOKEN ?? "",
         { withCredentials: true }
       );
       setToken(response.data.accessToken);
-      const decoded = jwtDecode(decryptData(response.data.accessToken));
-      // console.log(decoded);
+      const decoded = jwtDecode<CustomJwtPayload>(
+        decryptData(response.data.accessToken)
+      );
       setName(decoded.name);
-      setExpire(decoded.exp);
+      setExpire(decoded.exp.toString());
       setstatusLogin(true);
       setRole(decoded.role);
       setKdkanwil(decoded.kdkanwil);
@@ -182,12 +233,22 @@ export const MyContextProvider: React.FC<MyContextProviderProps> = ({
       setVerified(decoded.verified);
       setTelp(decoded.telp);
       // setOffline(true);
-    } catch (error) {
-      if (error.response) {
+    } catch (err: any) {
+      console.log(err);
+      const { status, data } = err.response || {};
+      handleHttpError(
+        status,
+        (data && data.error) ||
+          "Terjadi Permasalahan Koneksi atau Server Backend"
+      );
+
+      if (err.response) {
         localStorage.removeItem("status");
         navigate.push("/v3/next/login");
         // return <ToastError message="error mendapatkan token" />;
       }
+    } finally {
+      setIsTokenLoading(false); // Set loading state selesai
     }
   };
 
@@ -196,17 +257,18 @@ export const MyContextProvider: React.FC<MyContextProviderProps> = ({
   axiosJWT.interceptors.request.use(
     async (config) => {
       const currentTime = Date.now() / 1000;
-      if (expire < currentTime && localStorage.getItem("status")) {
+      if (parseInt(expire) < currentTime && localStorage.getItem("status")) {
         const response = await axios.get(
-          process.env.NEXT_PUBLIC_LOCAL_REFRESH_TOKEN
+          process.env.NEXT_PUBLIC_LOCAL_REFRESH_TOKEN ?? ""
         );
         config.headers.Authorization = `Bearer ${response.data.accessToken}`;
         setToken(response.data.accessToken);
-        const decoded = jwtDecode(decryptData(response.data.accessToken));
-        // console.log(decoded);
+        const decoded = jwtDecode<CustomJwtPayload>(
+          decryptData(response.data.accessToken)
+        );
         setTelp(decoded.telp);
         setName(decoded.name);
-        setExpire(decoded.exp);
+        setExpire(decoded.exp.toString());
         setstatusLogin(true);
         setRole(decoded.role);
         setKdkanwil(decoded.kdkanwil);
@@ -238,9 +300,6 @@ export const MyContextProvider: React.FC<MyContextProviderProps> = ({
   }, [namelogin]);
 
   useEffect(() => {
-    stat === "false" &&
-      console.log("System melakukan logout otomatis terhadap akun anda.");
-
     stat === "false" && logout();
   }, [stat]);
 
@@ -254,8 +313,8 @@ export const MyContextProvider: React.FC<MyContextProviderProps> = ({
     } catch (error) {
       // handleHttpError("Terjadi Permasalahan Koneksi atau Server Backend ");
       setstatusLogin(false);
-      setTampil(false);
-      setTampilverify(false);
+      setTampil("");
+      setTampilverify("");
       navigate.push("/v3/next/login");
     }
   };
@@ -365,30 +424,17 @@ export const MyContextProvider: React.FC<MyContextProviderProps> = ({
         tampilverify,
         persentase,
         setPersentase,
-        loadingExcell,
-        setloadingExcell,
         setVerified,
         verified,
-        totNotif,
-        settotNotif,
-        listNotif,
-        setlistNotif,
-        visibilityStatuses,
-        setVisibilityStatuses,
         offline,
         setOffline,
         offlinest,
         setOfflinest,
         telp,
         setTelp,
-        tampilAI,
-        settampilAI,
-        loginDengan,
-        setloginDengan,
-        dataEpa,
-        setDataEpa,
-        viewMode,
-        setViewMode,
+        session,
+        setKdprov,
+        isTokenLoading,
       }}
     >
       {children}

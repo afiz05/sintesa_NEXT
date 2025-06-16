@@ -1,39 +1,32 @@
 "use client";
 
-import { useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Autocomplete, AutocompleteItem } from "@heroui/react";
 
-interface KanwilData {
-  kdkanwil: string;
-  nmkanwil: string;
+import MyContext from "@/utils/Contex";
+import Encrypt from "@/utils/Encrypt";
+import { handleHttpError } from "@/utils/handleError";
+
+interface TahunData {
+  kode: string;
+  tahun: string;
 }
 
-interface KanwilProps {
-  dataKanwil: KanwilData[];
-}
+export const Thang = () => {
+  const [selectedKey, setSelectedKey] = useState<string>("2025");
 
-export const Kanwil: React.FC<KanwilProps> = ({ dataKanwil }) => {
-  useEffect(() => {
-    if (!dataKanwil || dataKanwil.length === 0) {
-      console.warn("dataKanwil kosong atau tidak tersedia");
-    } else {
-      console.log("dataKanwil tersedia:", dataKanwil);
-    }
-  }, [dataKanwil]);
-
-  const mappedKanwil = dataKanwil.map((item) => ({
-    key: item.kdkanwil,
-    label: item.nmkanwil,
-    value: item.kdkanwil,
-  }));
+  // Data tahun hanya 2025
+  const dataTahun: TahunData[] = [{ kode: "2025", tahun: "2025" }];
 
   return (
     <Autocomplete
-      placeholder="Pilih Kanwil"
+      placeholder="Pilih Tahun"
       className="w-full sm:w-44 lg:w-52 h-10"
       size="md"
       variant="flat"
       color="default"
+      selectedKey={selectedKey}
+      onSelectionChange={(key) => setSelectedKey(key as string)}
       classNames={{
         base: "rounded-lg bg-slate-50/80 dark:bg-slate-800/80",
         selectorButton:
@@ -42,14 +35,11 @@ export const Kanwil: React.FC<KanwilProps> = ({ dataKanwil }) => {
         popoverContent:
           "rounded-lg bg-slate-50/95 dark:bg-slate-800/95 backdrop-blur-sm border-slate-200/60 dark:border-slate-700/60",
       }}
-      allowsCustomValue
-      // items={mappedKanwil}
-      defaultItems={mappedKanwil}
+      allowsEmptyCollection={false}
+      defaultItems={dataTahun}
     >
       {(item) => (
-        <AutocompleteItem key={item.key} className="capitalize">
-          {item.label}
-        </AutocompleteItem>
+        <AutocompleteItem key={item.kode}>{item.tahun}</AutocompleteItem>
       )}
     </Autocomplete>
   );
