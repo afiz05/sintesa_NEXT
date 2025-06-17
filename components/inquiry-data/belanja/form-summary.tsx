@@ -38,6 +38,7 @@ import {
   FileText,
   X,
   Copy,
+  AlertTriangle,
 } from "lucide-react";
 import { useBelanja } from "./context";
 import {
@@ -47,9 +48,15 @@ import {
   EselonData,
 } from "../../../utils/referenceApi";
 import { useToast } from "../../context/ToastContext";
-import { KementerianForm, EselonIForm, SatkerForm } from "./forms";
-import { KementerianQueryGenerator } from "./query-generate";
+import { KementerianForm, EselonIForm, SatkerForm, CutOffForm } from "./forms";
+import {
+  KementerianQueryGenerator,
+  EselonIQueryGenerator,
+  CombinedQueryGenerator,
+  CutOffQueryGenerator,
+} from "./query-generate";
 import DataTableModal from "./data-table-modal";
+import FormSummaryButton from "./form-summary-button";
 
 // Constants moved outside component to prevent recreating on each render
 const CUT_OFF_OPTIONS = [
@@ -403,11 +410,7 @@ const useFormState = () => {
   const [kementerian, setKementerian] = useState<Set<string>>(new Set());
   const [eselonI, setEselonI] = useState<Set<string>>(new Set());
   const [satker, setSatker] = useState<Set<string>>(new Set());
-
   // Additional form fields
-  const [cutOffKondisi, setCutOffKondisi] = useState<string>("");
-  const [cutOffKata, setCutOffKata] = useState<string>("");
-  const [cutOffTampilan, setCutOffTampilan] = useState<string>("");
   const [kementerianKondisi, setKementerianKondisi] = useState<string>("");
   const [kementerianKata, setKementerianKata] = useState<string>("");
   const [kementerianTampilan, setKementerianTampilan] =
@@ -424,15 +427,11 @@ const useFormState = () => {
   const [eselonSearchQuery, setEselonSearchQuery] = useState<string>("");
   const [satkerSearchQuery, setSatkerSearchQuery] = useState<string>("");
   const [originalSearchCount, setOriginalSearchCount] = useState<number>(0);
-
   const resetAllState = useCallback(() => {
     setCutOff("");
     setKementerian(new Set());
     setEselonI(new Set());
     setSatker(new Set());
-    setCutOffKondisi("");
-    setCutOffKata("");
-    setCutOffTampilan("");
     setKementerianKondisi("");
     setKementerianKata("");
     setKementerianTampilan("kode");
@@ -447,7 +446,6 @@ const useFormState = () => {
     setSatkerSearchQuery("");
     setOriginalSearchCount(0);
   }, []);
-
   return {
     // Query parameters
     cutOff,
@@ -459,12 +457,6 @@ const useFormState = () => {
     satker,
     setSatker,
     // Additional fields
-    cutOffKondisi,
-    setCutOffKondisi,
-    cutOffKata,
-    setCutOffKata,
-    cutOffTampilan,
-    setCutOffTampilan,
     kementerianKondisi,
     setKementerianKondisi,
     kementerianKata,
@@ -754,7 +746,8 @@ const useComputedValues = (
 };
 
 export const FormSummary = () => {
-  const { switches, selectedJenisLaporan } = useBelanja();
+  const { switches, selectedJenisLaporan, selectedTahun, selectedPembulatan } =
+    useBelanja();
   const { showToast } = useToast(); // Helper function to format selected items display
   const formatSelectedItems = (
     selectedSet: Set<string>,
@@ -801,27 +794,17 @@ export const FormSummary = () => {
     if (allSwitchesOff) {
       formState.resetAllState();
     }
-  }, [switches, formState.resetAllState]);
-  // Reset specific form fields when related switches are turned off
+  }, [switches, formState.resetAllState]); // Reset specific form fields when related switches are turned off
   useEffect(() => {
     // Only reset if switch was turned off (was true, now false)
     if (!switches.cutOff && prevSwitchesRef.current.cutOff) {
       formState.setCutOff("");
-      formState.setCutOffKondisi("");
-      formState.setCutOffKata("");
-      formState.setCutOffTampilan("");
     }
     prevSwitchesRef.current = {
       ...prevSwitchesRef.current,
       cutOff: switches.cutOff,
     };
-  }, [
-    switches.cutOff,
-    formState.setCutOff,
-    formState.setCutOffKondisi,
-    formState.setCutOffKata,
-    formState.setCutOffTampilan,
-  ]);
+  }, [switches.cutOff, formState.setCutOff]);
   useEffect(() => {
     // Only reset if switch was turned off (was true, now false)
     if (!switches.kementerian && prevSwitchesRef.current.kementerian) {
@@ -1263,6 +1246,9 @@ export const FormSummary = () => {
     formState.setSatkerSearchQuery,
     formState.satker.size,
   ]);
+  const resetAllCutOff = useCallback(() => {
+    formState.setCutOff("");
+  }, [formState.setCutOff]);
 
   const selectAllKementerian = useCallback(() => {
     const allKeys = computed.kementerianOptions.map((option) => option.key);
@@ -1368,10 +1354,6 @@ export const FormSummary = () => {
     },
     [showToast]
   );
-
-  const handleExport = useCallback(() => {
-    console.log("Exporting data...");
-  }, []);
 
   const generateSQLQuery = useCallback(() => {
     // Check if "Pagu Realisasi" is selected from Jenis Laporan
@@ -1549,10 +1531,10 @@ export const FormSummary = () => {
       }
       // Note: If no specific satker selected, the JOIN with t_unit_2025 and
       // kddept/kdunit filters will automatically limit satker appropriately
-    }
-
-    // Add cutOff filter only if switch is enabled and value is set
-    if (switches.cutOff && formState.cutOff) {
+    } // Add cutOff filter - always applied regardless of switch state
+    // When switch is off: filters to current month automatically
+    // When switch is on: filters based on user selection
+    if (formState.cutOff) {
       whereConditions.push(`cut_off = '${formState.cutOff}'`);
     }
 
@@ -1811,88 +1793,57 @@ export const FormSummary = () => {
         query = `SELECT ${selectClause} FROM monev2025.pagu_real_detail_harian_2025 WHERE ${whereClause}${simpleGroupBy};`;
       }
     }
-
     return query;
   }, [formState, switches, computed]);
 
-  // NEW: Modular query generation using the new KementerianQueryGenerator
-  // This demonstrates the modular approach for kementerian-only queries
+  // NEW: Enhanced modular query generation using CombinedQueryGenerator
+  // This handles single filters and multiple filter combinations
   const generateModularQuery = useCallback(() => {
-    // Check if this is a kementerian-only query (no other filters enabled)
-    const isKementerianOnly =
-      switches.kementerian &&
-      !switches.eselonI &&
-      !switches.satker &&
-      !switches.cutOff;
+    console.log(
+      "🔄 Using CombinedQueryGenerator for scalable query generation"
+    );
 
-    if (isKementerianOnly) {
-      console.log("🔄 Using modular KementerianQueryGenerator");
-
-      const modularQuery = KementerianQueryGenerator.generateQuery({
-        kementerianEnabled: switches.kementerian,
-        kementerian: formState.kementerian,
-        kementerianTampilan: formState.kementerianTampilan,
-        cutOff: formState.cutOff,
+    try {
+      // Use the new CombinedQueryGenerator which handles all scenarios
+      const modularQuery = CombinedQueryGenerator.generateQuery({
+        switches: {
+          kementerian: switches.kementerian,
+          eselonI: switches.eselonI,
+          satker: switches.satker,
+          cutOff: switches.cutOff,
+        },
+        formState: {
+          kementerian: formState.kementerian,
+          kementerianTampilan: formState.kementerianTampilan,
+          eselonI: formState.eselonI,
+          eselonTampilan: formState.eselonTampilan,
+          satker: formState.satker,
+          satkerTampilan: formState.satkerTampilan,
+          cutOff: formState.cutOff,
+        },
         selectedJenisLaporan: selectedJenisLaporan,
+        selectedTahun: selectedTahun,
+        selectedPembulatan: selectedPembulatan,
       });
 
-      console.log("✅ Modular query generated:", modularQuery);
+      console.log("✅ Combined modular query generated:", modularQuery);
       return modularQuery;
-    }
-
-    // Fallback to original function for complex queries
-    console.log("🔄 Using original generateSQLQuery for complex query");
-    return generateSQLQuery();
-  }, [formState, switches, selectedJenisLaporan, generateSQLQuery]);
-
-  // Function to get SQL query and copy to clipboard
-  const handleGetSQL = useCallback(async () => {
-    try {
-      // Generate SQL query using the new modular approach
-      const sqlQuery = generateModularQuery();
-
-      // Copy to clipboard
-      await navigator.clipboard.writeText(sqlQuery);
-
-      // Show success toast
-      showToast("SQL query copied to clipboard!", "success");
     } catch (error) {
-      console.error("Failed to copy SQL query:", error);
-      showToast("Failed to copy SQL query", "error");
+      console.warn(
+        "⚠️ CombinedQueryGenerator failed, falling back to original logic:",
+        error
+      );
+      // Fallback to original function for unsupported combinations
+      return generateSQLQuery();
     }
-  }, [generateModularQuery, showToast]);
-
-  // Function to open modal with generated SQL
-  const openModalWithSQL = useCallback(() => {
-    try {
-      // Use the new modular approach when possible
-      const sqlQuery = generateModularQuery();
-      setCurrentSqlQuery(sqlQuery);
-      setIsModalOpen(true);
-    } catch (error) {
-      console.error("Error generating SQL query:", error);
-      showToast("Failed to generate SQL query", "error");
-    }
-  }, [generateModularQuery, showToast]);
-
-  // Update handleSubmit to use the new function
-  const handleSubmitWithModal = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
-      setIsLoading(true);
-
-      try {
-        openModalWithSQL();
-        showToast("Opening query results...", "success");
-      } catch (error) {
-        console.error("Error opening modal:", error);
-        showToast("Failed to open query results", "error");
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [openModalWithSQL, showToast]
-  );
+  }, [
+    formState,
+    switches,
+    selectedJenisLaporan,
+    selectedTahun,
+    selectedPembulatan,
+    generateSQLQuery,
+  ]);
 
   return (
     <div className="space-y-4 mb-6">
@@ -1911,87 +1862,21 @@ export const FormSummary = () => {
       </Card>
       {/* Query Parameters Card */}
       <Card className="bg-gradient-to-r from-green-50/50 to-emerald-50/50 dark:from-green-900/10 dark:to-emerald-900/10 border border-green-100 dark:border-green-800/20 shadow-sm">
+        {" "}
         <CardBody className="p-6">
-          <form onSubmit={handleSubmitWithModal} className="space-y-6">
+          <div className="space-y-6">
             {/* Query Parameters Section */}
             <div className="space-y-4">
               <h4 className="text-md font-medium bg-gradient-to-r from-gray-700 to-gray-600 dark:from-gray-200 dark:to-gray-300 bg-clip-text text-transparent border-b border-gray-200 dark:border-gray-700 pb-2">
                 Query Parameters
               </h4>{" "}
-              {/* Cut Off Section */}
-              {switches.cutOff && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 p-4 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/40 dark:to-purple-900/40 rounded-xl border border-blue-200 dark:border-blue-800 transition-all duration-200">
-                  <div className="flex items-center gap-2">
-                    <Calendar
-                      className="text-blue-600 dark:text-blue-400"
-                      size={16}
-                    />
-                    <span className="font-medium text-blue-700 dark:text-blue-300 text-sm whitespace-nowrap">
-                      Cut Off
-                    </span>
-                  </div>
-                  <div>
-                    <DropdownListbox
-                      items={CUT_OFF_OPTIONS}
-                      selectedKeys={formState.cutOff ? [formState.cutOff] : []}
-                      onSelectionChange={(keys) => {
-                        const selectedKey = Array.from(keys)[0] as string;
-                        formState.setCutOff(selectedKey || "");
-                      }}
-                      placeholder="Pilih Cut Off"
-                      ariaLabel="Pilih Cut Off"
-                      variant="bordered"
-                      size="sm"
-                      className="min-w-[140px]"
-                    />
-                  </div>
-                  <div>
-                    <Input
-                      placeholder="Masukkan Kondisi"
-                      value={formState.cutOffKondisi}
-                      onChange={(e) =>
-                        formState.setCutOffKondisi(e.target.value)
-                      }
-                      variant="bordered"
-                      size="sm"
-                      aria-label="Kondisi Cut Off"
-                    />
-                  </div>
-                  <div>
-                    <Input
-                      placeholder="Mengandung Kata"
-                      value={formState.cutOffKata}
-                      onChange={(e) => formState.setCutOffKata(e.target.value)}
-                      variant="bordered"
-                      size="sm"
-                      aria-label="Kata yang mengandung Cut Off"
-                    />
-                  </div>{" "}
-                  <div>
-                    <Select
-                      items={TAMPILAN_OPTIONS}
-                      selectedKeys={
-                        formState.cutOffTampilan
-                          ? [formState.cutOffTampilan]
-                          : []
-                      }
-                      onSelectionChange={(keys) => {
-                        const selectedKey = Array.from(keys)[0] as string;
-                        formState.setCutOffTampilan(selectedKey || "");
-                      }}
-                      placeholder="Pilih Tampilan"
-                      aria-label="Pilih Tampilan Cut Off"
-                      variant="bordered"
-                      size="sm"
-                      className="min-w-[140px]"
-                    >
-                      {(item) => (
-                        <SelectItem key={item.key}>{item.label}</SelectItem>
-                      )}
-                    </Select>
-                  </div>
-                </div>
-              )}{" "}
+              {/* Cut Off Section - Always shown but disabled when switch is off */}
+              <CutOffForm
+                cutOff={formState.cutOff}
+                setCutOff={formState.setCutOff}
+                resetAllCutOff={resetAllCutOff}
+                isEnabled={switches.cutOff}
+              />{" "}
               {/* Kementerian Section */}
               {switches.kementerian && (
                 <KementerianForm
@@ -2059,52 +1944,20 @@ export const FormSummary = () => {
                   isLoadingSatker={dataLoading.isLoadingSatker}
                   isProcessingSatker={isProcessingSatker}
                 />
-              )}
+              )}{" "}
             </div>{" "}
-            {/* Action Buttons */}{" "}
-            <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200 dark:border-gray-700 justify-center">
-              <Button
-                type="submit"
-                color="primary"
-                isLoading={isLoading}
-                startContent={!isLoading && <Search size={18} />}
-                className="min-w-[180px]"
-              >
-                {isLoading ? "Searching..." : "Search Data"}
-              </Button>
-              <Button
-                type="button"
-                variant="bordered"
-                startContent={<RefreshCw size={18} />}
-                className="min-w-[180px]"
-                onClick={() => {
-                  formState.resetAllState();
-                }}
-              >
-                Reset Form
-              </Button>
-              <Button
-                type="button"
-                color="success"
-                variant="flat"
-                startContent={<Download size={18} />}
-                className="min-w-[180px]"
-                onClick={handleExport}
-              >
-                Export Data
-              </Button>
-              <Button
-                type="button"
-                color="warning"
-                variant="flat"
-                startContent={<Copy size={18} />}
-                className="min-w-[180px]"
-                onClick={handleGetSQL}
-              >
-                Get SQL{" "}
-              </Button>{" "}
-            </div>
-          </form>
+            {/* Form Summary Buttons */}
+            <FormSummaryButton
+              isLoading={isLoading}
+              generateSQLQuery={generateSQLQuery}
+              generateModularQuery={generateModularQuery}
+              resetAllState={formState.resetAllState}
+              onSearchSubmit={() => {}}
+              setIsModalOpen={setIsModalOpen}
+              setCurrentSqlQuery={setCurrentSqlQuery}
+              setIsLoading={setIsLoading}
+            />
+          </div>
         </CardBody>
       </Card>{" "}
       {/* Data Table Modal */}
@@ -2112,6 +1965,9 @@ export const FormSummary = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         sqlQuery={currentSqlQuery}
+        cutOff={formState.cutOff} // Always pass cutOff value since it's always used for filtering
+        selectedTahun={selectedTahun}
+        selectedPembulatan={selectedPembulatan}
       />
     </div>
   );

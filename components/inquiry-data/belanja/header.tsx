@@ -21,10 +21,9 @@ export const Header: React.FC<HeaderProps> = ({
     setSelectedJenisLaporan,
     setSelectedPembulatan,
   } = useBelanja();
-
-  // Generate years from 2014 to 2025
+  // Generate years from 2025 to 2014 (descending order)
   const tahunOptions = Array.from({ length: 12 }, (_, i) =>
-    (2014 + i).toString()
+    (2025 - i).toString()
   );
 
   const jenisLaporanOptions = [
@@ -38,6 +37,32 @@ export const Header: React.FC<HeaderProps> = ({
   ];
 
   const pembulatanOptions = ["Rupiah", "Ribu", "Juta", "Miliar", "Triliun"];
+
+  // Demo function to show dynamic table and rounding configuration
+  const getDynamicTableInfo = () => {
+    const tableName = `monev${selectedTahun}.pagu_real_detail_harian_${selectedTahun}`;
+
+    let roundingInfo = "No rounding";
+    switch (selectedPembulatan.toLowerCase()) {
+      case "ribu":
+        roundingInfo = "Divide by 1,000";
+        break;
+      case "juta":
+        roundingInfo = "Divide by 1,000,000";
+        break;
+      case "miliar":
+        roundingInfo = "Divide by 1,000,000,000";
+        break;
+      case "triliun":
+        roundingInfo = "Divide by 1,000,000,000,000";
+        break;
+    }
+
+    return { tableName, roundingInfo };
+  };
+
+  const { tableName, roundingInfo } = getDynamicTableInfo();
+
   return (
     <div className="space-y-4 mb-4">
       {/* Header Card */}
@@ -123,6 +148,53 @@ export const Header: React.FC<HeaderProps> = ({
                   <SelectItem key={pembulatan}>{pembulatan}</SelectItem>
                 ))}
               </Select>
+            </div>
+          </div>
+
+          {/* Demo Display */}
+          <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-inner">
+            <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+              Dynamic Table & Rounding Info
+            </h4>
+            <p className="text-xs text-gray-600 dark:text-gray-400">
+              Table Name:{" "}
+              <span className="font-mono text-gray-800 dark:text-gray-200">
+                {tableName}
+              </span>
+            </p>
+            <p className="text-xs text-gray-600 dark:text-gray-400">
+              Rounding:{" "}
+              <span className="font-mono text-gray-800 dark:text-gray-200">
+                {roundingInfo}
+              </span>
+            </p>
+          </div>
+        </CardBody>
+      </Card>
+
+      {/* Configuration Info Card */}
+      <Card className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700/30">
+        <CardBody className="p-4">
+          <div className="text-sm text-blue-700 dark:text-blue-300">
+            <div className="flex flex-wrap gap-4">
+              <div>
+                <span className="font-medium">Table:</span>{" "}
+                <code className="bg-white dark:bg-gray-800 px-2 py-1 rounded text-xs">
+                  {tableName}
+                </code>
+              </div>
+              <div>
+                <span className="font-medium">Report:</span>{" "}
+                <span className="text-blue-600 dark:text-blue-400">
+                  {selectedJenisLaporan}
+                </span>
+              </div>
+              <div>
+                <span className="font-medium">Rounding:</span>{" "}
+                <span className="text-blue-600 dark:text-blue-400">
+                  {roundingInfo}
+                </span>
+              </div>
             </div>
           </div>
         </CardBody>
