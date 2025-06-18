@@ -3,12 +3,24 @@
 import { useContext, useEffect, useState } from "react";
 import { Card, CardBody, CardHeader, Skeleton, Chip } from "@heroui/react";
 import { useTheme } from "next-themes";
-import Chart, { Props } from "react-apexcharts";
 import { BarChart3, Database, FileX } from "lucide-react";
+import dynamic from "next/dynamic";
+import type { Props } from "react-apexcharts";
+
+// Import Chart component with SSR disabled
+const Chart = dynamic(() => import("./client-chart"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center">
+      <Skeleton className="w-full h-64" />
+    </div>
+  ),
+});
 
 import MyContext from "@/utils/Contex";
 import Encrypt from "@/utils/Encrypt";
 import { handleHttpError } from "@/utils/handleError";
+import { useToast } from "../context/ToastContext";
 
 interface DipaPerFungsi {
   thang: number;
@@ -34,6 +46,7 @@ export const Fungsi = ({ selectedKanwil, selectedKddept }: FungsiProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const context = useContext(MyContext);
   const { theme } = useTheme();
+  const { showToast } = useToast();
 
   const { token, axiosJWT } = context! as {
     token: string;
@@ -64,23 +77,6 @@ export const Fungsi = ({ selectedKanwil, selectedKddept }: FungsiProps) => {
   };
 
   const getData = async () => {
-    let groupBy = "";
-
-    if (
-      selectedKanwil &&
-      selectedKanwil !== "00" &&
-      selectedKddept &&
-      selectedKddept !== "000"
-    ) {
-      groupBy = "a.kddept, a.kdfungsi, a.kdkanwil";
-    } else if (selectedKanwil && selectedKanwil !== "00") {
-      groupBy = "a.kdfungsi, a.kdkanwil";
-    } else if (selectedKddept && selectedKddept !== "000") {
-      groupBy = "a.kddept, a.kdfungsi";
-    } else {
-      groupBy = "a.kdfungsi";
-    }
-
     // Tambahkan filter kanwil jika selectedKanwil tersedia dan tidak "00"
     let kanwilFilter = "";
     if (selectedKanwil && selectedKanwil !== "00") {
@@ -109,8 +105,8 @@ export const Fungsi = ({ selectedKanwil, selectedKddept }: FungsiProps) => {
   LEFT JOIN dbref.t_kanwil_2025 k ON a.kdkanwil = k.kdkanwil
   LEFT JOIN dbref.t_dept_2025 c ON a.kddept = c.kddept
   WHERE a.thang='2025' ${kanwilFilter} ${kddeptFilter}
-  GROUP BY ${groupBy}
-  ORDER BY a.thang, ${groupBy};
+  GROUP BY a.kdfungsi
+  ORDER BY a.thang, a.kdfungsi;
 `);
 
     const cleanedQuery = decodeURIComponent(encodedQuery)
@@ -139,12 +135,7 @@ export const Fungsi = ({ selectedKanwil, selectedKddept }: FungsiProps) => {
       setDataDipaPerFungsi(resultData);
     } catch (err: any) {
       const { status, data } = err.response || {};
-      setDataDipaPerFungsi([]); // Explicitly set empty array on error
-      handleHttpError(
-        status,
-        (data && data.error) ||
-          "Terjadi Permasalahan Koneksi atau Server Backend "
-      );
+      showToast("Terjadi Permasalahan Koneksi atau Server Backend", "error");
     } finally {
       setLoading(false);
     }
@@ -182,14 +173,13 @@ export const Fungsi = ({ selectedKanwil, selectedKddept }: FungsiProps) => {
       textMuted: isDark ? "text-slate-400" : "text-slate-600",
     };
   };
+  const isEmpty =
+    dataDipaPerFungsi.length === 0 ||
+    Object.values(dataDipaPerFungsi[0])
+      .slice(2) // abaikan 2 field pertama
+      .every((val) => val === 0 || val === null);
 
-  // Check for empty data - comprehensive check
-  const hasValidData =
-    dataDipaPerFungsi &&
-    Array.isArray(dataDipaPerFungsi) &&
-    dataDipaPerFungsi.length > 0;
-
-  if (!loading && !hasValidData) {
+  if (isEmpty) {
     return (
       <div className="w-full h-full">
         <Card
@@ -206,13 +196,9 @@ export const Fungsi = ({ selectedKanwil, selectedKddept }: FungsiProps) => {
                   startContent={<Database className="w-3 h-3" />}
                   className="text-xs"
                 >
-                  No Data Available
+                  Data Tidak Tersedia
                 </Chip>
               </div>
-              <p className="text-sm text-default-500 mt-2">
-                Tidak ada data DIPA per Fungsi tersedia untuk filter yang
-                dipilih
-              </p>
             </div>
           </CardBody>
         </Card>
@@ -257,40 +243,6 @@ export const Fungsi = ({ selectedKanwil, selectedKddept }: FungsiProps) => {
   const realisasiData: number[] = sortedEntries.map(
     ([_, data]) => data.realisasi
   );
-
-  // Check if all data is zero (empty data)
-  const hasNonZeroData =
-    paguData.some((val) => val > 0) || realisasiData.some((val) => val > 0);
-
-  if (!loading && hasValidData && !hasNonZeroData) {
-    return (
-      <div className="w-full h-full">
-        <Card
-          className={`border-none shadow-sm ${getThemeClasses().cardBg} h-full`}
-        >
-          <CardBody className="pt-0 px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <FileX className="w-12 h-12 text-default-400 mb-4" />
-              <div className="mt-4">
-                <Chip
-                  size="sm"
-                  variant="flat"
-                  color="warning"
-                  startContent={<Database className="w-3 h-3" />}
-                  className="text-xs"
-                >
-                  No Data Available
-                </Chip>
-              </div>
-              <p className="text-sm text-default-500 mt-2">
-                Data DIPA per Fungsi belum tersedia untuk periode ini
-              </p>
-            </div>
-          </CardBody>
-        </Card>
-      </div>
-    );
-  }
 
   const state: Props["series"] = [
     {
@@ -371,7 +323,7 @@ export const Fungsi = ({ selectedKanwil, selectedKddept }: FungsiProps) => {
         fontSize: "12px",
       },
       x: {
-        formatter: (_, { dataPointIndex }) =>
+        formatter: (_: any, { dataPointIndex }: { dataPointIndex: number }) =>
           fungsiNamesLengkap[dataPointIndex],
       },
       y: {
@@ -396,6 +348,7 @@ export const Fungsi = ({ selectedKanwil, selectedKddept }: FungsiProps) => {
     // @ts-ignore
     markers: false,
   };
+  // console.log(kodeFungsiList);
 
   return (
     <div className="w-full h-full relative">

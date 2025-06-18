@@ -16,7 +16,15 @@ import {
   Skeleton,
 } from "@heroui/react";
 import NextLink from "next/link";
-import { Building2, TrendingUp, Database, FileX } from "lucide-react";
+import {
+  Building2,
+  TrendingUp,
+  Database,
+  FileX,
+  BarChart3,
+} from "lucide-react";
+import { useToast } from "@/components/context/ToastContext";
+import ModalPerforma from "@/components/home/modal/detailPerforma";
 
 interface PerformaTerbesarData {
   kddept: string;
@@ -31,15 +39,18 @@ interface GetPerformaTerbesarProps {
   selectedKddept?: string;
 }
 
-export const GetPerformaTerbesar = ({
+export const PerformaTerbesar = ({
   selectedKanwil,
   selectedKddept,
 }: GetPerformaTerbesarProps) => {
   const [dataDipa, setDataDipa] = useState<PerformaTerbesarData[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const context = useContext(MyContext);
+
   const { theme } = useTheme();
+  const { showToast } = useToast();
+  const [modalPerforma, setModalPerforma] = useState(false);
+  const context = useContext(MyContext);
 
   const { token, axiosJWT, statusLogin } = context! as {
     token: string;
@@ -74,18 +85,6 @@ export const GetPerformaTerbesar = ({
   };
 
   const getData = async () => {
-    // Tambahkan filter kanwil jika selectedKanwil tersedia dan tidak "00"
-    let kanwilFilter = "";
-    if (selectedKanwil && selectedKanwil !== "00") {
-      kanwilFilter = ` and prk.kdkanwil='${selectedKanwil}'`;
-    }
-
-    // Tambahkan filter kddept jika selectedKddept tersedia dan tidak "000"
-    let kddeptFilter = "";
-    if (selectedKddept && selectedKddept !== "000") {
-      kddeptFilter = ` and prk.kddept='${selectedKddept}'`;
-    }
-
     const encodedQuery = encodeURIComponent(
       `SELECT 
   prk.kddept,
@@ -96,8 +95,7 @@ export const GetPerformaTerbesar = ({
 FROM dashboard.pagu_real_kl prk
 LEFT JOIN dbref.t_dept_2025 td
   ON prk.kddept = td.kddept
-WHERE prk.thang = '2022'${kanwilFilter}${kddeptFilter}
-GROUP BY prk.kddept, td.nmdept
+WHERE prk.thang = '2022' group by prk.kddept
 ORDER BY pagu DESC
 LIMIT 4;`
     );
@@ -128,26 +126,15 @@ LIMIT 4;`
     } catch (err: any) {
       const { status, data } = err.response || {};
       setDataDipa([]); // Explicitly set empty array on error
-      handleHttpError(
-        status,
-        (data && data.error) ||
-          "Terjadi Permasalahan Koneksi atau Server Backend "
-      );
+      showToast("Terjadi Permasalahan Koneksi atau Server Backend", "error");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (statusLogin && token) {
-      getData();
-    }
-  }, [statusLogin, token, selectedKanwil, selectedKddept]); // Tambahkan selectedKanwil dan selectedKddept sebagai dependency
-
-  // Re-render component when theme changes to update styles
-  useEffect(() => {
-    // Component will automatically re-render when theme changes
-  }, [theme]);
+    getData();
+  }, []);
 
   if (loading) {
     return (
@@ -185,25 +172,7 @@ LIMIT 4;`
     );
   }
 
-  if (error) {
-    return (
-      <Card
-        className={`border-none shadow-sm ${
-          getThemeClasses().cardBg
-        } lg:col-span-6 xl:col-span-3`}
-      >
-        <CardBody className="p-6 text-center">
-          <p className="text-sm text-danger">Error: {error}</p>
-        </CardBody>
-      </Card>
-    );
-  }
-
-  // Check for empty data - more comprehensive check
-  const hasValidData =
-    dataDipa && Array.isArray(dataDipa) && dataDipa.length > 0;
-
-  if (!loading && !hasValidData) {
+  if (!dataDipa || dataDipa.length === 0) {
     return (
       <Card
         className={`border-none shadow-sm ${
@@ -232,12 +201,9 @@ LIMIT 4;`
                 startContent={<Database className="w-3 h-3" />}
                 className="text-xs"
               >
-                No Data Available
+                Data tidak tersedia
               </Chip>
             </div>
-            <p className="text-sm text-default-500 mt-2">
-              Tidak ada data performa K/L tersedia untuk filter yang dipilih
-            </p>
           </div>
         </CardBody>
       </Card>
@@ -271,47 +237,6 @@ LIMIT 4;`
     (item) => item.paguValue > 0 || item.realisasiValue > 0
   );
 
-  if (!loading && hasValidData && !hasNonZeroData) {
-    return (
-      <Card
-        className={`border-none shadow-sm ${
-          getThemeClasses().cardBg
-        } lg:col-span-6 xl:col-span-3`}
-      >
-        <CardHeader className="pb-2 px-4 md:px-6">
-          <div className="flex justify-between items-center w-full">
-            <h3
-              className={`text-sm md:text-base font-semibold ${
-                getThemeClasses().textPrimary
-              }`}
-            >
-              Performa K/L Terbesar
-            </h3>
-          </div>
-        </CardHeader>
-        <CardBody className="pt-0 px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center py-8 text-center">
-            <FileX className="w-12 h-12 text-default-400 mb-4" />
-            <div className="mt-4">
-              <Chip
-                size="sm"
-                variant="flat"
-                color="warning"
-                startContent={<Database className="w-3 h-3" />}
-                className="text-xs"
-              >
-                No Data Available
-              </Chip>
-            </div>
-            <p className="text-sm text-default-500 mt-2">
-              Data performa K/L belum tersedia untuk periode ini
-            </p>
-          </div>
-        </CardBody>
-      </Card>
-    );
-  }
-
   return (
     <Card
       className={`border-none shadow-sm ${
@@ -319,21 +244,22 @@ LIMIT 4;`
       } lg:col-span-6 xl:col-span-3`}
     >
       <CardHeader className="pb-2 px-4 md:px-6">
-        <div className="flex justify-between items-center w-full">
-          <h3
-            className={`text-sm md:text-base font-semibold ${
-              getThemeClasses().textPrimary
-            }`}
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center gap-2">
+            <h3 className="text-sm md:text-base font-semibold">
+              Performa K/L Terbesar
+            </h3>
+          </div>
+
+          <Chip
+            color="primary"
+            onClick={() => setModalPerforma(true)}
+            variant="flat"
+            size="sm"
+            className="w-fit cursor-pointer"
           >
-            Performa K/L Terbesar
-          </h3>
-          <Link
-            href="/mbg/data-update"
-            as={NextLink}
-            className="text-xs text-primary"
-          >
-            Lihat Semua
-          </Link>
+            Detail
+          </Chip>
         </div>
       </CardHeader>
       <CardBody className="pt-0 px-4 md:px-6">
@@ -401,6 +327,10 @@ LIMIT 4;`
           ))}
         </div>
       </CardBody>
+      <ModalPerforma
+        isOpen={modalPerforma}
+        onClose={() => setModalPerforma(false)}
+      />
     </Card>
   );
 };

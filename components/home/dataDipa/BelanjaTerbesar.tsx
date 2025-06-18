@@ -17,6 +17,7 @@ import {
 } from "@heroui/react";
 import NextLink from "next/link";
 import { BarChart3, Database, FileX } from "lucide-react";
+import { useToast } from "@/components/context/ToastContext";
 
 interface BelanjaTerbesarData {
   kddept: string;
@@ -32,7 +33,7 @@ interface GetBelanjaTerbesarProps {
   selectedKddept?: string;
 }
 
-export const GetBelanjaTerbesar = ({
+export const BelanjaTerbesar = ({
   selectedKanwil,
   selectedKddept,
 }: GetBelanjaTerbesarProps) => {
@@ -41,6 +42,7 @@ export const GetBelanjaTerbesar = ({
   const [loading, setLoading] = useState<boolean>(false);
   const context = useContext(MyContext);
   const { theme } = useTheme();
+  const { showToast } = useToast();
 
   const { token, axiosJWT, statusLogin } = context! as {
     token: string;
@@ -103,7 +105,7 @@ export const GetBelanjaTerbesar = ({
   SUM(realisasi) / NULLIF(SUM(pagu),0) * 100 AS persen
 FROM dashboard.pagu_real_jenbel 
 WHERE thang = '2022' ${kanwilFilter}${kddeptFilter}
-GROUP BY ${selectedKddept && selectedKddept !== "000" ? "kddept, " : ""}jenbel;`
+GROUP BY jenbel;`
     );
     const cleanedQuery = decodeURIComponent(encodedQuery)
       .replace(/\n/g, " ")
@@ -131,11 +133,7 @@ GROUP BY ${selectedKddept && selectedKddept !== "000" ? "kddept, " : ""}jenbel;`
     } catch (err: any) {
       const { status, data } = err.response || {};
       setDataDipa([]); // Explicitly set empty array on error
-      handleHttpError(
-        status,
-        (data && data.error) ||
-          "Terjadi Permasalahan Koneksi atau Server Backend "
-      );
+      showToast("Terjadi Permasalahan Koneksi atau Server Backend", "error");
     } finally {
       setLoading(false);
     }
@@ -144,11 +142,6 @@ GROUP BY ${selectedKddept && selectedKddept !== "000" ? "kddept, " : ""}jenbel;`
   useEffect(() => {
     getData();
   }, [selectedKanwil, selectedKddept]); // Tambahkan selectedKanwil dan selectedKddept sebagai dependency
-
-  // Re-render component when theme changes to update styles
-  useEffect(() => {
-    // Component will automatically re-render when theme changes
-  }, [theme]);
 
   if (loading) {
     return (
@@ -186,11 +179,7 @@ GROUP BY ${selectedKddept && selectedKddept !== "000" ? "kddept, " : ""}jenbel;`
     );
   }
 
-  // Check for empty data - more comprehensive check
-  const hasValidData =
-    dataDipa && Array.isArray(dataDipa) && dataDipa.length > 0;
-
-  if (!loading && !hasValidData) {
+  if (dataDipa.length === 0 || !dataDipa) {
     return (
       <Card
         className={`border-none shadow-sm ${
@@ -219,12 +208,9 @@ GROUP BY ${selectedKddept && selectedKddept !== "000" ? "kddept, " : ""}jenbel;`
                 startContent={<Database className="w-3 h-3" />}
                 className="text-xs"
               >
-                No Data Available
+                Data tidak tersedia
               </Chip>
             </div>
-            <p className="text-sm text-default-500 mt-2">
-              Tidak ada data jenis belanja tersedia untuk filter yang dipilih
-            </p>
           </div>
         </CardBody>
       </Card>
@@ -257,52 +243,6 @@ GROUP BY ${selectedKddept && selectedKddept !== "000" ? "kddept, " : ""}jenbel;`
       const budgetB = parseFloat(b.budget.replace(/[^\d.-]/g, ""));
       return budgetB - budgetA;
     });
-
-  // Check if all data is zero (empty data)
-  const hasNonZeroData = jenbelData.some(
-    (item) => item.paguValue > 0 || item.realisasiValue > 0
-  );
-
-  if (!loading && hasValidData && !hasNonZeroData) {
-    return (
-      <Card
-        className={`border-none shadow-sm ${
-          getThemeClasses().cardBg
-        } lg:col-span-6 xl:col-span-3`}
-      >
-        <CardHeader className="pb-2 px-4 md:px-6">
-          <div className="flex justify-between items-center w-full">
-            <h3
-              className={`text-sm md:text-base font-semibold ${
-                getThemeClasses().textPrimary
-              }`}
-            >
-              Jenis Belanja Terbesar
-            </h3>
-          </div>
-        </CardHeader>
-        <CardBody className="pt-0 px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center py-8 text-center">
-            <FileX className="w-12 h-12 text-default-400 mb-4" />
-            <div className="mt-4">
-              <Chip
-                size="sm"
-                variant="flat"
-                color="warning"
-                startContent={<Database className="w-3 h-3" />}
-                className="text-xs"
-              >
-                No Data Available
-              </Chip>
-            </div>
-            <p className="text-sm text-default-500 mt-2">
-              Data jenis belanja belum tersedia untuk periode ini
-            </p>
-          </div>
-        </CardBody>
-      </Card>
-    );
-  }
 
   return (
     <Card

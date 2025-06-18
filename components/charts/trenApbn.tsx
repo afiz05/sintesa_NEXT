@@ -3,12 +3,24 @@
 import { useContext, useEffect, useState } from "react";
 import { Card, CardBody, CardHeader, Skeleton, Chip } from "@heroui/react";
 import { useTheme } from "next-themes";
-import Chart, { Props } from "react-apexcharts";
 import { TrendingUp, Database, FileX } from "lucide-react";
+import dynamic from "next/dynamic";
+import type { Props } from "react-apexcharts";
+
+// Import Chart component with SSR disabled
+const Chart = dynamic(() => import("./client-chart"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center">
+      <Skeleton className="w-full h-64" />
+    </div>
+  ),
+});
 
 import MyContext from "@/utils/Contex";
 import Encrypt from "@/utils/Encrypt";
 import { handleHttpError } from "@/utils/handleError";
+import { useToast } from "../context/ToastContext";
 
 interface RencanaReal {
   kddept: string;
@@ -49,6 +61,7 @@ export const TrenApbn = ({ selectedKanwil, selectedKddept }: TrenApbnProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const context = useContext(MyContext);
   const { theme } = useTheme();
+  const { showToast } = useToast();
 
   const { token, axiosJWT } = context! as {
     token: string;
@@ -118,13 +131,14 @@ export const TrenApbn = ({ selectedKanwil, selectedKddept }: TrenApbnProps) => {
     ROUND(sum(renc12)/1, 0) as renc12, 
     ROUND(sum(real12)/1, 0) as real12 FROM dashboard.rencana_real_bulanan  a  
     LEFT JOIN dbref.t_dept_2025 b ON a.kddept=b.kddept 
-    WHERE 1=1 ${kanwilFilter}${kddeptFilter};`
+    WHERE a.thang = '2022' ${kanwilFilter}${kddeptFilter};`
     );
     const cleanedQuery = decodeURIComponent(encodedQuery)
       .replace(/\n/g, " ")
       .replace(/\s+/g, " ")
       .trim();
     const encryptedQuery = Encrypt(cleanedQuery);
+    console.log(cleanedQuery);
 
     try {
       setLoading(true);
@@ -145,12 +159,8 @@ export const TrenApbn = ({ selectedKanwil, selectedKddept }: TrenApbnProps) => {
       setDataRencanaReal(resultData);
     } catch (err: any) {
       const { status, data } = err.response || {};
-      setDataRencanaReal([]); // Explicitly set empty array on error
-      handleHttpError(
-        status,
-        (data && data.error) ||
-          "Terjadi Permasalahan Koneksi atau Server Backend "
-      );
+
+      showToast("Terjadi Permasalahan Koneksi atau Server Backend", "error");
     } finally {
       setLoading(false);
     }
@@ -158,9 +168,7 @@ export const TrenApbn = ({ selectedKanwil, selectedKddept }: TrenApbnProps) => {
 
   useEffect(() => {
     getData();
-  }, [selectedKanwil, selectedKddept]); // Tambahkan selectedKanwil dan selectedKddept sebagai dependency
-
-  // Re-render chart when theme changes to update colors
+  }, [selectedKanwil, selectedKddept]);
 
   if (loading) {
     return (
@@ -204,126 +212,92 @@ export const TrenApbn = ({ selectedKanwil, selectedKddept }: TrenApbnProps) => {
       </Card>
     );
   }
-
-  const getThemeClasses = () => {
+  const getCardClasses = () => {
     const isDark = theme === "dark";
-    return {
-      cardBg: isDark
-        ? "bg-gradient-to-br from-slate-800/90 to-slate-700/90"
-        : "bg-gradient-to-br from-white/90 to-slate-50/90",
-      textPrimary: isDark ? "text-slate-100" : "text-slate-900",
-      textSecondary: isDark ? "text-slate-300" : "text-slate-600",
-      textMuted: isDark ? "text-slate-400" : "text-slate-600",
-    };
+    return isDark
+      ? "bg-gradient-to-br from-slate-800 to-slate-700"
+      : "bg-gradient-to-br from-slate-100 to-slate-200";
   };
 
-  // Check for empty data - more comprehensive check
-  const hasValidData =
-    dataRencanaReal &&
-    Array.isArray(dataRencanaReal) &&
-    dataRencanaReal.length > 0 &&
-    dataRencanaReal[0]; // Make sure first element exists
+  const cardClasses = getCardClasses();
+  const isEmpty =
+    dataRencanaReal.length === 0 ||
+    Object.values(dataRencanaReal[0])
+      .filter((_, i) => i > 1)
+      .every((val) => val === 0 || val === null);
 
-  if (!loading && !hasValidData) {
+  if (isEmpty) {
     return (
-      <div className="w-full h-full">
-        <Card
-          className={`border-none shadow-sm ${getThemeClasses().cardBg} h-full`}
-        >
-          <CardBody className="pt-0 px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <FileX className="w-12 h-12 text-default-400 mb-4" />
-              <div className="mt-4">
-                <Chip
-                  size="sm"
-                  variant="flat"
-                  color="warning"
-                  startContent={<Database className="w-3 h-3" />}
-                  className="text-xs"
-                >
-                  No Data Available
-                </Chip>
+      <Card
+        className={`border-none shadow-sm ${cardClasses} sm:col-span-2 lg:col-span-12 xl:col-span-6`}
+      >
+        <CardHeader className="pb-1 px-4 md:px-6">
+          <div className="flex flex-col gap-1">
+            <h3 className="text-sm md:text-base font-semibold">
+              Tren Realisasi APBN
+            </h3>
+          </div>
+        </CardHeader>{" "}
+        <div className="w-full h-full">
+          <div className="h-full flex flex-col">
+            <CardBody className="pt-0 px-2 md:px-4 pb-1">
+              <div className="h-[150px] md:h-[200px] w-full flex flex-col overflow-hidden">
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <FileX className="w-12 h-12 text-default-400 mb-4" />
+                  <div className="mt-4">
+                    <Chip
+                      size="sm"
+                      variant="flat"
+                      color="warning"
+                      startContent={<Database className="w-3 h-3" />}
+                      className="text-xs"
+                    >
+                      Data Tidak Tersedia
+                    </Chip>
+                  </div>
+                </div>
               </div>
-              <p className="text-sm text-default-500 mt-2">
-                Tidak ada data APBN tersedia untuk filter yang dipilih
-              </p>
-            </div>
-          </CardBody>
-        </Card>
-      </div>
+            </CardBody>{" "}
+          </div>
+        </div>
+      </Card>
     );
   }
 
   // Proses data untuk chart - with safety checks
-  const rencanaData =
-    hasValidData && dataRencanaReal[0]
-      ? [
-          dataRencanaReal[0].renc1 || 0,
-          dataRencanaReal[0].renc2 || 0,
-          dataRencanaReal[0].renc3 || 0,
-          dataRencanaReal[0].renc4 || 0,
-          dataRencanaReal[0].renc5 || 0,
-          dataRencanaReal[0].renc6 || 0,
-          dataRencanaReal[0].renc7 || 0,
-          dataRencanaReal[0].renc8 || 0,
-          dataRencanaReal[0].renc9 || 0,
-          dataRencanaReal[0].renc10 || 0,
-          dataRencanaReal[0].renc11 || 0,
-          dataRencanaReal[0].renc12 || 0,
-        ]
-      : [];
+  const rencanaData = dataRencanaReal[0]
+    ? [
+        dataRencanaReal[0].renc1 || 0,
+        dataRencanaReal[0].renc2 || 0,
+        dataRencanaReal[0].renc3 || 0,
+        dataRencanaReal[0].renc4 || 0,
+        dataRencanaReal[0].renc5 || 0,
+        dataRencanaReal[0].renc6 || 0,
+        dataRencanaReal[0].renc7 || 0,
+        dataRencanaReal[0].renc8 || 0,
+        dataRencanaReal[0].renc9 || 0,
+        dataRencanaReal[0].renc10 || 0,
+        dataRencanaReal[0].renc11 || 0,
+        dataRencanaReal[0].renc12 || 0,
+      ]
+    : [];
 
-  const realisasiData =
-    hasValidData && dataRencanaReal[0]
-      ? [
-          dataRencanaReal[0].real1 || 0,
-          dataRencanaReal[0].real2 || 0,
-          dataRencanaReal[0].real3 || 0,
-          dataRencanaReal[0].real4 || 0,
-          dataRencanaReal[0].real5 || 0,
-          dataRencanaReal[0].real6 || 0,
-          dataRencanaReal[0].real7 || 0,
-          dataRencanaReal[0].real8 || 0,
-          dataRencanaReal[0].real9 || 0,
-          dataRencanaReal[0].real10 || 0,
-          dataRencanaReal[0].real11 || 0,
-          dataRencanaReal[0].real12 || 0,
-        ]
-      : [];
-
-  // Check if all data is zero (empty data)
-  const hasNonZeroData =
-    rencanaData.some((val) => val > 0) || realisasiData.some((val) => val > 0);
-
-  if (!loading && hasValidData && !hasNonZeroData) {
-    return (
-      <div className="w-full h-full">
-        <Card
-          className={`border-none shadow-sm ${getThemeClasses().cardBg} h-full`}
-        >
-          <CardBody className="pt-0 px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <FileX className="w-12 h-12 text-default-400 mb-4" />
-              <div className="mt-4">
-                <Chip
-                  size="sm"
-                  variant="flat"
-                  color="warning"
-                  startContent={<Database className="w-3 h-3" />}
-                  className="text-xs"
-                >
-                  No Data Available
-                </Chip>
-              </div>
-              <p className="text-sm text-default-500 mt-2">
-                Data APBN belum tersedia untuk periode ini
-              </p>
-            </div>
-          </CardBody>
-        </Card>
-      </div>
-    );
-  }
+  const realisasiData = dataRencanaReal[0]
+    ? [
+        dataRencanaReal[0].real1 || 0,
+        dataRencanaReal[0].real2 || 0,
+        dataRencanaReal[0].real3 || 0,
+        dataRencanaReal[0].real4 || 0,
+        dataRencanaReal[0].real5 || 0,
+        dataRencanaReal[0].real6 || 0,
+        dataRencanaReal[0].real7 || 0,
+        dataRencanaReal[0].real8 || 0,
+        dataRencanaReal[0].real9 || 0,
+        dataRencanaReal[0].real10 || 0,
+        dataRencanaReal[0].real11 || 0,
+        dataRencanaReal[0].real12 || 0,
+      ]
+    : [];
 
   const state: Props["series"] = [
     {
@@ -440,17 +414,32 @@ export const TrenApbn = ({ selectedKanwil, selectedKddept }: TrenApbnProps) => {
   };
 
   return (
-    <div className="w-full h-full">
-      <div className="h-full flex flex-col">
-        <Chart
-          key={theme} // Force re-render when theme changes
-          options={options}
-          series={state}
-          type="area"
-          height="100%"
-          width="100%"
-        />
+    <Card
+      className={`border-none shadow-sm ${cardClasses} sm:col-span-2 lg:col-span-12 xl:col-span-6`}
+    >
+      <CardHeader className="pb-1 px-4 md:px-6">
+        <div className="flex flex-col gap-1">
+          <h3 className="text-sm md:text-base font-semibold">
+            Tren Realisasi APBN
+          </h3>
+        </div>
+      </CardHeader>{" "}
+      <div className="w-full h-full">
+        <div className="h-full flex flex-col">
+          <CardBody className="pt-0 px-2 md:px-4 pb-1">
+            <div className="h-[150px] md:h-[200px] w-full flex flex-col overflow-hidden">
+              <Chart
+                key={theme} // Force re-render when theme changes
+                options={options}
+                series={state}
+                type="area"
+                height="100%"
+                width="100%"
+              />{" "}
+            </div>
+          </CardBody>{" "}
+        </div>
       </div>
-    </div>
+    </Card>
   );
 };

@@ -15,13 +15,13 @@ import { Thang } from "@/components/referensi/Thang";
 import { Kddept } from "@/components/referensi/Kddept";
 import { Kanwil } from "@/components/referensi/Kanwil";
 import { GetDipa } from "@/components/home/dataDipa/getDipa";
-import { GetBelanjaTerbesar } from "@/components/home/dataDipa/getBelanjaTerbesar";
-import { GetPerformaTerbesar } from "@/components/home/dataDipa/getPerformaTerbesar";
 import dynamic from "next/dynamic";
 import { AlertTriangle, BarChart3, CheckCircle2, Clock } from "lucide-react";
 import NextLink from "next/link";
 import { Fungsi } from "@/components/charts/fungsi";
 import { DukmanTeknis } from "@/components/charts/dukmanteknis";
+import { BelanjaTerbesar } from "@/components/home/dataDipa/BelanjaTerbesar";
+import { PerformaTerbesar } from "@/components/home/dataDipa/PerformaTerbesar";
 
 const realizationProgramData = [
   { name: "Infrastruktur", pagu: 450, realisasi: 390 },
@@ -125,66 +125,23 @@ export default function DashboardLoading() {
         {/* Three Card Row Skeleton */}
         <div className="grid grid-cols-1 lg:grid-cols-6 xl:grid-cols-12 gap-6">
           {/* Overall Summary Skeleton */}
-          <GetBelanjaTerbesar
+          <BelanjaTerbesar
             selectedKanwil={selectedKanwil}
             selectedKddept={selectedKddept}
           />
 
           {/* Ministry Performance Skeleton */}
-          <GetPerformaTerbesar
+          <PerformaTerbesar
             selectedKanwil={selectedKanwil}
             selectedKddept={selectedKddept}
           />
 
           {/* Chart Skeleton */}
-          {/* <Card className="border-none shadow-sm bg-gradient-to-br from-default-50 to-default-100 lg:col-span-12 xl:col-span-6">
-            <CardHeader className="pb-2 px-4 md:px-6">
-              <div className="flex flex-col gap-2 w-full">
-                <Skeleton className="h-5 md:h-6 w-48 rounded" />
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-                  <Skeleton className="h-3 md:h-4 w-40 rounded" />
-                  <Skeleton className="h-6 w-20 rounded-full" />
-                </div>
-              </div>
-            </CardHeader>
-            <CardBody className="pt-0 px-2 pb-2">
-              <div className="h-[200px] md:h-[280px] w-full flex items-center justify-center">
-                <Skeleton className="h-full w-full rounded-lg" />
-              </div>
-            </CardBody>
-          </Card> */}
-          <Card
-            className={`border-none shadow-sm ${cardClasses} sm:col-span-2 lg:col-span-12 xl:col-span-6`}
-          >
-            <CardHeader className="pb-1 px-4 md:px-6">
-              <div className="flex flex-col gap-1">
-                <h3 className="text-sm md:text-base font-semibold">
-                  Tren Realisasi APBN
-                </h3>
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
-                  <p className="text-xs text-default-500">
-                    Target vs realisasi bulanan
-                  </p>
-                  <Chip
-                    color="success"
-                    variant="flat"
-                    size="sm"
-                    className="w-fit"
-                  >
-                    Real-time
-                  </Chip>
-                </div>
-              </div>
-            </CardHeader>
-            <CardBody className="pt-0 px-2 md:px-4 pb-1">
-              <div className="h-[150px] md:h-[200px] w-full flex flex-col overflow-hidden">
-                <TrenApbn
-                  selectedKanwil={selectedKanwil}
-                  selectedKddept={selectedKddept}
-                />
-              </div>
-            </CardBody>
-          </Card>
+
+          <TrenApbn
+            selectedKanwil={selectedKanwil}
+            selectedKddept={selectedKddept}
+          />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">

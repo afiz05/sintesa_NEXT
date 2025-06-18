@@ -3,8 +3,19 @@
 import { useContext, useEffect, useState } from "react";
 import { Card, CardBody, CardHeader, Skeleton, Chip } from "@heroui/react";
 import { useTheme } from "next-themes";
-import Chart, { Props } from "react-apexcharts";
 import { PieChart, Database, FileX } from "lucide-react";
+import dynamic from "next/dynamic";
+import type { Props } from "react-apexcharts";
+
+// Import Chart component with SSR disabled
+const Chart = dynamic(() => import("./client-chart"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center">
+      <Skeleton className="w-full h-64" />
+    </div>
+  ),
+});
 
 import MyContext from "@/utils/Contex";
 import Encrypt from "@/utils/Encrypt";
@@ -211,15 +222,15 @@ WHERE thang = '2022' ${kanwilFilter}${kddeptFilter}`
     };
   };
 
-  // Check for empty data - more comprehensive check
-  const hasValidData =
-    dataDukmanTeknis &&
-    Array.isArray(dataDukmanTeknis) &&
-    dataDukmanTeknis.length > 0 &&
-    dataDukmanTeknis[0]; // Make sure first element exists
+  // Check if all numerical values are zero or null
+  const isEmpty =
+    dataDukmanTeknis.length === 0 ||
+    Object.values(dataDukmanTeknis[0])
+      .slice(1)
+      .every((val) => val === 0 || val === null);
 
   // Process data for chart - create series for Dukman and Teknis
-  if (!loading && !hasValidData) {
+  if (isEmpty) {
     return (
       <div className="w-full h-full">
         <Card
@@ -238,13 +249,9 @@ WHERE thang = '2022' ${kanwilFilter}${kddeptFilter}`
                   startContent={<Database className="w-3 h-3" />}
                   className="text-xs"
                 >
-                  No Data Available
+                  Data Tidak Tersedia
                 </Chip>
               </div>
-              <p className="text-sm text-default-500 mt-2">
-                Tidak ada data Dukungan Manajemen/Teknis tersedia untuk filter
-                yang dipilih
-              </p>
             </div>
           </CardBody>
         </Card>
@@ -261,42 +268,6 @@ WHERE thang = '2022' ${kanwilFilter}${kddeptFilter}`
   // Use actual values for both pagu and realisasi
   const paguData = [data.pagu_dukman || 0, data.pagu_teknis || 0];
   const realisasiData = [data.real_dukman || 0, data.real_teknis || 0];
-
-  // Check if all data is zero (empty data)
-  const hasNonZeroData =
-    paguData.some((val) => val > 0) || realisasiData.some((val) => val > 0);
-
-  if (!loading && hasValidData && !hasNonZeroData) {
-    return (
-      <div className="w-full h-full">
-        <Card
-          className={`border-none shadow-sm ${
-            getEmptyStateClasses().cardBg
-          } h-full`}
-        >
-          <CardBody className="pt-0 px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <FileX className="w-12 h-12 text-default-400 mb-4" />
-              <div className="mt-4">
-                <Chip
-                  size="sm"
-                  variant="flat"
-                  color="warning"
-                  startContent={<Database className="w-3 h-3" />}
-                  className="text-xs"
-                >
-                  No Data Available
-                </Chip>
-              </div>
-              <p className="text-sm text-default-500 mt-2">
-                Data Dukungan Manajemen/Teknis belum tersedia untuk periode ini
-              </p>
-            </div>
-          </CardBody>
-        </Card>
-      </div>
-    );
-  }
 
   const colors = getThemeColors();
 
