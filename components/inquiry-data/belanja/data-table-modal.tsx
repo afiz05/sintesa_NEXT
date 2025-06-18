@@ -32,11 +32,15 @@ import {
   X,
 } from "lucide-react";
 import { useToast } from "../../context/ToastContext";
+import { CutOffQueryGenerator } from "./query-generate";
 
 interface DataTableModalProps {
   isOpen: boolean;
   onClose: () => void;
   sqlQuery: string;
+  cutOff?: string; // Optional cutoff period value
+  selectedTahun?: string; // Selected year
+  selectedPembulatan?: string; // Selected rounding option
 }
 
 interface TableData {
@@ -54,6 +58,9 @@ const DataTableModal: React.FC<DataTableModalProps> = ({
   isOpen,
   onClose,
   sqlQuery,
+  cutOff,
+  selectedTahun,
+  selectedPembulatan,
 }) => {
   const [data, setData] = useState<TableData[]>([]);
   const [loading, setLoading] = useState(false);
@@ -66,6 +73,22 @@ const DataTableModal: React.FC<DataTableModalProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const { showToast } = useToast();
+
+  // Helper function to get rounding text
+  const getRoundingText = (pembulatan: string) => {
+    switch (pembulatan) {
+      case "Rupiah":
+        return "dalam Rupiah";
+      case "Ribu":
+        return "dalam ribu Rupiah";
+      case "Juta":
+        return "dalam juta Rupiah";
+      case "Miliar":
+        return "dalam miliar Rupiah";
+      default:
+        return "dalam Rupiah";
+    }
+  };
   // Extract columns from data
   const columns = useMemo(() => {
     if (data.length === 0) return [];
@@ -364,7 +387,8 @@ const DataTableModal: React.FC<DataTableModalProps> = ({
       }}
     >
       <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">
+        {" "}
+        <ModalHeader className="flex flex-row items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-md">
               <Database className="text-white" size={20} />
@@ -372,12 +396,25 @@ const DataTableModal: React.FC<DataTableModalProps> = ({
             <div>
               <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                 Query Results
-              </h2>
+              </h2>{" "}
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 {filteredData.length} records found
               </p>
             </div>
-          </div>
+          </div>{" "}
+          {cutOff && (
+            <div className="text-right">
+              <span className="text-xs bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-md block">
+                {CutOffQueryGenerator.getCutOffInfo(cutOff).description}{" "}
+                {selectedTahun}
+              </span>
+              {selectedPembulatan && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  {getRoundingText(selectedPembulatan)}
+                </p>
+              )}
+            </div>
+          )}
         </ModalHeader>{" "}
         <ModalBody>
           <div className="p-6 space-y-4">
