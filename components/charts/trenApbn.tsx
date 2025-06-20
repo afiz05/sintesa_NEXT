@@ -3,24 +3,12 @@
 import { useContext, useEffect, useState } from "react";
 import { Card, CardBody, CardHeader, Skeleton, Chip } from "@heroui/react";
 import { useTheme } from "next-themes";
+import Chart, { Props } from "react-apexcharts";
 import { TrendingUp, Database, FileX } from "lucide-react";
-import dynamic from "next/dynamic";
-import type { Props } from "react-apexcharts";
-
-// Import Chart component with SSR disabled
-const Chart = dynamic(() => import("./client-chart"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-full flex items-center justify-center">
-      <Skeleton className="w-full h-64" />
-    </div>
-  ),
-});
 
 import MyContext from "@/utils/Contex";
 import Encrypt from "@/utils/Encrypt";
 import { handleHttpError } from "@/utils/handleError";
-import { useToast } from "../context/ToastContext";
 
 interface RencanaReal {
   kddept: string;
@@ -61,7 +49,6 @@ export const TrenApbn = ({ selectedKanwil, selectedKddept }: TrenApbnProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const context = useContext(MyContext);
   const { theme } = useTheme();
-  const { showToast } = useToast();
 
   const { token, axiosJWT } = context! as {
     token: string;
@@ -75,6 +62,22 @@ export const TrenApbn = ({ selectedKanwil, selectedKddept }: TrenApbnProps) => {
         maximumFractionDigits: 2,
       }).format(amount / 1000000000000) + " T"
     );
+  };
+
+  // Theme-aware class definitions
+  const getThemeClasses = () => {
+    const isDark = theme === "dark";
+    return {
+      cardBg: isDark
+        ? "bg-gradient-to-br from-slate-800/90 to-slate-700/90"
+        : "bg-gradient-to-br from-white/90 to-slate-50/90",
+      skeletonCardBg: isDark
+        ? "bg-gradient-to-br from-slate-800 to-slate-700"
+        : "bg-gradient-to-br from-default-50 to-default-100",
+      textPrimary: isDark ? "text-slate-100" : "text-slate-900",
+      textSecondary: isDark ? "text-slate-300" : "text-slate-600",
+      textMuted: isDark ? "text-slate-400" : "text-slate-600",
+    };
   };
 
   // Theme-aware color definitions
@@ -130,15 +133,14 @@ export const TrenApbn = ({ selectedKanwil, selectedKddept }: TrenApbnProps) => {
     ROUND(sum(real11)/1, 0) as real11, 
     ROUND(sum(renc12)/1, 0) as renc12, 
     ROUND(sum(real12)/1, 0) as real12 FROM dashboard.rencana_real_bulanan  a  
-    LEFT JOIN dbref.t_dept_2025 b ON a.kddept=b.kddept 
-    WHERE a.thang = '2022' ${kanwilFilter}${kddeptFilter};`
+    INNER JOIN dbref.t_dept_2025 b ON a.kddept=b.kddept 
+   ${kanwilFilter}${kddeptFilter};`
     );
     const cleanedQuery = decodeURIComponent(encodedQuery)
       .replace(/\n/g, " ")
       .replace(/\s+/g, " ")
       .trim();
     const encryptedQuery = Encrypt(cleanedQuery);
-    console.log(cleanedQuery);
 
     try {
       setLoading(true);
@@ -159,8 +161,12 @@ export const TrenApbn = ({ selectedKanwil, selectedKddept }: TrenApbnProps) => {
       setDataRencanaReal(resultData);
     } catch (err: any) {
       const { status, data } = err.response || {};
-
-      showToast("Terjadi Permasalahan Koneksi atau Server Backend", "error");
+      setDataRencanaReal([]); // Explicitly set empty array on error
+      handleHttpError(
+        status,
+        (data && data.error) ||
+          "Terjadi Permasalahan Koneksi atau Server Backend "
+      );
     } finally {
       setLoading(false);
     }
@@ -170,276 +176,229 @@ export const TrenApbn = ({ selectedKanwil, selectedKddept }: TrenApbnProps) => {
     getData();
   }, [selectedKanwil, selectedKddept]);
 
-  if (loading) {
-    return (
-      <Card className="border-none shadow-sm bg-gradient-to-br from-default-50 to-default-100 lg:col-span-12 xl:col-span-6">
-        <CardHeader className="pb-2 px-4 md:px-6">
+  // Render loading state
+  const renderLoadingContent = () => (
+    <Card className={`border-none shadow-sm ${getThemeClasses().skeletonCardBg} lg:col-span-12 xl:col-span-6`}>
+      <CardHeader className="pb-2 px-4 md:px-6">
+        <div className="flex flex-col gap-2 w-full">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+            <Skeleton className="h-3 md:h-4 w-40 rounded" />
+            <Skeleton className="h-6 w-20 rounded-full" />
+          </div>
+        </div>
+      </CardHeader>
+      {Array.from({ length: 3 }).map((_, index) => (
+        <CardHeader key={index} className="pb-2 px-4 md:px-6">
           <div className="flex flex-col gap-2 w-full">
-            {/* <Skeleton className="h-5 md:h-6 w-48 rounded" /> */}
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
               <Skeleton className="h-3 md:h-4 w-40 rounded" />
               <Skeleton className="h-6 w-20 rounded-full" />
             </div>
           </div>
         </CardHeader>
-        <CardHeader className="pb-2 px-4 md:px-6">
-          <div className="flex flex-col gap-2 w-full">
-            {/* <Skeleton className="h-5 md:h-6 w-48 rounded" /> */}
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-              <Skeleton className="h-3 md:h-4 w-40 rounded" />
-              <Skeleton className="h-6 w-20 rounded-full" />
-            </div>
-          </div>
-        </CardHeader>{" "}
-        <CardHeader className="pb-2 px-4 md:px-6">
-          <div className="flex flex-col gap-2 w-full">
-            {/* <Skeleton className="h-5 md:h-6 w-48 rounded" /> */}
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-              <Skeleton className="h-3 md:h-4 w-40 rounded" />
-              <Skeleton className="h-6 w-20 rounded-full" />
-            </div>
-          </div>
-        </CardHeader>{" "}
-        <CardHeader className="pb-2 px-4 md:px-6">
-          <div className="flex flex-col gap-2 w-full">
-            {/* <Skeleton className="h-5 md:h-6 w-48 rounded" /> */}
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-              <Skeleton className="h-3 md:h-4 w-40 rounded" />
-              <Skeleton className="h-6 w-20 rounded-full" />
-            </div>
-          </div>
-        </CardHeader>{" "}
-      </Card>
-    );
-  }
-  const getCardClasses = () => {
-    const isDark = theme === "dark";
-    return isDark
-      ? "bg-gradient-to-br from-slate-800 to-slate-700"
-      : "bg-gradient-to-br from-slate-100 to-slate-200";
-  };
-
-  const cardClasses = getCardClasses();
-  const isEmpty =
-    dataRencanaReal.length === 0 ||
-    Object.values(dataRencanaReal[0])
-      .filter((_, i) => i > 1)
-      .every((val) => val === 0 || val === null);
-
-  if (isEmpty) {
-    return (
-      <Card
-        className={`border-none shadow-sm ${cardClasses} sm:col-span-2 lg:col-span-12 xl:col-span-6`}
-      >
-        <CardHeader className="pb-1 px-4 md:px-6">
-          <div className="flex flex-col gap-1">
-            <h3 className="text-sm md:text-base font-semibold">
-              Tren Realisasi APBN
-            </h3>
-          </div>
-        </CardHeader>{" "}
-        <div className="w-full h-full">
-          <div className="h-full flex flex-col">
-            <CardBody className="pt-0 px-2 md:px-4 pb-1">
-              <div className="h-[150px] md:h-[200px] w-full flex flex-col overflow-hidden">
-                <div className="flex flex-col items-center justify-center py-8 text-center">
-                  <FileX className="w-12 h-12 text-default-400 mb-4" />
-                  <div className="mt-4">
-                    <Chip
-                      size="sm"
-                      variant="flat"
-                      color="warning"
-                      startContent={<Database className="w-3 h-3" />}
-                      className="text-xs"
-                    >
-                      Data Tidak Tersedia
-                    </Chip>
-                  </div>
-                </div>
-              </div>
-            </CardBody>{" "}
-          </div>
-        </div>
-      </Card>
-    );
-  }
-
-  // Proses data untuk chart - with safety checks
-  const rencanaData = dataRencanaReal[0]
-    ? [
-        dataRencanaReal[0].renc1 || 0,
-        dataRencanaReal[0].renc2 || 0,
-        dataRencanaReal[0].renc3 || 0,
-        dataRencanaReal[0].renc4 || 0,
-        dataRencanaReal[0].renc5 || 0,
-        dataRencanaReal[0].renc6 || 0,
-        dataRencanaReal[0].renc7 || 0,
-        dataRencanaReal[0].renc8 || 0,
-        dataRencanaReal[0].renc9 || 0,
-        dataRencanaReal[0].renc10 || 0,
-        dataRencanaReal[0].renc11 || 0,
-        dataRencanaReal[0].renc12 || 0,
-      ]
-    : [];
-
-  const realisasiData = dataRencanaReal[0]
-    ? [
-        dataRencanaReal[0].real1 || 0,
-        dataRencanaReal[0].real2 || 0,
-        dataRencanaReal[0].real3 || 0,
-        dataRencanaReal[0].real4 || 0,
-        dataRencanaReal[0].real5 || 0,
-        dataRencanaReal[0].real6 || 0,
-        dataRencanaReal[0].real7 || 0,
-        dataRencanaReal[0].real8 || 0,
-        dataRencanaReal[0].real9 || 0,
-        dataRencanaReal[0].real10 || 0,
-        dataRencanaReal[0].real11 || 0,
-        dataRencanaReal[0].real12 || 0,
-      ]
-    : [];
-
-  const state: Props["series"] = [
-    {
-      name: "Target APBN",
-      data: rencanaData,
-    },
-    {
-      name: "Realisasi APBN",
-      data: realisasiData,
-    },
-  ];
-
-  const colors = getThemeColors();
-
-  const options: Props["options"] = {
-    chart: {
-      type: "area",
-      animations: {
-        speed: 300,
-      },
-      sparkline: {
-        enabled: false,
-      },
-      brush: {
-        enabled: false,
-      },
-      id: "basic-bar",
-      foreColor: getThemeColors().foreColor,
-      stacked: true,
-      toolbar: {
-        show: false,
-      },
-      parentHeightOffset: 0,
-    },
-    legend: {
-      position: "top",
-      horizontalAlign: "center",
-      fontSize: "12px",
-      fontWeight: 500,
-      labels: {
-        colors: colors.textPrimary,
-      },
-      markers: {
-        size: 8,
-      },
-      itemMargin: {
-        horizontal: 10,
-        vertical: 5,
-      },
-    },
-    xaxis: {
-      categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "Mei",
-        "Jun",
-        "Jul",
-        "Agt",
-        "Sep",
-        "Okt",
-        "Nov",
-        "Des",
-      ],
-      labels: {
-        style: {
-          colors: getThemeColors().foreColor,
-        },
-      },
-      axisBorder: {
-        color: getThemeColors().borderColor,
-      },
-      axisTicks: {
-        color: getThemeColors().borderColor,
-      },
-    },
-    yaxis: {
-      labels: {
-        style: {
-          colors: getThemeColors().foreColor,
-        },
-        formatter: function (value: number) {
-          return formatTrillions(value);
-        },
-      },
-    },
-    tooltip: {
-      theme: theme === "dark" ? "dark" : "light",
-      style: {
-        fontSize: "12px",
-      },
-      y: {
-        formatter: function (value: number) {
-          return formatTrillions(value);
-        },
-      },
-    },
-    colors: [colors.primary, colors.success],
-    grid: {
-      show: true,
-      borderColor: getThemeColors().gridColor,
-      strokeDashArray: 0,
-      position: "back",
-    },
-    stroke: {
-      curve: "smooth",
-      fill: {
-        colors: ["red"],
-      },
-    },
-    // @ts-ignore
-    markers: false,
-  };
-
-  return (
-    <Card
-      className={`border-none shadow-sm ${cardClasses} sm:col-span-2 lg:col-span-12 xl:col-span-6`}
-    >
-      <CardHeader className="pb-1 px-4 md:px-6">
-        <div className="flex flex-col gap-1">
-          <h3 className="text-sm md:text-base font-semibold">
-            Tren Realisasi APBN
-          </h3>
-        </div>
-      </CardHeader>{" "}
-      <div className="w-full h-full">
-        <div className="h-full flex flex-col">
-          <CardBody className="pt-0 px-2 md:px-4 pb-1">
-            <div className="h-[150px] md:h-[200px] w-full flex flex-col overflow-hidden">
-              <Chart
-                key={theme} // Force re-render when theme changes
-                options={options}
-                series={state}
-                type="area"
-                height="100%"
-                width="100%"
-              />{" "}
-            </div>
-          </CardBody>{" "}
-        </div>
-      </div>
+      ))}
     </Card>
   );
+
+  // Render empty state
+  const renderEmptyContent = () => (
+    <div className="w-full h-full">
+      <Card className={`border-none shadow-sm ${getThemeClasses().cardBg} h-full`}>
+        <CardBody className="pt-0 px-4 md:px-6">
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <FileX className="w-12 h-12 text-default-400 mb-4" />
+            <div className="mt-4">
+              <Chip
+                size="sm"
+                variant="flat"
+                color="warning"
+                startContent={<Database className="w-3 h-3" />}
+                className="text-xs"
+              >
+                Data Tidak Tersedia
+              </Chip>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
+    </div>
+  );
+
+  // Render main chart content
+  const renderChartContent = () => {
+    // Proses data untuk chart - with safety checks
+    const rencanaData = dataRencanaReal[0]
+      ? [
+          dataRencanaReal[0].renc1 || 0,
+          dataRencanaReal[0].renc2 || 0,
+          dataRencanaReal[0].renc3 || 0,
+          dataRencanaReal[0].renc4 || 0,
+          dataRencanaReal[0].renc5 || 0,
+          dataRencanaReal[0].renc6 || 0,
+          dataRencanaReal[0].renc7 || 0,
+          dataRencanaReal[0].renc8 || 0,
+          dataRencanaReal[0].renc9 || 0,
+          dataRencanaReal[0].renc10 || 0,
+          dataRencanaReal[0].renc11 || 0,
+          dataRencanaReal[0].renc12 || 0,
+        ]
+      : [];
+
+    const realisasiData = dataRencanaReal[0]
+      ? [
+          dataRencanaReal[0].real1 || 0,
+          dataRencanaReal[0].real2 || 0,
+          dataRencanaReal[0].real3 || 0,
+          dataRencanaReal[0].real4 || 0,
+          dataRencanaReal[0].real5 || 0,
+          dataRencanaReal[0].real6 || 0,
+          dataRencanaReal[0].real7 || 0,
+          dataRencanaReal[0].real8 || 0,
+          dataRencanaReal[0].real9 || 0,
+          dataRencanaReal[0].real10 || 0,
+          dataRencanaReal[0].real11 || 0,
+          dataRencanaReal[0].real12 || 0,
+        ]
+      : [];
+
+    const state: Props["series"] = [
+      {
+        name: "Target APBN",
+        data: rencanaData,
+      },
+      {
+        name: "Realisasi APBN",
+        data: realisasiData,
+      },
+    ];
+
+    const colors = getThemeColors();
+
+    const options: Props["options"] = {
+      chart: {
+        type: "area",
+        animations: {
+          speed: 300,
+        },
+        sparkline: {
+          enabled: false,
+        },
+        brush: {
+          enabled: false,
+        },
+        id: "basic-bar",
+        foreColor: getThemeColors().foreColor,
+        stacked: true,
+        toolbar: {
+          show: false,
+        },
+        parentHeightOffset: 0,
+      },
+      legend: {
+        position: "top",
+        horizontalAlign: "center",
+        fontSize: "12px",
+        fontWeight: 500,
+        labels: {
+          colors: colors.textPrimary,
+        },
+        markers: {
+          size: 8,
+        },
+        itemMargin: {
+          horizontal: 10,
+          vertical: 5,
+        },
+      },
+      xaxis: {
+        categories: [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "Mei",
+          "Jun",
+          "Jul",
+          "Agt",
+          "Sep",
+          "Okt",
+          "Nov",
+          "Des",
+        ],
+        labels: {
+          style: {
+            colors: getThemeColors().foreColor,
+          },
+        },
+        axisBorder: {
+          color: getThemeColors().borderColor,
+        },
+        axisTicks: {
+          color: getThemeColors().borderColor,
+        },
+      },
+      yaxis: {
+        labels: {
+          style: {
+            colors: getThemeColors().foreColor,
+          },
+          formatter: function (value: number) {
+            return formatTrillions(value);
+          },
+        },
+      },
+      tooltip: {
+        theme: theme === "dark" ? "dark" : "light",
+        style: {
+          fontSize: "12px",
+        },
+        y: {
+          formatter: function (value: number) {
+            return formatTrillions(value);
+          },
+        },
+      },
+      colors: [colors.primary, colors.success],
+      grid: {
+        show: true,
+        borderColor: getThemeColors().gridColor,
+        strokeDashArray: 0,
+        position: "back",
+      },
+      stroke: {
+        curve: "smooth",
+        fill: {
+          colors: ["red"],
+        },
+      },
+      // @ts-ignore
+      markers: false,
+    };
+
+    return (
+      <div className="w-full h-full">
+        <div className="h-full flex flex-col">
+          <Chart
+            key={theme} // Force re-render when theme changes
+            options={options}
+            series={state}
+            type="area"
+            height="100%"
+            width="100%"
+          />
+        </div>
+      </div>
+    );
+  };
+
+  // Main return with conditional rendering
+  if (loading) {
+    return renderLoadingContent();
+  }
+
+  if (dataRencanaReal.length === 0 || !dataRencanaReal[0].kddept) {
+    return renderEmptyContent();
+  }
+
+  return renderChartContent();
 };

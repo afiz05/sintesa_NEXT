@@ -7,6 +7,7 @@ import MyContext from "@/utils/Contex";
 import Encrypt from "@/utils/Encrypt";
 
 import { handleHttpError } from "@/utils/handleError";
+import { useToast } from "../context/ToastContext";
 
 interface KddeptData {
   kddept: string;
@@ -23,6 +24,7 @@ export const Kddept = ({ onKddeptChange, selectedKddept }: KddeptProps) => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const context = useContext(MyContext);
+  const { showToast } = useToast();
 
   const { token, axiosJWT, statusLogin } = context! as {
     token: string;
@@ -60,12 +62,8 @@ export const Kddept = ({ onKddeptChange, selectedKddept }: KddeptProps) => {
       const deptData = [nasionalOption, ...(response.data.result || [])];
       setDataKddept(deptData);
     } catch (err: any) {
-      const { status, data } = err.response || {};
-      handleHttpError(
-        status,
-        (data && data.error) ||
-          "Terjadi Permasalahan Koneksi atau Server Backend "
-      );
+      const { data } = err.response || {};
+      showToast(data && data.error, "error");
     } finally {
       setLoading(false);
     }

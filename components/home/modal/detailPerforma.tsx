@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useMemo, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Modal,
   ModalContent,
@@ -13,24 +13,9 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Spinner,
-  Chip,
   Input,
-  Select,
-  SelectItem,
-  Pagination,
-  Card,
-  CardBody,
 } from "@heroui/react";
-import {
-  Search,
-  Download,
-  RefreshCw,
-  Database,
-  FileText,
-  Filter,
-  X,
-} from "lucide-react";
+import { X, Search } from "lucide-react";
 import { useToast } from "@/components/context/ToastContext";
 import Encrypt from "@/utils/Encrypt";
 import MyContext from "@/utils/Contex";
@@ -39,6 +24,7 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
 interface PerformaTerbesarData {
   kddept: string;
   nmdept: string;
@@ -46,199 +32,171 @@ interface PerformaTerbesarData {
   realisasi: number;
   persen: number;
 }
+
 const ModalPerforma: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   const [dataDipa, setDataDipa] = useState<PerformaTerbesarData[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const { showToast } = useToast();
   const context = useContext(MyContext);
+  const { token, axiosJWT } = context!;
 
-  const { token, axiosJWT, statusLogin } = context! as {
-    token: string;
-    axiosJWT: any;
-    statusLogin: any;
-  };
+  const formatNumber = (value: number): string =>
+    new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 }).format(value);
 
   const getData = async () => {
-    const encodedQuery = encodeURIComponent(
-      `SELECT 
-  prk.kddept,
-  td.nmdept,
-  SUM(prk.pagu) AS pagu,
-  SUM(prk.realisasi) AS realisasi,
-  SUM(prk.realisasi) / NULLIF(SUM(prk.pagu), 0) * 100 AS persen
-FROM dashboard.pagu_real_kl prk
-LEFT JOIN dbref.t_dept_2025 td
-  ON prk.kddept = td.kddept
-WHERE prk.thang = '2022' group by prk.kddept
-ORDER BY pagu DESC`
-    );
-    const cleanedQuery = decodeURIComponent(encodedQuery)
-      .replace(/\n/g, " ")
+    const query = `
+      SELECT 
+        prk.kddept,
+        td.nmdept,
+        SUM(prk.pagu) AS pagu,
+        SUM(prk.realisasi) AS realisasi,
+        SUM(prk.realisasi) / NULLIF(SUM(prk.pagu), 0) * 100 AS persen
+      FROM dashboard.pagu_real_kl prk
+      LEFT JOIN dbref.t_dept_2025 td ON prk.kddept = td.kddept
+      WHERE prk.thang = '2022' 
+      GROUP BY prk.kddept
+      ORDER BY pagu DESC
+    `
       .replace(/\s+/g, " ")
       .trim();
-    const encryptedQuery = Encrypt(cleanedQuery);
 
     try {
       setLoading(true);
-      setError(null);
-
+      const encryptedQuery = Encrypt(query);
       const response = await axiosJWT.post(
         `${process.env.NEXT_PUBLIC_GET_REFERENSI}`,
         { query: encryptedQuery },
         {
           headers: {
             "Content-Type": "application/json",
-            Accept: "application/json, text/plain, */*",
             Authorization: `Bearer ${token}`,
           },
         }
       );
 
       const resultData = response.data.result || [];
-      setDataDipa(resultData);
+      const cleanedData = resultData.map((item: any) => ({
+        kddept: item.kddept || "",
+        nmdept: item.nmdept || "",
+        pagu: item.pagu || 0,
+        realisasi: item.realisasi || 0,
+        persen: item.persen || 0,
+      }));
+      setDataDipa(cleanedData);
     } catch (err: any) {
-      const { status, data } = err.response || {};
-      setDataDipa([]); // Explicitly set empty array on error
-      showToast("Terjadi Permasalahan Koneksi atau Server Backend", "error");
+      const errorMessage =
+        err.response?.data?.error || "Terjadi kesalahan saat memuat data";
+      showToast(errorMessage, "error");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    getData();
-  }, []);
+    if (isOpen) getData();
+  }, [isOpen]);
+
+  const skeletonRowCount = 8;
+
+  const filteredData = dataDipa.filter((item) =>
+    `${item.kddept} ${item.nmdept}`
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      hideCloseButton={true}
-      size="5xl"
-      scrollBehavior="inside"
-      classNames={{
-        base: "max-h-[90vh] max-w-[95vw]",
-        backdrop: "bg-black/60",
-        wrapper: "flex items-center justify-center p-4",
-        body: "p-0",
-        header: "border-b border-gray-200 dark:border-gray-700",
-        footer: "border-t border-gray-200 dark:border-gray-700",
-      }}
-    >
+    <Modal isOpen={isOpen} onClose={onClose} size="5xl" scrollBehavior="inside">
       <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">
-          Detail Performa Kementerian/ Lembaga
-        </ModalHeader>{" "}
-        <ModalBody>
-          {loading ? (
+        <ModalHeader>Detail Performa Kementerian/Lembaga</ModalHeader>
+        <ModalBody className="p-4">
+          <div className="mb-4">
+            <Input
+              placeholder="Cari Kementerian atau Kode..."
+              value={searchTerm}
+              onValueChange={setSearchTerm}
+              startContent={<Search size={18} />}
+              variant="bordered"
+              radius="sm"
+              size="sm"
+              className="w-full sm:w-1/2"
+            />
+          </div>
+          <div className="relative min-h-[60vh] overflow-auto">
             <Table
-              aria-label="Loading Performa Kementerian/Lembaga data"
-              className="min-w-full"
+              isStriped
+              isHeaderSticky
+              aria-label="Tabel Performa KL"
               removeWrapper
-              classNames={{
-                th: "text-center py-2 bg-gray-100 dark:bg-gray-900 sticky top-0 z-10",
-                td: "py-2",
-              }}
             >
               <TableHeader>
-                <TableColumn className="w-12">No.</TableColumn>
-                <TableColumn> Kementerian </TableColumn>
-                <TableColumn className="w-36">Pagu</TableColumn>
-                <TableColumn className="w-36">Realisasi</TableColumn>
-                <TableColumn className="w-28">Persentase</TableColumn>
+                {["Nama Kementerian", "Pagu", "Realisasi", "Persentase"].map(
+                  (header, i) => (
+                    <TableColumn
+                      key={i}
+                      className=" top-0 z-10 bg-gradient-to-r from-blue-150 to-indigo-50 text-center font-semibold text-sm text-gray-800 border-b-2 border-blue-200 shadow-sm"
+                    >
+                      {header}
+                    </TableColumn>
+                  )
+                )}
               </TableHeader>
               <TableBody>
-                {Array(5)
-                  .fill(0)
-                  .map((_, index) => (
-                    <TableRow key={`skeleton-${index}`} className="border-b">
-                      <TableCell className="text-center">
-                        <div className="h-4 w-4 mx-auto rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse" />
-                      </TableCell>
-                      <TableCell>
-                        <div className="h-4 w-full max-w-[300px] rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse" />
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="h-4 w-28 ml-auto rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse" />
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="h-4 w-28 ml-auto rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse" />
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <div className="h-6 w-20 mx-auto rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          ) : error ? (
-            <div className="text-center text-danger p-4">{error}</div>
-          ) : (
-            <Table
-              aria-label="Performa Kementerian/Lembaga data table"
-              className="min-w-full"
-              removeWrapper
-              classNames={{
-                th: "text-center py-2 bg-gray-100 dark:bg-gray-900 sticky top-0 z-10",
-                td: "py-2",
-              }}
-            >
-              <TableHeader>
-                <TableColumn className="w-12">No.</TableColumn>
-                <TableColumn>Nama Kementerian (Kode)</TableColumn>
-                <TableColumn className="w-36">Pagu</TableColumn>
-                <TableColumn className="w-36">Realisasi</TableColumn>
-                <TableColumn className="w-28">Persentase</TableColumn>
-              </TableHeader>
-              <TableBody emptyContent="Tidak ada data yang tersedia">
-                {dataDipa.map((item, index) => (
-                  <TableRow key={index} className="border-b">
-                    <TableCell className="text-center">{index + 1}</TableCell>
-                    <TableCell>
-                      <div>
-                        <span className="font-medium">{item.nmdept}</span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">
-                          ({item.kddept})
-                        </span>
-                      </div>
+                {(loading
+                  ? Array.from({ length: skeletonRowCount }, (_, i) => ({
+                      kddept: `skeleton-${i}`,
+                      nmdept: "",
+                      pagu: 0,
+                      realisasi: 0,
+                      persen: 0,
+                    }))
+                  : filteredData
+                ).map((item, index) => (
+                  <TableRow key={item.kddept}>
+                    <TableCell className="text-left align-top">
+                      {loading ? (
+                        <>
+                          <div className="h-4 w-40 bg-gray-200 rounded animate-pulse mb-1"></div>
+                          <div className="h-3 w-24 bg-gray-100 rounded animate-pulse"></div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="font-medium">{item.nmdept}</div>
+                          <div className="text-xs text-gray-500">
+                            ({item.kddept})
+                          </div>
+                        </>
+                      )}
                     </TableCell>
-                    <TableCell className="text-right">
-                      {new Intl.NumberFormat("id-ID", {
-                        maximumFractionDigits: 0,
-                      }).format(item.pagu)}
+                    <TableCell className="text-right align-top">
+                      {loading ? (
+                        <div className="h-4 w-24 bg-gray-200 rounded animate-pulse ml-auto"></div>
+                      ) : (
+                        formatNumber(item.pagu)
+                      )}
                     </TableCell>
-                    <TableCell className="text-right">
-                      {new Intl.NumberFormat("id-ID", {
-                        maximumFractionDigits: 0,
-                      }).format(item.realisasi)}
+                    <TableCell className="text-right align-top">
+                      {loading ? (
+                        <div className="h-4 w-24 bg-gray-200 rounded animate-pulse ml-auto"></div>
+                      ) : (
+                        formatNumber(item.realisasi)
+                      )}
                     </TableCell>
-                    <TableCell className="text-center">
-                      <Chip
-                        size="sm"
-                        color={
-                          Number(item.persen) >= 90
-                            ? "success"
-                            : Number(item.persen) >= 70
-                            ? "warning"
-                            : "danger"
-                        }
-                      >
-                        {typeof item.persen === "number"
-                          ? item.persen.toFixed(2)
-                          : Number(item.persen).toFixed(2)}
-                        %
-                      </Chip>
+                    <TableCell className="text-right align-top">
+                      {loading ? (
+                        <div className="h-4 w-16 bg-gray-200 rounded animate-pulse ml-auto"></div>
+                      ) : (
+                        `${Number(item.persen).toFixed(2)}%`
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-          )}
-        </ModalBody>{" "}
+          </div>
+        </ModalBody>
         <ModalFooter>
           <Button
-            size="sm"
             color="danger"
             onPress={onClose}
             startContent={<X size={16} />}

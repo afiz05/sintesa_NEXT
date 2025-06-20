@@ -15,8 +15,9 @@ import {
   Link,
   Skeleton,
 } from "@heroui/react";
-import NextLink from "next/link";
-import { BarChart3, Database, FileX } from "lucide-react";
+
+import { Database, FileX } from "lucide-react";
+import ModalPerforma from "../modal/detailPerforma";
 import { useToast } from "@/components/context/ToastContext";
 
 interface BelanjaTerbesarData {
@@ -40,9 +41,10 @@ export const BelanjaTerbesar = ({
   const [dataDipa, setDataDipa] = useState<BelanjaTerbesarData[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const context = useContext(MyContext);
   const { theme } = useTheme();
   const { showToast } = useToast();
+  const [modal, setModal] = useState(false);
+  const context = useContext(MyContext);
 
   const { token, axiosJWT, statusLogin } = context! as {
     token: string;
@@ -61,9 +63,9 @@ export const BelanjaTerbesar = ({
         ? "bg-gradient-to-br from-slate-800 to-slate-700"
         : "bg-gradient-to-br from-default-50 to-default-100",
       skeletonItemBg: isDark ? "bg-slate-700/50" : "bg-default-50",
-      textPrimary: isDark ? "text-slate-100" : "text-slate-900", // Dark text in light mode
-      textSecondary: isDark ? "text-slate-300" : "text-slate-700", // Dark secondary text in light mode
-      textMuted: isDark ? "text-slate-400" : "text-slate-600", // Dark muted text in light mode
+      textPrimary: isDark ? "text-slate-100" : "text-slate-900",
+      textSecondary: isDark ? "text-slate-300" : "text-slate-700",
+      textMuted: isDark ? "text-slate-400" : "text-slate-600",
     };
   };
 
@@ -112,9 +114,11 @@ GROUP BY jenbel;`
       .replace(/\s+/g, " ")
       .trim();
     const encryptedQuery = Encrypt(cleanedQuery);
+    console.log(cleanedQuery);
 
     try {
       setLoading(true);
+      setError(null);
 
       const response = await axiosJWT.post(
         `${process.env.NEXT_PUBLIC_GET_REFERENSI}`,
@@ -131,9 +135,8 @@ GROUP BY jenbel;`
       const resultData = response.data.result || [];
       setDataDipa(resultData);
     } catch (err: any) {
-      const { status, data } = err.response || {};
-      setDataDipa([]); // Explicitly set empty array on error
-      showToast("Terjadi Permasalahan Koneksi atau Server Backend", "error");
+      const { data } = err.response || {};
+      showToast(data && data.error, "error");
     } finally {
       setLoading(false);
     }
@@ -141,132 +144,112 @@ GROUP BY jenbel;`
 
   useEffect(() => {
     getData();
-  }, [selectedKanwil, selectedKddept]); // Tambahkan selectedKanwil dan selectedKddept sebagai dependency
+  }, [selectedKanwil, selectedKddept]);
 
-  if (loading) {
-    return (
-      <Card
-        className={`border-none shadow-sm ${
-          getThemeClasses().skeletonCardBg
-        } lg:col-span-6 xl:col-span-3`}
-      >
-        <CardHeader className="pb-3 md:pb-4 px-4 md:px-6">
-          <div className="flex justify-between items-center w-full">
-            <Skeleton className="h-5 md:h-6 w-40 rounded" />
-            <Skeleton className="h-4 w-20 rounded" />
-          </div>
-        </CardHeader>
-        <CardBody className="pt-0 px-4 md:px-6">
-          <div className="space-y-2 md:space-y-3">
-            {Array.from({ length: 2 }).map((_, index) => (
-              <div
-                key={index}
-                className={`p-2 md:p-3 ${
-                  getThemeClasses().skeletonItemBg
-                } rounded-lg space-y-2`}
-              >
-                <div className="flex justify-between items-center">
-                  <Skeleton className="h-4 w-40 rounded" />
-                  <Skeleton className="h-6 w-12 rounded-full" />
-                </div>
-                <Skeleton className="h-3 w-32 rounded" />
-                <Skeleton className="h-2 w-full rounded-full" />
-              </div>
-            ))}
-          </div>
-        </CardBody>
-      </Card>
-    );
-  }
+  // Common Card Header component
+  const CardHeaderComponent = () => (
+    <CardHeader className="pb-2 px-4 md:px-6">
+      <div className="flex justify-between items-center w-full">
+        <h3
+          className={`text-sm md:text-base font-semibold ${
+            getThemeClasses().textPrimary
+          }`}
+        >
+          Jenis Belanja Terbesar
+        </h3>
+        <Chip
+          color="primary"
+          onClick={() => setModal(true)}
+          variant="flat"
+          size="sm"
+          className="w-fit cursor-pointer"
+        >
+          Detail
+        </Chip>
+      </div>
+    </CardHeader>
+  );
 
-  if (dataDipa.length === 0 || !dataDipa) {
-    return (
-      <Card
-        className={`border-none shadow-sm ${
-          getThemeClasses().cardBg
-        } lg:col-span-6 xl:col-span-3`}
-      >
-        <CardHeader className="pb-2 px-4 md:px-6">
-          <div className="flex justify-between items-center w-full">
-            <h3
-              className={`text-sm md:text-base font-semibold ${
-                getThemeClasses().textPrimary
-              }`}
-            >
-              Jenis Belanja Terbesar
-            </h3>
-          </div>
-        </CardHeader>
-        <CardBody className="pt-0 px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center py-8 text-center">
-            <FileX className="w-12 h-12 text-default-400 mb-4" />
-            <div className="mt-4">
-              <Chip
-                size="sm"
-                variant="flat"
-                color="warning"
-                startContent={<Database className="w-3 h-3" />}
-                className="text-xs"
-              >
-                Data tidak tersedia
-              </Chip>
-            </div>
-          </div>
-        </CardBody>
-      </Card>
-    );
-  }
-
-  // Process data based on whether we're filtering by specific department or showing all
-  const jenbelData = dataDipa
-    .map((item) => {
-      const percentage = item.pagu > 0 ? (item.realisasi / item.pagu) * 100 : 0;
-      const status =
-        percentage >= 80
-          ? "excellent"
-          : percentage >= 60
-          ? "on-track"
-          : "warning";
-      return {
-        name: item.jenis_belanja,
-        budget: formatTrillions(item.pagu / 1000000000000), // Convert to trillions
-        realized: formatTrillions(item.realisasi / 1000000000000), // Convert to trillions
-        percentage: Math.round(percentage),
-        status,
-        paguValue: item.pagu,
-        realisasiValue: item.realisasi,
-      };
-    })
-    .sort((a, b) => {
-      // Sort by budget amount (extract numeric value from formatted string)
-      const budgetA = parseFloat(a.budget.replace(/[^\d.-]/g, ""));
-      const budgetB = parseFloat(b.budget.replace(/[^\d.-]/g, ""));
-      return budgetB - budgetA;
-    });
-
-  return (
-    <Card
-      className={`border-none shadow-sm ${
-        getThemeClasses().cardBg
-      } lg:col-span-6 xl:col-span-3`}
-    >
-      <CardHeader className="pb-2 px-4 md:px-6">
-        <div className="flex justify-between items-center w-full">
-          <h3
-            className={`text-sm md:text-base font-semibold ${
-              getThemeClasses().textPrimary
-            }`}
+  // Render loading state
+  const renderLoadingContent = () => (
+    <CardBody className="pt-0 px-4 md:px-6">
+      <div className="space-y-2 md:space-y-3">
+        {Array.from({ length: 2 }).map((_, index) => (
+          <div
+            key={index}
+            className={`p-2 md:p-3 ${
+              getThemeClasses().skeletonItemBg
+            } rounded-lg space-y-2`}
           >
-            Jenis Belanja Terbesar
-          </h3>
+            <div className="flex justify-between items-center">
+              <Skeleton className="h-4 w-40 rounded" />
+              <Skeleton className="h-6 w-12 rounded-full" />
+            </div>
+            <Skeleton className="h-3 w-32 rounded" />
+            <Skeleton className="h-2 w-full rounded-full" />
+          </div>
+        ))}
+      </div>
+    </CardBody>
+  );
+
+  // Render empty state
+  const renderEmptyContent = () => (
+    <CardBody className="pt-0 px-4 md:px-6">
+      <div className="flex flex-col items-center justify-center py-8 text-center">
+        <FileX className="w-12 h-12 text-default-400 mb-4" />
+        <div className="mt-4">
+          <Chip
+            size="sm"
+            variant="flat"
+            color="warning"
+            startContent={<Database className="w-3 h-3" />}
+            className="text-xs"
+          >
+            Data Tidak Tersedia
+          </Chip>
         </div>
-      </CardHeader>
+      </div>
+    </CardBody>
+  );
+
+  // Render main content
+  const renderMainContent = () => {
+    // Process data based on whether we're filtering by specific department or showing all
+    const jenbelData = dataDipa
+      .map((item) => {
+        const percentage =
+          item.pagu > 0 ? (item.realisasi / item.pagu) * 100 : 0;
+        const status =
+          percentage >= 80
+            ? "excellent"
+            : percentage >= 60
+            ? "on-track"
+            : "warning";
+        return {
+          name: item.jenis_belanja,
+          budget: formatTrillions(item.pagu / 1000000000000),
+          realized: formatTrillions(item.realisasi / 1000000000000),
+          percentage: Math.round(percentage),
+          status,
+          paguValue: item.pagu,
+          realisasiValue: item.realisasi,
+        };
+      })
+      .sort((a, b) => {
+        // Sort by budget amount (extract numeric value from formatted string)
+        const budgetA = parseFloat(a.budget.replace(/[^\d.-]/g, ""));
+        const budgetB = parseFloat(b.budget.replace(/[^\d.-]/g, ""));
+        return budgetB - budgetA;
+      });
+
+    return (
       <CardBody className="pt-0 px-4 md:px-6">
         <div className="space-y-0">
           {jenbelData.slice(0, 4).map((jenbel, index) => (
             <div
               key={index}
-              className="flex items-center justify-between p-0.5 md:p-1 rounded-lg"
+              className="flex items-center justify-between p-0.5 md:p-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors duration-200"
             >
               <div className="flex-1 min-w-0">
                 <div className="mb-0.5">
@@ -290,15 +273,23 @@ GROUP BY jenbel;`
                           : "warning"
                       }
                       size="md"
-                      className="w-full h-5"
+                      className="w-full h-6"
                       classNames={{
-                        track: "h-5",
-                        indicator: "h-5",
+                        track:
+                          "h-6 bg-gradient-to-r from-default-100 to-default-200 dark:from-slate-700 dark:to-slate-600 shadow-inner rounded-full border border-default-200 dark:border-slate-600",
+                        indicator: `h-6 rounded-full shadow-lg transition-all duration-500 ease-out ${
+                          jenbel.status === "excellent"
+                            ? "bg-gradient-to-r from-green-400 to-emerald-500 shadow-green-200 dark:shadow-green-900/50"
+                            : jenbel.status === "on-track"
+                            ? "bg-gradient-to-r from-blue-400 to-indigo-500 shadow-blue-200 dark:shadow-blue-900/50"
+                            : "bg-gradient-to-r from-amber-400 to-orange-500 shadow-amber-200 dark:shadow-amber-900/50"
+                        }`,
+                        label: "hidden",
                       }}
                     />
                     <div className="absolute inset-0 flex items-center justify-center">
                       <span
-                        className={`text-xs font-medium ${
+                        className={`text-xs font-semibold drop-shadow-sm ${
                           theme === "dark" ? "text-white" : "text-slate-800"
                         }`}
                       >
@@ -316,7 +307,7 @@ GROUP BY jenbel;`
                         ? "primary"
                         : "warning"
                     }
-                    className="text-xs flex-shrink-0"
+                    className="text-xs flex-shrink-0 font-semibold shadow-sm"
                   >
                     {jenbel.percentage}%
                   </Chip>
@@ -326,6 +317,27 @@ GROUP BY jenbel;`
           ))}
         </div>
       </CardBody>
-    </Card>
+    );
+  };
+
+  // Main return with common structure
+  return (
+    <>
+      <Card
+        className={`border-none shadow-sm ${
+          loading ? getThemeClasses().skeletonCardBg : getThemeClasses().cardBg
+        } lg:col-span-6 xl:col-span-3`}
+      >
+        <CardHeaderComponent />
+        {loading
+          ? renderLoadingContent()
+          : dataDipa.length === 0
+          ? renderEmptyContent()
+          : renderMainContent()}
+      </Card>{" "}
+      {modal && (
+        <ModalPerforma isOpen={modal} onClose={() => setModal(false)} />
+      )}
+    </>
   );
 };

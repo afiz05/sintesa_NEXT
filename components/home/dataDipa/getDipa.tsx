@@ -120,13 +120,8 @@ FROM dashboard.pagu_real_kl prk where thang='2022' and kddept<>'999'${kanwilFilt
 
       setDataDipa(response.data.result?.[0] || null);
     } catch (err: any) {
-      const { status, data } = err.response || {};
-      // handleHttpError(
-      //   status,
-      //   (data && data.error) ||
-      //     "Terjadi Permasalahan Koneksi atau Server Backend "
-      // );
-      showToast("Terjadi Permasalahan Koneksi atau Server Backend", "error");
+      const { data } = err.response || {};
+      showToast(data && data.error, "error");
     } finally {
       setLoading(false);
     }
