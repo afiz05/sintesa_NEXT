@@ -404,9 +404,40 @@ interface SatkerOption extends FormOption {
 }
 
 // Custom hooks for better state management
-const useFormState = () => {
+const useFormState = (initialSwitchState?: { cutOff: boolean }) => {
+  // Helper function to get current month name
+  const getCurrentMonthName = () => {
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth(); // 0-based month
+    const monthNames = [
+      "januari",
+      "februari",
+      "maret",
+      "april",
+      "mei",
+      "juni",
+      "juli",
+      "agustus",
+      "september",
+      "oktober",
+      "november",
+      "desember",
+    ];
+    return monthNames[currentMonth];
+  };
+
+  // Initialize cutOff based on switch state
+  const getInitialCutOffValue = () => {
+    if (initialSwitchState?.cutOff === false) {
+      // Switch is OFF: start with current month
+      return getCurrentMonthName();
+    }
+    // Switch is ON or undefined: start empty (will be set to "januari" by useEffect)
+    return "";
+  };
+
   // Query Parameters State
-  const [cutOff, setCutOff] = useState<string>("");
+  const [cutOff, setCutOff] = useState<string>(getInitialCutOffValue());
   const [kementerian, setKementerian] = useState<Set<string>>(new Set());
   const [eselonI, setEselonI] = useState<Set<string>>(new Set());
   const [satker, setSatker] = useState<Set<string>>(new Set());
@@ -746,8 +777,13 @@ const useComputedValues = (
 };
 
 export const FormSummary = () => {
-  const { switches, selectedJenisLaporan, selectedTahun, selectedPembulatan } =
-    useBelanja();
+  const {
+    switches,
+    selectedJenisLaporan,
+    selectedTahun,
+    selectedPembulatan,
+    activeFiltersCount,
+  } = useBelanja();
   const { showToast } = useToast(); // Helper function to format selected items display
   const formatSelectedItems = (
     selectedSet: Set<string>,
@@ -784,9 +820,8 @@ export const FormSummary = () => {
 
   // Track previous switch states to avoid unnecessary resets
   const prevSwitchesRef = useRef(switches);
-
-  // Form state using custom hook
-  const formState = useFormState(); // Reset all form fields when all switches are reset
+  // Form state using custom hook with switch state context
+  const formState = useFormState({ cutOff: switches.cutOff }); // Reset all form fields when all switches are reset
   useEffect(() => {
     const allSwitchesOff = Object.values(switches).every(
       (value) => value === false
@@ -794,17 +829,21 @@ export const FormSummary = () => {
     if (allSwitchesOff) {
       formState.resetAllState();
     }
-  }, [switches, formState.resetAllState]); // Reset specific form fields when related switches are turned off
+  }, [switches, formState.resetAllState]);
+
+  // Reset specific form fields when related switches are turned off
   useEffect(() => {
     // Only reset if switch was turned off (was true, now false)
     if (!switches.cutOff && prevSwitchesRef.current.cutOff) {
-      formState.setCutOff("");
+      // Don't reset cutOff value when switching off - let CutOffForm handle the auto-selection
+      // This prevents the race condition between reset and auto-selection logic
+      // formState.setCutOff(""); // Removed this line
     }
     prevSwitchesRef.current = {
       ...prevSwitchesRef.current,
       cutOff: switches.cutOff,
     };
-  }, [switches.cutOff, formState.setCutOff]);
+  }, [switches.cutOff]);
   useEffect(() => {
     // Only reset if switch was turned off (was true, now false)
     if (!switches.kementerian && prevSwitchesRef.current.kementerian) {
@@ -1247,8 +1286,30 @@ export const FormSummary = () => {
     formState.satker.size,
   ]);
   const resetAllCutOff = useCallback(() => {
-    formState.setCutOff("");
-  }, [formState.setCutOff]);
+    if (switches.cutOff) {
+      // When switch is ON: Reset to "januari" (required default)
+      formState.setCutOff("januari");
+    } else {
+      // When switch is OFF: Reset to current month (auto-selection)
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth(); // 0-based month
+      const monthNames = [
+        "januari",
+        "februari",
+        "maret",
+        "april",
+        "mei",
+        "juni",
+        "juli",
+        "agustus",
+        "september",
+        "oktober",
+        "november",
+        "desember",
+      ];
+      formState.setCutOff(monthNames[currentMonth]);
+    }
+  }, [formState.setCutOff, switches.cutOff]);
 
   const selectAllKementerian = useCallback(() => {
     const allKeys = computed.kementerianOptions.map((option) => option.key);
@@ -1803,6 +1864,17 @@ export const FormSummary = () => {
       "🔄 Using CombinedQueryGenerator for scalable query generation"
     );
 
+    // Add detailed debugging for satker queries
+    console.log("🐛 Debug - Form State:", {
+      satker: Array.from(formState.satker),
+      satkerTampilan: formState.satkerTampilan,
+      satkerEnabled: switches.satker,
+      cutOff: formState.cutOff,
+      selectedJenisLaporan,
+      selectedTahun,
+      selectedPembulatan,
+    });
+
     try {
       // Use the new CombinedQueryGenerator which handles all scenarios
       const modularQuery = CombinedQueryGenerator.generateQuery({
@@ -1946,7 +2018,7 @@ export const FormSummary = () => {
                 />
               )}{" "}
             </div>{" "}
-            {/* Form Summary Buttons */}
+            {/* Form Summary Buttons */}{" "}
             <FormSummaryButton
               isLoading={isLoading}
               generateSQLQuery={generateSQLQuery}
@@ -1956,6 +2028,8 @@ export const FormSummary = () => {
               setIsModalOpen={setIsModalOpen}
               setCurrentSqlQuery={setCurrentSqlQuery}
               setIsLoading={setIsLoading}
+              activeFiltersCount={activeFiltersCount}
+              switches={switches}
             />
           </div>
         </CardBody>

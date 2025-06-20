@@ -165,11 +165,6 @@ const SatkerForm: React.FC<SatkerFormProps> = ({
               {Math.max(0, limitedDisplaySatkerOptions.length)} hasil)
             </div>
           )}
-          {kementerianSize === 0 && (
-            <div className="text-green-600 dark:text-green-400">
-              Menampilkan semua satker (dari semua kementerian)
-            </div>
-          )}
           {kementerianSize === 0 && filteredSatkerOptions.length > 100 && (
             <div className="text-blue-600 dark:text-blue-400">
               Gunakan pencarian untuk menemukan satker yang diinginkan
