@@ -64,6 +64,22 @@ export const TrenApbn = ({ selectedKanwil, selectedKddept }: TrenApbnProps) => {
     );
   };
 
+  // Theme-aware class definitions
+  const getThemeClasses = () => {
+    const isDark = theme === "dark";
+    return {
+      cardBg: isDark
+        ? "bg-gradient-to-br from-slate-800/90 to-slate-700/90"
+        : "bg-gradient-to-br from-white/90 to-slate-50/90",
+      skeletonCardBg: isDark
+        ? "bg-gradient-to-br from-slate-800 to-slate-700"
+        : "bg-gradient-to-br from-default-50 to-default-100",
+      textPrimary: isDark ? "text-slate-100" : "text-slate-900",
+      textSecondary: isDark ? "text-slate-300" : "text-slate-600",
+      textMuted: isDark ? "text-slate-400" : "text-slate-600",
+    };
+  };
+
   // Theme-aware color definitions
   const getThemeColors = () => {
     const isDark = theme === "dark";
@@ -117,8 +133,8 @@ export const TrenApbn = ({ selectedKanwil, selectedKddept }: TrenApbnProps) => {
     ROUND(sum(real11)/1, 0) as real11, 
     ROUND(sum(renc12)/1, 0) as renc12, 
     ROUND(sum(real12)/1, 0) as real12 FROM dashboard.rencana_real_bulanan  a  
-    LEFT JOIN dbref.t_dept_2025 b ON a.kddept=b.kddept 
-    WHERE 1=1 ${kanwilFilter}${kddeptFilter};`
+    INNER JOIN dbref.t_dept_2025 b ON a.kddept=b.kddept 
+   ${kanwilFilter}${kddeptFilter};`
     );
     const cleanedQuery = decodeURIComponent(encodedQuery)
       .replace(/\n/g, " ")
@@ -158,105 +174,60 @@ export const TrenApbn = ({ selectedKanwil, selectedKddept }: TrenApbnProps) => {
 
   useEffect(() => {
     getData();
-  }, [selectedKanwil, selectedKddept]); // Tambahkan selectedKanwil dan selectedKddept sebagai dependency
+  }, [selectedKanwil, selectedKddept]);
 
-  // Re-render chart when theme changes to update colors
-
-  if (loading) {
-    return (
-      <Card className="border-none shadow-sm bg-gradient-to-br from-default-50 to-default-100 lg:col-span-12 xl:col-span-6">
-        <CardHeader className="pb-2 px-4 md:px-6">
+  // Render loading state
+  const renderLoadingContent = () => (
+    <Card className={`border-none shadow-sm ${getThemeClasses().skeletonCardBg} lg:col-span-12 xl:col-span-6`}>
+      <CardHeader className="pb-2 px-4 md:px-6">
+        <div className="flex flex-col gap-2 w-full">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+            <Skeleton className="h-3 md:h-4 w-40 rounded" />
+            <Skeleton className="h-6 w-20 rounded-full" />
+          </div>
+        </div>
+      </CardHeader>
+      {Array.from({ length: 3 }).map((_, index) => (
+        <CardHeader key={index} className="pb-2 px-4 md:px-6">
           <div className="flex flex-col gap-2 w-full">
-            {/* <Skeleton className="h-5 md:h-6 w-48 rounded" /> */}
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
               <Skeleton className="h-3 md:h-4 w-40 rounded" />
               <Skeleton className="h-6 w-20 rounded-full" />
             </div>
           </div>
         </CardHeader>
-        <CardHeader className="pb-2 px-4 md:px-6">
-          <div className="flex flex-col gap-2 w-full">
-            {/* <Skeleton className="h-5 md:h-6 w-48 rounded" /> */}
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-              <Skeleton className="h-3 md:h-4 w-40 rounded" />
-              <Skeleton className="h-6 w-20 rounded-full" />
+      ))}
+    </Card>
+  );
+
+  // Render empty state
+  const renderEmptyContent = () => (
+    <div className="w-full h-full">
+      <Card className={`border-none shadow-sm ${getThemeClasses().cardBg} h-full`}>
+        <CardBody className="pt-0 px-4 md:px-6">
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <FileX className="w-12 h-12 text-default-400 mb-4" />
+            <div className="mt-4">
+              <Chip
+                size="sm"
+                variant="flat"
+                color="warning"
+                startContent={<Database className="w-3 h-3" />}
+                className="text-xs"
+              >
+                Data Tidak Tersedia
+              </Chip>
             </div>
           </div>
-        </CardHeader>{" "}
-        <CardHeader className="pb-2 px-4 md:px-6">
-          <div className="flex flex-col gap-2 w-full">
-            {/* <Skeleton className="h-5 md:h-6 w-48 rounded" /> */}
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-              <Skeleton className="h-3 md:h-4 w-40 rounded" />
-              <Skeleton className="h-6 w-20 rounded-full" />
-            </div>
-          </div>
-        </CardHeader>{" "}
-        <CardHeader className="pb-2 px-4 md:px-6">
-          <div className="flex flex-col gap-2 w-full">
-            {/* <Skeleton className="h-5 md:h-6 w-48 rounded" /> */}
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-              <Skeleton className="h-3 md:h-4 w-40 rounded" />
-              <Skeleton className="h-6 w-20 rounded-full" />
-            </div>
-          </div>
-        </CardHeader>{" "}
+        </CardBody>
       </Card>
-    );
-  }
+    </div>
+  );
 
-  const getThemeClasses = () => {
-    const isDark = theme === "dark";
-    return {
-      cardBg: isDark
-        ? "bg-gradient-to-br from-slate-800/90 to-slate-700/90"
-        : "bg-gradient-to-br from-white/90 to-slate-50/90",
-      textPrimary: isDark ? "text-slate-100" : "text-slate-900",
-      textSecondary: isDark ? "text-slate-300" : "text-slate-600",
-      textMuted: isDark ? "text-slate-400" : "text-slate-600",
-    };
-  };
-
-  // Check for empty data - more comprehensive check
-  const hasValidData =
-    dataRencanaReal &&
-    Array.isArray(dataRencanaReal) &&
-    dataRencanaReal.length > 0 &&
-    dataRencanaReal[0]; // Make sure first element exists
-
-  if (!loading && !hasValidData) {
-    return (
-      <div className="w-full h-full">
-        <Card
-          className={`border-none shadow-sm ${getThemeClasses().cardBg} h-full`}
-        >
-          <CardBody className="pt-0 px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <FileX className="w-12 h-12 text-default-400 mb-4" />
-              <div className="mt-4">
-                <Chip
-                  size="sm"
-                  variant="flat"
-                  color="warning"
-                  startContent={<Database className="w-3 h-3" />}
-                  className="text-xs"
-                >
-                  No Data Available
-                </Chip>
-              </div>
-              <p className="text-sm text-default-500 mt-2">
-                Tidak ada data APBN tersedia untuk filter yang dipilih
-              </p>
-            </div>
-          </CardBody>
-        </Card>
-      </div>
-    );
-  }
-
-  // Proses data untuk chart - with safety checks
-  const rencanaData =
-    hasValidData && dataRencanaReal[0]
+  // Render main chart content
+  const renderChartContent = () => {
+    // Proses data untuk chart - with safety checks
+    const rencanaData = dataRencanaReal[0]
       ? [
           dataRencanaReal[0].renc1 || 0,
           dataRencanaReal[0].renc2 || 0,
@@ -273,8 +244,7 @@ export const TrenApbn = ({ selectedKanwil, selectedKddept }: TrenApbnProps) => {
         ]
       : [];
 
-  const realisasiData =
-    hasValidData && dataRencanaReal[0]
+    const realisasiData = dataRencanaReal[0]
       ? [
           dataRencanaReal[0].real1 || 0,
           dataRencanaReal[0].real2 || 0,
@@ -291,166 +261,144 @@ export const TrenApbn = ({ selectedKanwil, selectedKddept }: TrenApbnProps) => {
         ]
       : [];
 
-  // Check if all data is zero (empty data)
-  const hasNonZeroData =
-    rencanaData.some((val) => val > 0) || realisasiData.some((val) => val > 0);
+    const state: Props["series"] = [
+      {
+        name: "Target APBN",
+        data: rencanaData,
+      },
+      {
+        name: "Realisasi APBN",
+        data: realisasiData,
+      },
+    ];
 
-  if (!loading && hasValidData && !hasNonZeroData) {
+    const colors = getThemeColors();
+
+    const options: Props["options"] = {
+      chart: {
+        type: "area",
+        animations: {
+          speed: 300,
+        },
+        sparkline: {
+          enabled: false,
+        },
+        brush: {
+          enabled: false,
+        },
+        id: "basic-bar",
+        foreColor: getThemeColors().foreColor,
+        stacked: true,
+        toolbar: {
+          show: false,
+        },
+        parentHeightOffset: 0,
+      },
+      legend: {
+        position: "top",
+        horizontalAlign: "center",
+        fontSize: "12px",
+        fontWeight: 500,
+        labels: {
+          colors: colors.textPrimary,
+        },
+        markers: {
+          size: 8,
+        },
+        itemMargin: {
+          horizontal: 10,
+          vertical: 5,
+        },
+      },
+      xaxis: {
+        categories: [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "Mei",
+          "Jun",
+          "Jul",
+          "Agt",
+          "Sep",
+          "Okt",
+          "Nov",
+          "Des",
+        ],
+        labels: {
+          style: {
+            colors: getThemeColors().foreColor,
+          },
+        },
+        axisBorder: {
+          color: getThemeColors().borderColor,
+        },
+        axisTicks: {
+          color: getThemeColors().borderColor,
+        },
+      },
+      yaxis: {
+        labels: {
+          style: {
+            colors: getThemeColors().foreColor,
+          },
+          formatter: function (value: number) {
+            return formatTrillions(value);
+          },
+        },
+      },
+      tooltip: {
+        theme: theme === "dark" ? "dark" : "light",
+        style: {
+          fontSize: "12px",
+        },
+        y: {
+          formatter: function (value: number) {
+            return formatTrillions(value);
+          },
+        },
+      },
+      colors: [colors.primary, colors.success],
+      grid: {
+        show: true,
+        borderColor: getThemeColors().gridColor,
+        strokeDashArray: 0,
+        position: "back",
+      },
+      stroke: {
+        curve: "smooth",
+        fill: {
+          colors: ["red"],
+        },
+      },
+      // @ts-ignore
+      markers: false,
+    };
+
     return (
       <div className="w-full h-full">
-        <Card
-          className={`border-none shadow-sm ${getThemeClasses().cardBg} h-full`}
-        >
-          <CardBody className="pt-0 px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <FileX className="w-12 h-12 text-default-400 mb-4" />
-              <div className="mt-4">
-                <Chip
-                  size="sm"
-                  variant="flat"
-                  color="warning"
-                  startContent={<Database className="w-3 h-3" />}
-                  className="text-xs"
-                >
-                  No Data Available
-                </Chip>
-              </div>
-              <p className="text-sm text-default-500 mt-2">
-                Data APBN belum tersedia untuk periode ini
-              </p>
-            </div>
-          </CardBody>
-        </Card>
+        <div className="h-full flex flex-col">
+          <Chart
+            key={theme} // Force re-render when theme changes
+            options={options}
+            series={state}
+            type="area"
+            height="100%"
+            width="100%"
+          />
+        </div>
       </div>
     );
-  }
-
-  const state: Props["series"] = [
-    {
-      name: "Target APBN",
-      data: rencanaData,
-    },
-    {
-      name: "Realisasi APBN",
-      data: realisasiData,
-    },
-  ];
-
-  const colors = getThemeColors();
-
-  const options: Props["options"] = {
-    chart: {
-      type: "area",
-      animations: {
-        speed: 300,
-      },
-      sparkline: {
-        enabled: false,
-      },
-      brush: {
-        enabled: false,
-      },
-      id: "basic-bar",
-      foreColor: getThemeColors().foreColor,
-      stacked: true,
-      toolbar: {
-        show: false,
-      },
-      parentHeightOffset: 0,
-    },
-    legend: {
-      position: "top",
-      horizontalAlign: "center",
-      fontSize: "12px",
-      fontWeight: 500,
-      labels: {
-        colors: colors.textPrimary,
-      },
-      markers: {
-        size: 8,
-      },
-      itemMargin: {
-        horizontal: 10,
-        vertical: 5,
-      },
-    },
-    xaxis: {
-      categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "Mei",
-        "Jun",
-        "Jul",
-        "Agt",
-        "Sep",
-        "Okt",
-        "Nov",
-        "Des",
-      ],
-      labels: {
-        style: {
-          colors: getThemeColors().foreColor,
-        },
-      },
-      axisBorder: {
-        color: getThemeColors().borderColor,
-      },
-      axisTicks: {
-        color: getThemeColors().borderColor,
-      },
-    },
-    yaxis: {
-      labels: {
-        style: {
-          colors: getThemeColors().foreColor,
-        },
-        formatter: function (value: number) {
-          return formatTrillions(value);
-        },
-      },
-    },
-    tooltip: {
-      theme: theme === "dark" ? "dark" : "light",
-      style: {
-        fontSize: "12px",
-      },
-      y: {
-        formatter: function (value: number) {
-          return formatTrillions(value);
-        },
-      },
-    },
-    colors: [colors.primary, colors.success],
-    grid: {
-      show: true,
-      borderColor: getThemeColors().gridColor,
-      strokeDashArray: 0,
-      position: "back",
-    },
-    stroke: {
-      curve: "smooth",
-      fill: {
-        colors: ["red"],
-      },
-    },
-    // @ts-ignore
-    markers: false,
   };
 
-  return (
-    <div className="w-full h-full">
-      <div className="h-full flex flex-col">
-        <Chart
-          key={theme} // Force re-render when theme changes
-          options={options}
-          series={state}
-          type="area"
-          height="100%"
-          width="100%"
-        />
-      </div>
-    </div>
-  );
+  // Main return with conditional rendering
+  if (loading) {
+    return renderLoadingContent();
+  }
+
+  if (dataRencanaReal.length === 0 || !dataRencanaReal[0].kddept) {
+    return renderEmptyContent();
+  }
+
+  return renderChartContent();
 };

@@ -7,18 +7,24 @@ import {
   Navbar,
   NavbarItem,
 } from "@heroui/react";
-import React, { useCallback } from "react";
-import { DarkModeSwitch } from "./darkmodeswitch";
+import React, { useCallback, useContext } from "react";
+
 import { useRouter } from "next/navigation";
 import { deleteAuthCookie } from "@/actions/auth.action";
+import MyContext from "@/utils/Contex";
+import Link from "next/link";
 
 export const UserDropdown = () => {
   const router = useRouter();
-
   const handleLogout = useCallback(async () => {
     await deleteAuthCookie();
     router.replace("/login");
   }, [router]);
+  const context = useContext(MyContext);
+
+  const { name } = context! as {
+    name: string;
+  };
 
   return (
     <Dropdown>
@@ -41,7 +47,7 @@ export const UserDropdown = () => {
           className="flex flex-col justify-start w-full items-start"
         >
           <p>Signed in as</p>
-          <p>legendani@kemenkeu.go.id</p>
+          <p>{name}</p>
         </DropdownItem>
         <DropdownItem key="settings">My Settings</DropdownItem>
         <DropdownItem key="team_settings">Team Settings</DropdownItem>
@@ -49,6 +55,11 @@ export const UserDropdown = () => {
         <DropdownItem key="system">System</DropdownItem>
         <DropdownItem key="configurations">Configurations</DropdownItem>
         <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
+        <DropdownItem key="user-manage">
+          <Link href="/accounts" className="dropdown-item">
+            User Management
+          </Link>
+        </DropdownItem>
         <DropdownItem
           key="logout"
           color="danger"

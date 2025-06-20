@@ -18,6 +18,7 @@ import {
   Database,
   FileX,
 } from "lucide-react";
+import { useToast } from "@/components/context/ToastContext";
 
 interface DipaData {
   pagu: number;
@@ -38,6 +39,7 @@ export const GetDipa = ({ selectedKanwil, selectedKddept }: GetDipaProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const context = useContext(MyContext);
   const { theme } = useTheme();
+  const { showToast } = useToast();
 
   const { token, axiosJWT, statusLogin } = context! as {
     token: string;
@@ -52,6 +54,18 @@ export const GetDipa = ({ selectedKanwil, selectedKddept }: GetDipaProps) => {
       cardBg: isDark
         ? "bg-gradient-to-br from-slate-800/90 to-slate-700/90"
         : "bg-gradient-to-br from-white/90 to-slate-50/90",
+      cardBgPrimary: isDark
+        ? "bg-gradient-to-br from-blue-900/80 to-blue-800/70"
+        : "bg-gradient-to-br from-blue-50 to-blue-100/90",
+      cardBgSuccess: isDark
+        ? "bg-gradient-to-br from-green-900/80 to-green-800/70"
+        : "bg-gradient-to-br from-green-50 to-green-100/90",
+      cardBgWarning: isDark
+        ? "bg-gradient-to-br from-amber-900/80 to-amber-800/70"
+        : "bg-gradient-to-br from-amber-50 to-amber-100/90",
+      cardBgSecondary: isDark
+        ? "bg-gradient-to-br from-purple-900/80 to-purple-800/70"
+        : "bg-gradient-to-br from-purple-50 to-purple-100/90",
       iconBg: isDark ? "bg-blue-500/20" : "bg-blue-500/10",
       textPrimary: isDark ? "text-slate-100" : "text-slate-900",
       textSecondary: isDark ? "text-slate-300" : "text-slate-600",
@@ -106,12 +120,8 @@ FROM dashboard.pagu_real_kl prk where thang='2022' and kddept<>'999'${kanwilFilt
 
       setDataDipa(response.data.result?.[0] || null);
     } catch (err: any) {
-      const { status, data } = err.response || {};
-      handleHttpError(
-        status,
-        (data && data.error) ||
-          "Terjadi Permasalahan Koneksi atau Server Backend "
-      );
+      const { data } = err.response || {};
+      showToast(data && data.error, "error");
     } finally {
       setLoading(false);
     }
@@ -245,7 +255,15 @@ FROM dashboard.pagu_real_kl prk where thang='2022' and kddept<>'999'${kanwilFilt
         <Card
           key={index}
           className={`border-none shadow-sm hover:shadow-md transition-shadow ${
-            getThemeClasses().cardBg
+            stat.color === "primary"
+              ? getThemeClasses().cardBgPrimary
+              : stat.color === "success"
+              ? getThemeClasses().cardBgSuccess
+              : stat.color === "warning"
+              ? getThemeClasses().cardBgWarning
+              : stat.color === "secondary"
+              ? getThemeClasses().cardBgSecondary
+              : getThemeClasses().cardBg
           } ${
             // Custom width for each card on large screens
             index === 0

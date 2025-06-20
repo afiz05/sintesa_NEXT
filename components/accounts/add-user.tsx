@@ -16,8 +16,11 @@ export const AddUser = () => {
   return (
     <div>
       <>
-        <Button onPress={onOpen} color="primary">
-          Add User
+        <Button
+          onPress={onOpen}
+          className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+        >
+          Tambah User
         </Button>
         <Modal
           isOpen={isOpen}
@@ -44,10 +47,17 @@ export const AddUser = () => {
                   />
                 </ModalBody>
                 <ModalFooter>
-                  <Button color="danger" variant="flat" onClick={onClose}>
+                  <Button
+                    variant="flat"
+                    onPress={onClose}
+                    className="bg-gradient-to-r from-red-100 to-red-200 hover:from-red-200 hover:to-red-300 text-red-700 font-semibold"
+                  >
                     Close
                   </Button>
-                  <Button color="primary" onPress={onClose}>
+                  <Button
+                    onPress={onClose}
+                    className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                  >
                     Add User
                   </Button>
                 </ModalFooter>

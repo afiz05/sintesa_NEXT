@@ -6,6 +6,7 @@ import { Autocomplete, AutocompleteItem, Skeleton } from "@heroui/react";
 import MyContext from "@/utils/Contex";
 import Encrypt from "@/utils/Encrypt";
 import { handleHttpError } from "@/utils/handleError";
+import { useToast } from "../context/ToastContext";
 
 interface KanwilData {
   kdkanwil: string;
@@ -28,6 +29,7 @@ export const Kanwil = ({
     propSelectedKanwil || "00"
   );
   const context = useContext(MyContext);
+  const { showToast } = useToast();
 
   const { token, axiosJWT, statusLogin } = context! as {
     token: string;
@@ -65,12 +67,8 @@ export const Kanwil = ({
       const kanwilData = [allKanwilOption, ...(response.data.result || [])];
       setDataKanwil(kanwilData);
     } catch (err: any) {
-      const { status, data } = err.response || {};
-      handleHttpError(
-        status,
-        (data && data.error) ||
-          "Terjadi Permasalahan Koneksi atau Server Backend "
-      );
+      const { data } = err.response || {};
+      showToast(data && data.error, "error");
     } finally {
       setLoading(false);
     }

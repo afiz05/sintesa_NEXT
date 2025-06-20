@@ -21,6 +21,9 @@ export function Providers({ children, themeProps }: ProvidersProps) {
         <NextThemesProvider
           defaultTheme="system"
           attribute="class"
+          enableSystem={true}
+          enableColorScheme={true}
+          storageKey="sintesa-theme"
           {...themeProps}
         >
           <NotificationProvider>
