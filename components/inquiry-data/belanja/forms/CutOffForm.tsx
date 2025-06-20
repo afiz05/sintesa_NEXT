@@ -43,27 +43,33 @@ const CutOffForm: React.FC<CutOffFormProps> = ({
   className = "",
   isEnabled = true,
 }) => {
+  // Helper function to get current month name
+  const getCurrentMonthName = () => {
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth(); // 0-based month
+    const monthNames = [
+      "januari",
+      "februari",
+      "maret",
+      "april",
+      "mei",
+      "juni",
+      "juli",
+      "agustus",
+      "september",
+      "oktober",
+      "november",
+      "desember",
+    ];
+    return monthNames[currentMonth];
+  };
+
   // Handle default selection based on switch state
   React.useEffect(() => {
     if (!isEnabled) {
       // When switch is OFF: Set to current month automatically
-      const currentDate = new Date();
-      const currentMonth = currentDate.getMonth(); // 0-based month
-      const monthNames = [
-        "januari",
-        "februari",
-        "maret",
-        "april",
-        "mei",
-        "juni",
-        "juli",
-        "agustus",
-        "september",
-        "oktober",
-        "november",
-        "desember",
-      ];
-      setCutOff(monthNames[currentMonth]);
+      const currentMonthName = getCurrentMonthName();
+      setCutOff(currentMonthName);
     } else {
       // When switch is ON: Set to "januari" if no selection exists (required)
       if (!cutOff) {
@@ -71,6 +77,14 @@ const CutOffForm: React.FC<CutOffFormProps> = ({
       }
     }
   }, [isEnabled, setCutOff, cutOff]);
+
+  // Ensure cutOff has a value when disabled (fallback for initial render)
+  React.useEffect(() => {
+    if (!isEnabled && !cutOff) {
+      const currentMonthName = getCurrentMonthName();
+      setCutOff(currentMonthName);
+    }
+  }, [isEnabled, cutOff, setCutOff]);
 
   return (
     <div
@@ -110,6 +124,16 @@ const CutOffForm: React.FC<CutOffFormProps> = ({
           isDisabled={!isEnabled}
           isRequired={isEnabled}
           validationBehavior="native"
+          // Force display of selected value even when disabled
+          renderValue={(items) => {
+            if (!isEnabled && cutOff) {
+              const selectedOption = CUT_OFF_OPTIONS.find(
+                (opt) => opt.key === cutOff
+              );
+              return selectedOption ? selectedOption.label : cutOff;
+            }
+            return items.map((item) => item.textValue).join(", ");
+          }}
         >
           {CUT_OFF_OPTIONS.map((item) => (
             <SelectItem key={item.key}>{item.label}</SelectItem>
@@ -129,28 +153,6 @@ const CutOffForm: React.FC<CutOffFormProps> = ({
           >
             Reset to Januari
           </Button>
-        </div>
-      )}
-      {/* Selection Summary */}
-      {cutOff && (
-        <div className="sm:col-span-2 xl:col-span-3">
-          <div className="flex flex-wrap gap-2 items-center">
-            {" "}
-            <span className="text-xs text-gray-600 dark:text-gray-400">
-              {isEnabled
-                ? "Realisasi dijumlahkan sampai periode (pilihan manual):"
-                : "Realisasi dijumlahkan sampai periode (otomatis bulan ini):"}
-            </span>{" "}
-            <Chip
-              size="sm"
-              variant="flat"
-              color={isEnabled ? "primary" : "default"}
-              className="text-xs"
-            >
-              {CUT_OFF_OPTIONS.find((opt) => opt.key === cutOff)?.label ||
-                cutOff}{" "}
-            </Chip>
-          </div>
         </div>
       )}
     </div>

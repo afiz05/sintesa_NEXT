@@ -105,6 +105,12 @@ export const SidebarWrapper = () => {
                   icon={<DevIcon />}
                   href="/test-loading"
                 />
+                <SidebarItem
+                  isActive={pathname === "/test-belanja"}
+                  title="Belanja Test"
+                  icon={<ChartCandlestick className="text-default-500" />}
+                  href="/test-belanja"
+                />
               </SidebarMenu>
             </div>
             <div className={Sidebar.Footer()}>
@@ -176,6 +182,13 @@ export const SidebarWrapper = () => {
                 title="Test Loading"
                 icon={<DevIcon />}
                 href="/test-loading"
+              />
+
+              <SidebarItem
+                isActive={pathname === "/test-belanja"}
+                title="Belanja Test"
+                icon={<ChartCandlestick className="text-default-500" />}
+                href="/test-belanja"
               />
             </div>
 

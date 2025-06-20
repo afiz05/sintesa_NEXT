@@ -1,10 +1,11 @@
 "use client";
 import React, { useCallback } from "react";
-import { Button } from "@heroui/react";
+import { Button, Tooltip } from "@heroui/react";
 import { Search, Download, RefreshCw, Copy } from "lucide-react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { useToast } from "../../context/ToastContext";
+import { SwitchState } from "./context";
 
 interface FormSummaryButtonProps {
   isLoading: boolean;
@@ -15,6 +16,8 @@ interface FormSummaryButtonProps {
   setIsModalOpen: (isOpen: boolean) => void;
   setCurrentSqlQuery: (query: string) => void;
   setIsLoading: (loading: boolean) => void;
+  activeFiltersCount: number;
+  switches: SwitchState;
 }
 
 const FormSummaryButton: React.FC<FormSummaryButtonProps> = ({
@@ -26,6 +29,8 @@ const FormSummaryButton: React.FC<FormSummaryButtonProps> = ({
   setIsModalOpen,
   setCurrentSqlQuery,
   setIsLoading,
+  activeFiltersCount,
+  switches,
 }) => {
   const { showToast } = useToast();
 
@@ -203,31 +208,48 @@ const FormSummaryButton: React.FC<FormSummaryButtonProps> = ({
     },
     [openModalWithSQL, showToast, setIsLoading]
   );
-
   const handleSearchClick = () => {
     handleSubmitWithModal({
       preventDefault: () => {},
     } as React.FormEvent);
   };
 
+  // Check if buttons should be disabled
+  // Disable if no filters selected OR if only cutOff is selected (which filters to no data)
+  const isOnlyCutOffSelected = activeFiltersCount === 1 && switches.cutOff;
+  const shouldDisableButtons = activeFiltersCount === 0 || isOnlyCutOffSelected;
+
   return (
     <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200 dark:border-gray-700 justify-center">
-      <Button
-        type="button"
-        color="primary"
-        isLoading={isLoading}
-        startContent={!isLoading && <Search size={18} />}
-        className="min-w-[180px]"
-        onClick={handleSearchClick}
+      <Tooltip
+        content="Silahkan Pilih Query Filter Terlebih Dahulu"
+        isDisabled={!shouldDisableButtons}
+        placement="top"
+        showArrow={true}
+        className="max-w-xs text-center"
+        color="danger"
       >
-        {isLoading ? "Searching..." : "Search Data"}
-      </Button>
+        <div className="inline-block">
+          <Button
+            type="button"
+            color="primary"
+            isLoading={isLoading}
+            startContent={!isLoading && <Search size={18} />}
+            className="min-w-[180px]"
+            onClick={handleSearchClick}
+            isDisabled={shouldDisableButtons || isLoading}
+          >
+            {isLoading ? "Searching..." : "Search Data"}
+          </Button>
+        </div>
+      </Tooltip>{" "}
       <Button
         type="button"
         variant="bordered"
         startContent={<RefreshCw size={18} />}
         className="min-w-[180px]"
         onClick={resetAllState}
+        isDisabled={shouldDisableButtons}
       >
         Reset Form
       </Button>
@@ -239,7 +261,7 @@ const FormSummaryButton: React.FC<FormSummaryButtonProps> = ({
         className="min-w-[180px]"
         onClick={handleExport}
         isLoading={isLoading}
-        isDisabled={isLoading}
+        isDisabled={shouldDisableButtons || isLoading}
       >
         {isLoading ? "Exporting..." : "Export to Excel"}
       </Button>
@@ -250,6 +272,7 @@ const FormSummaryButton: React.FC<FormSummaryButtonProps> = ({
         startContent={<Copy size={18} />}
         className="min-w-[180px]"
         onClick={handleGetSQL}
+        isDisabled={shouldDisableButtons}
       >
         Get SQL
       </Button>

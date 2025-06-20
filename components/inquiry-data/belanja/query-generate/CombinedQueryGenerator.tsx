@@ -1,5 +1,6 @@
-// Combined Query Generator
+// Combined Query Generator - EFFICIENT VERSION
 // Handles multiple switches (filters) working together in a scalable way
+// Uses direct SUM without CASE WHEN conditions for optimal performance
 
 import {
   KementerianQueryGenerator,
@@ -13,6 +14,10 @@ import {
   CutOffQueryGenerator,
   type CutOffQueryParams,
 } from "./CutOffQueryGenerator";
+import {
+  SatkerQueryGenerator,
+  type SatkerQueryParams,
+} from "./SatkerQueryGenerator";
 
 export interface CombinedQueryParams {
   // Switch states
@@ -101,6 +106,7 @@ export class CombinedQueryGenerator {
 
     return `ROUND(${columnName} / ${divisor}, 2)`;
   }
+
   /**
    * Main entry point for combined query generation
    */
@@ -135,6 +141,7 @@ export class CombinedQueryGenerator {
       return this.generateBasicQuery(params);
     }
   }
+
   /**
    * Handle single filter scenarios (delegate to specific generators)
    */
@@ -170,8 +177,17 @@ export class CombinedQueryGenerator {
       });
     }
 
-    // Add other single filters here as needed
-    // if (switches.satker) { ... }
+    if (switches.satker) {
+      return SatkerQueryGenerator.generateQuery({
+        satkerEnabled: switches.satker,
+        satker: formState.satker,
+        satkerTampilan: formState.satkerTampilan,
+        cutOff: formState.cutOff,
+        selectedJenisLaporan,
+        selectedTahun,
+        selectedPembulatan,
+      });
+    }
 
     throw new Error("Unknown single filter combination");
   }
@@ -180,22 +196,34 @@ export class CombinedQueryGenerator {
    * Handle multiple filter scenarios (the main innovation)
    */
   private static handleMultipleFilters(params: CombinedQueryParams): string {
-    const { switches, formState, selectedJenisLaporan } = params; // Check for Kementerian + EselonI combination (excluding cutOff from count)
+    const { switches, formState, selectedJenisLaporan } = params;
+
+    // Check for filter combinations (excluding cutOff from count)
     const nonCutOffActiveFilters = Object.keys(switches).filter(
       (k) => switches[k] && k !== "cutOff"
     );
-    if (
-      switches.kementerian &&
-      switches.eselonI &&
-      nonCutOffActiveFilters.length === 2
-    ) {
-      return this.generateKementerianEselonQuery(params);
+
+    // Two-filter combinations
+    if (nonCutOffActiveFilters.length === 2) {
+      if (switches.kementerian && switches.eselonI) {
+        return this.generateKementerianEselonQuery(params);
+      }
+
+      if (switches.kementerian && switches.satker) {
+        return this.generateKementerianSatkerQuery(params);
+      }
+
+      if (switches.eselonI && switches.satker) {
+        return this.generateEselonSatkerQuery(params);
+      }
     }
 
-    // Future combinations can be added here:
-    // if (switches.kementerian && switches.satker) { ... }
-    // if (switches.eselonI && switches.satker) { ... }
-    // if (switches.kementerian && switches.eselonI && switches.satker) { ... }
+    // Three-filter combination
+    if (nonCutOffActiveFilters.length === 3) {
+      if (switches.kementerian && switches.eselonI && switches.satker) {
+        return this.generateKementerianEselonSatkerQuery(params);
+      }
+    }
 
     // Fallback for complex combinations not yet implemented
     console.warn(
@@ -226,8 +254,79 @@ export class CombinedQueryGenerator {
 
     return this.buildQueryFromConfig(config, params);
   }
+
+  /**
+   * Generate query for Kementerian + Satker combination
+   */
+  private static generateKementerianSatkerQuery(
+    params: CombinedQueryParams
+  ): string {
+    const { formState, selectedJenisLaporan } = params;
+
+    console.log("🔄 Generating Kementerian + Satker combined query");
+
+    // Determine if this is a Pagu Realisasi query
+    const isPaguRealisasi = selectedJenisLaporan === "Pagu Realisasi";
+
+    let config: CombinedQueryConfig;
+    if (isPaguRealisasi) {
+      config = this.buildKementerianSatkerPaguRealisasiConfig(params);
+    } else {
+      config = this.buildKementerianSatkerStandardConfig(params);
+    }
+
+    return this.buildQueryFromConfig(config, params);
+  }
+
+  /**
+   * Generate query for EselonI + Satker combination
+   */
+  private static generateEselonSatkerQuery(
+    params: CombinedQueryParams
+  ): string {
+    const { formState, selectedJenisLaporan } = params;
+
+    console.log("🔄 Generating EselonI + Satker combined query");
+
+    // Determine if this is a Pagu Realisasi query
+    const isPaguRealisasi = selectedJenisLaporan === "Pagu Realisasi";
+
+    let config: CombinedQueryConfig;
+    if (isPaguRealisasi) {
+      config = this.buildEselonSatkerPaguRealisasiConfig(params);
+    } else {
+      config = this.buildEselonSatkerStandardConfig(params);
+    }
+
+    return this.buildQueryFromConfig(config, params);
+  }
+
+  /**
+   * Generate query for Kementerian + EselonI + Satker combination
+   */
+  private static generateKementerianEselonSatkerQuery(
+    params: CombinedQueryParams
+  ): string {
+    const { formState, selectedJenisLaporan } = params;
+
+    console.log("🔄 Generating Kementerian + EselonI + Satker combined query");
+
+    // Determine if this is a Pagu Realisasi query
+    const isPaguRealisasi = selectedJenisLaporan === "Pagu Realisasi";
+
+    let config: CombinedQueryConfig;
+    if (isPaguRealisasi) {
+      config = this.buildKementerianEselonSatkerPaguRealisasiConfig(params);
+    } else {
+      config = this.buildKementerianEselonSatkerStandardConfig(params);
+    }
+
+    return this.buildQueryFromConfig(config, params);
+  }
+
   /**
    * Build configuration for Kementerian + EselonI Pagu Realisasi queries
+   * EFFICIENT APPROACH: Uses direct SUM without CASE WHEN conditions
    */
   private static buildKementerianEselonPaguRealisasiConfig(
     params: CombinedQueryParams
@@ -235,7 +334,7 @@ export class CombinedQueryGenerator {
     const { formState, selectedTahun } = params;
     let selectColumns: string[] = [];
     let groupByColumns: string[] = [];
-    let whereConditions: string[] = ["1=1"]; // Start with default condition
+    let whereConditions: string[] = ["1=1"];
     let joinClauses: string[] = [];
 
     const mainTable = `${this.getTableName(selectedTahun)} a`;
@@ -257,7 +356,9 @@ export class CombinedQueryGenerator {
           break;
       }
       joinClauses.push("LEFT JOIN dbref.t_dept_2023 b ON a.kddept = b.kddept");
-    } // Handle EselonI display
+    }
+
+    // Handle EselonI display
     if (formState.eselonTampilan !== "jangan_tampilkan") {
       switch (formState.eselonTampilan) {
         case "kode":
@@ -276,50 +377,23 @@ export class CombinedQueryGenerator {
       joinClauses.push(
         "LEFT JOIN dbref.t_unit_2025 c ON a.kdunit = c.kdunit AND a.kddept = c.kddept"
       );
-    } // Add financial columns for Pagu Realisasi with proper filtering
-    // Only sum amounts where both kementerian and eselon conditions are met
-    let paguCondition = "a.pagu"; // Get realization sum expression based on cutoff month - always applied
-    // When switch is off: uses current month automatically set in form
-    // When switch is on: uses user-selected month
+    }
+
+    // Get realization sum expression based on cutoff month
     let realisasiCondition = "";
     if (formState.cutOff) {
       const cutOffInfo = CutOffQueryGenerator.getCutOffInfo(formState.cutOff);
       realisasiCondition = `a.${cutOffInfo.sumExpression}`;
     } else {
-      // Fallback to full year if no cutoff selected (shouldn't happen now)
       realisasiCondition =
         "a.real1 + a.real2 + a.real3 + a.real4 + a.real5 + a.real6 + a.real7 + a.real8 + a.real9 + a.real10 + a.real11 + a.real12";
     }
 
-    let blokirCondition = "a.blokir";
-
-    // Add conditional filtering for proper kementerian-eselon matching
-    const conditionalFilters: string[] = [];
-
-    if (formState.kementerian.size > 0) {
-      const kementerianList = Array.from(formState.kementerian)
-        .map((k) => `'${k}'`)
-        .join(", ");
-      conditionalFilters.push(`a.kddept IN (${kementerianList})`);
-    }
-
-    if (formState.eselonI.size > 0) {
-      const eselonIList = Array.from(formState.eselonI)
-        .map((k) => `'${k}'`)
-        .join(", ");
-      conditionalFilters.push(`a.kdunit IN (${eselonIList})`);
-    }
-
-    // If both filters are active, use conditional SUM to ensure proper matching
-    if (conditionalFilters.length > 1) {
-      const conditionClause = conditionalFilters.join(" AND ");
-      paguCondition = `CASE WHEN ${conditionClause} THEN a.pagu ELSE 0 END`;
-      realisasiCondition = `CASE WHEN ${conditionClause} THEN ${realisasiCondition} ELSE 0 END`;
-      blokirCondition = `CASE WHEN ${conditionClause} THEN a.blokir ELSE 0 END`;
-    }
+    // EFFICIENT APPROACH: Use direct SUM without CASE conditions
+    // The WHERE clause will handle the filtering
     selectColumns.push(
       `${this.applyRounding(
-        `SUM(${paguCondition})`,
+        "SUM(a.pagu)",
         params.selectedPembulatan
       )} AS PAGU_DIPA`,
       `${this.applyRounding(
@@ -327,7 +401,7 @@ export class CombinedQueryGenerator {
         params.selectedPembulatan
       )} AS REALISASI`,
       `${this.applyRounding(
-        `SUM(${blokirCondition})`,
+        "SUM(a.blokir)",
         params.selectedPembulatan
       )} AS BLOKIR`
     );
@@ -355,6 +429,354 @@ export class CombinedQueryGenerator {
       mainTable,
     };
   }
+
+  /**
+   * Build configuration for Kementerian + Satker Pagu Realisasi queries
+   * EFFICIENT APPROACH: Uses direct SUM without CASE WHEN conditions
+   */
+  private static buildKementerianSatkerPaguRealisasiConfig(
+    params: CombinedQueryParams
+  ): CombinedQueryConfig {
+    const { formState, selectedTahun } = params;
+    let selectColumns: string[] = [];
+    let groupByColumns: string[] = [];
+    let whereConditions: string[] = ["1=1"];
+    let joinClauses: string[] = [];
+
+    const mainTable = `${this.getTableName(selectedTahun)} a`;
+
+    // Handle Kementerian display
+    if (formState.kementerianTampilan !== "jangan_tampilkan") {
+      switch (formState.kementerianTampilan) {
+        case "kode":
+          selectColumns.push("b.kddept");
+          groupByColumns.push("b.kddept");
+          break;
+        case "uraian":
+          selectColumns.push("b.nmdept");
+          groupByColumns.push("b.nmdept");
+          break;
+        case "kode_uraian":
+          selectColumns.push("b.kddept", "b.nmdept");
+          groupByColumns.push("b.kddept", "b.nmdept");
+          break;
+      }
+      joinClauses.push("LEFT JOIN dbref.t_dept_2023 b ON a.kddept = b.kddept");
+    }
+
+    // Handle Satker display
+    if (formState.satkerTampilan !== "jangan_tampilkan") {
+      switch (formState.satkerTampilan) {
+        case "kode":
+          selectColumns.push("d.kdsatker");
+          groupByColumns.push("d.kdsatker");
+          break;
+        case "uraian":
+          selectColumns.push("d.nmsatker");
+          groupByColumns.push("d.nmsatker");
+          break;
+        case "kode_uraian":
+          selectColumns.push("d.kdsatker", "d.nmsatker");
+          groupByColumns.push("d.kdsatker", "d.nmsatker");
+          break;
+      }
+      joinClauses.push(
+        "LEFT JOIN dbref.t_satker_2025 d ON a.kdsatker = d.kdsatker AND a.kdunit = d.kdunit AND a.kddept = d.kddept"
+      );
+    }
+
+    // Get realization sum expression based on cutoff month
+    let realisasiCondition = "";
+    if (formState.cutOff) {
+      const cutOffInfo = CutOffQueryGenerator.getCutOffInfo(formState.cutOff);
+      realisasiCondition = `a.${cutOffInfo.sumExpression}`;
+    } else {
+      realisasiCondition =
+        "a.real1 + a.real2 + a.real3 + a.real4 + a.real5 + a.real6 + a.real7 + a.real8 + a.real9 + a.real10 + a.real11 + a.real12";
+    }
+
+    // EFFICIENT APPROACH: Use direct SUM without CASE conditions
+    // The WHERE clause will handle the filtering
+    selectColumns.push(
+      `${this.applyRounding(
+        "SUM(a.pagu)",
+        params.selectedPembulatan
+      )} AS PAGU_DIPA`,
+      `${this.applyRounding(
+        `SUM(${realisasiCondition})`,
+        params.selectedPembulatan
+      )} AS REALISASI`,
+      `${this.applyRounding(
+        "SUM(a.blokir)",
+        params.selectedPembulatan
+      )} AS BLOKIR`
+    );
+
+    // Add WHERE conditions for selections
+    if (formState.kementerian.size > 0) {
+      const kementerianList = Array.from(formState.kementerian)
+        .map((k) => `'${k}'`)
+        .join(", ");
+      whereConditions.push(`a.kddept IN (${kementerianList})`);
+    }
+    if (formState.satker.size > 0) {
+      const satkerList = Array.from(formState.satker)
+        .map((k) => `'${k}'`)
+        .join(", ");
+      whereConditions.push(`a.kdsatker IN (${satkerList})`);
+    }
+
+    return {
+      selectColumns,
+      groupByColumns,
+      whereConditions,
+      needsJoin: joinClauses.length > 0,
+      joinClauses,
+      mainTable,
+    };
+  }
+
+  /**
+   * Build configuration for EselonI + Satker Pagu Realisasi queries
+   * EFFICIENT APPROACH: Uses direct SUM without CASE WHEN conditions
+   */
+  private static buildEselonSatkerPaguRealisasiConfig(
+    params: CombinedQueryParams
+  ): CombinedQueryConfig {
+    const { formState, selectedTahun } = params;
+    let selectColumns: string[] = [];
+    let groupByColumns: string[] = [];
+    let whereConditions: string[] = ["1=1"];
+    let joinClauses: string[] = [];
+
+    const mainTable = `${this.getTableName(selectedTahun)} a`;
+
+    // Handle EselonI display
+    if (formState.eselonTampilan !== "jangan_tampilkan") {
+      switch (formState.eselonTampilan) {
+        case "kode":
+          selectColumns.push("c.kdunit");
+          groupByColumns.push("c.kdunit");
+          break;
+        case "uraian":
+          selectColumns.push("c.nmunit");
+          groupByColumns.push("c.nmunit");
+          break;
+        case "kode_uraian":
+          selectColumns.push("c.kdunit", "c.nmunit");
+          groupByColumns.push("c.kdunit", "c.nmunit");
+          break;
+      }
+      joinClauses.push(
+        "LEFT JOIN dbref.t_unit_2025 c ON a.kdunit = c.kdunit AND a.kddept = c.kddept"
+      );
+    }
+
+    // Handle Satker display
+    if (formState.satkerTampilan !== "jangan_tampilkan") {
+      switch (formState.satkerTampilan) {
+        case "kode":
+          selectColumns.push("d.kdsatker");
+          groupByColumns.push("d.kdsatker");
+          break;
+        case "uraian":
+          selectColumns.push("d.nmsatker");
+          groupByColumns.push("d.nmsatker");
+          break;
+        case "kode_uraian":
+          selectColumns.push("d.kdsatker", "d.nmsatker");
+          groupByColumns.push("d.kdsatker", "d.nmsatker");
+          break;
+      }
+      joinClauses.push(
+        "LEFT JOIN dbref.t_satker_2025 d ON a.kdsatker = d.kdsatker AND a.kdunit = d.kdunit AND a.kddept = d.kddept"
+      );
+    }
+
+    // Get realization sum expression based on cutoff month
+    let realisasiCondition = "";
+    if (formState.cutOff) {
+      const cutOffInfo = CutOffQueryGenerator.getCutOffInfo(formState.cutOff);
+      realisasiCondition = `a.${cutOffInfo.sumExpression}`;
+    } else {
+      realisasiCondition =
+        "a.real1 + a.real2 + a.real3 + a.real4 + a.real5 + a.real6 + a.real7 + a.real8 + a.real9 + a.real10 + a.real11 + a.real12";
+    }
+
+    // EFFICIENT APPROACH: Use direct SUM without CASE conditions
+    // The WHERE clause will handle the filtering
+    selectColumns.push(
+      `${this.applyRounding(
+        "SUM(a.pagu)",
+        params.selectedPembulatan
+      )} AS PAGU_DIPA`,
+      `${this.applyRounding(
+        `SUM(${realisasiCondition})`,
+        params.selectedPembulatan
+      )} AS REALISASI`,
+      `${this.applyRounding(
+        "SUM(a.blokir)",
+        params.selectedPembulatan
+      )} AS BLOKIR`
+    );
+
+    // Add WHERE conditions for selections
+    if (formState.eselonI.size > 0) {
+      const eselonIList = Array.from(formState.eselonI)
+        .map((k) => `'${k}'`)
+        .join(", ");
+      whereConditions.push(`a.kdunit IN (${eselonIList})`);
+    }
+    if (formState.satker.size > 0) {
+      const satkerList = Array.from(formState.satker)
+        .map((k) => `'${k}'`)
+        .join(", ");
+      whereConditions.push(`a.kdsatker IN (${satkerList})`);
+    }
+
+    return {
+      selectColumns,
+      groupByColumns,
+      whereConditions,
+      needsJoin: joinClauses.length > 0,
+      joinClauses,
+      mainTable,
+    };
+  }
+
+  /**
+   * Build configuration for Kementerian + EselonI + Satker Pagu Realisasi queries
+   * EFFICIENT APPROACH: Uses direct SUM without CASE WHEN conditions
+   */
+  private static buildKementerianEselonSatkerPaguRealisasiConfig(
+    params: CombinedQueryParams
+  ): CombinedQueryConfig {
+    const { formState, selectedTahun } = params;
+    let selectColumns: string[] = [];
+    let groupByColumns: string[] = [];
+    let whereConditions: string[] = ["1=1"];
+    let joinClauses: string[] = [];
+
+    const mainTable = `${this.getTableName(selectedTahun)} a`;
+
+    // Handle Kementerian display
+    if (formState.kementerianTampilan !== "jangan_tampilkan") {
+      switch (formState.kementerianTampilan) {
+        case "kode":
+          selectColumns.push("b.kddept");
+          groupByColumns.push("b.kddept");
+          break;
+        case "uraian":
+          selectColumns.push("b.nmdept");
+          groupByColumns.push("b.nmdept");
+          break;
+        case "kode_uraian":
+          selectColumns.push("b.kddept", "b.nmdept");
+          groupByColumns.push("b.kddept", "b.nmdept");
+          break;
+      }
+      joinClauses.push("LEFT JOIN dbref.t_dept_2023 b ON a.kddept = b.kddept");
+    }
+
+    // Handle EselonI display
+    if (formState.eselonTampilan !== "jangan_tampilkan") {
+      switch (formState.eselonTampilan) {
+        case "kode":
+          selectColumns.push("c.kdunit");
+          groupByColumns.push("c.kdunit");
+          break;
+        case "uraian":
+          selectColumns.push("c.nmunit");
+          groupByColumns.push("c.nmunit");
+          break;
+        case "kode_uraian":
+          selectColumns.push("c.kdunit", "c.nmunit");
+          groupByColumns.push("c.kdunit", "c.nmunit");
+          break;
+      }
+      joinClauses.push(
+        "LEFT JOIN dbref.t_unit_2025 c ON a.kdunit = c.kdunit AND a.kddept = c.kddept"
+      );
+    }
+
+    // Handle Satker display
+    if (formState.satkerTampilan !== "jangan_tampilkan") {
+      switch (formState.satkerTampilan) {
+        case "kode":
+          selectColumns.push("d.kdsatker");
+          groupByColumns.push("d.kdsatker");
+          break;
+        case "uraian":
+          selectColumns.push("d.nmsatker");
+          groupByColumns.push("d.nmsatker");
+          break;
+        case "kode_uraian":
+          selectColumns.push("d.kdsatker", "d.nmsatker");
+          groupByColumns.push("d.kdsatker", "d.nmsatker");
+          break;
+      }
+      joinClauses.push(
+        "LEFT JOIN dbref.t_satker_2025 d ON a.kdsatker = d.kdsatker AND a.kdunit = d.kdunit AND a.kddept = d.kddept"
+      );
+    }
+
+    // Get realization sum expression based on cutoff month
+    let realisasiCondition = "";
+    if (formState.cutOff) {
+      const cutOffInfo = CutOffQueryGenerator.getCutOffInfo(formState.cutOff);
+      realisasiCondition = `a.${cutOffInfo.sumExpression}`;
+    } else {
+      realisasiCondition =
+        "a.real1 + a.real2 + a.real3 + a.real4 + a.real5 + a.real6 + a.real7 + a.real8 + a.real9 + a.real10 + a.real11 + a.real12";
+    }
+
+    // EFFICIENT APPROACH: Use direct SUM without CASE conditions
+    // The WHERE clause will handle the filtering
+    selectColumns.push(
+      `${this.applyRounding(
+        "SUM(a.pagu)",
+        params.selectedPembulatan
+      )} AS PAGU_DIPA`,
+      `${this.applyRounding(
+        `SUM(${realisasiCondition})`,
+        params.selectedPembulatan
+      )} AS REALISASI`,
+      `${this.applyRounding(
+        "SUM(a.blokir)",
+        params.selectedPembulatan
+      )} AS BLOKIR`
+    );
+
+    // Add WHERE conditions for selections
+    if (formState.kementerian.size > 0) {
+      const kementerianList = Array.from(formState.kementerian)
+        .map((k) => `'${k}'`)
+        .join(", ");
+      whereConditions.push(`a.kddept IN (${kementerianList})`);
+    }
+    if (formState.eselonI.size > 0) {
+      const eselonIList = Array.from(formState.eselonI)
+        .map((k) => `'${k}'`)
+        .join(", ");
+      whereConditions.push(`a.kdunit IN (${eselonIList})`);
+    }
+    if (formState.satker.size > 0) {
+      const satkerList = Array.from(formState.satker)
+        .map((k) => `'${k}'`)
+        .join(", ");
+      whereConditions.push(`a.kdsatker IN (${satkerList})`);
+    }
+
+    return {
+      selectColumns,
+      groupByColumns,
+      whereConditions,
+      needsJoin: joinClauses.length > 0,
+      joinClauses,
+      mainTable,
+    };
+  }
+
   /**
    * Build configuration for Kementerian + EselonI standard queries
    */
@@ -391,7 +813,9 @@ export class CombinedQueryGenerator {
           );
           break;
       }
-    } // Handle EselonI columns
+    }
+
+    // Handle EselonI columns
     if (
       formState.eselonTampilan &&
       formState.eselonTampilan !== "jangan_tampilkan"
@@ -443,15 +867,312 @@ export class CombinedQueryGenerator {
       mainTable,
     };
   }
+
+  /**
+   * Build configuration for Kementerian + Satker standard queries
+   */
+  private static buildKementerianSatkerStandardConfig(
+    params: CombinedQueryParams
+  ): CombinedQueryConfig {
+    const { formState, selectedTahun } = params;
+
+    let selectColumns: string[] = [];
+    let whereConditions: string[] = ["1=1"];
+    let joinClauses: string[] = [];
+
+    const mainTable = `${this.getTableName(selectedTahun)} a`;
+
+    // Handle Kementerian columns
+    if (
+      formState.kementerianTampilan &&
+      formState.kementerianTampilan !== "jangan_tampilkan"
+    ) {
+      switch (formState.kementerianTampilan) {
+        case "kode":
+          selectColumns.push("a.kddept");
+          break;
+        case "uraian":
+          selectColumns.push("b.nmdept");
+          joinClauses.push(
+            "LEFT JOIN dbref.t_dept_2023 b ON a.kddept = b.kddept"
+          );
+          break;
+        case "kode_uraian":
+          selectColumns.push("a.kddept", "b.nmdept");
+          joinClauses.push(
+            "LEFT JOIN dbref.t_dept_2023 b ON a.kddept = b.kddept"
+          );
+          break;
+      }
+    }
+
+    // Handle Satker columns
+    if (
+      formState.satkerTampilan &&
+      formState.satkerTampilan !== "jangan_tampilkan"
+    ) {
+      switch (formState.satkerTampilan) {
+        case "kode":
+          selectColumns.push("a.kdsatker");
+          break;
+        case "uraian":
+          selectColumns.push("d.nmsatker");
+          joinClauses.push(
+            "LEFT JOIN dbref.t_satker_2025 d ON a.kdsatker = d.kdsatker AND a.kdunit = d.kdunit AND a.kddept = d.kddept"
+          );
+          break;
+        case "kode_uraian":
+          selectColumns.push("a.kdsatker", "d.nmsatker");
+          joinClauses.push(
+            "LEFT JOIN dbref.t_satker_2025 d ON a.kdsatker = d.kdsatker AND a.kdunit = d.kdunit AND a.kddept = d.kddept"
+          );
+          break;
+      }
+    }
+
+    // If no specific columns, show all
+    if (selectColumns.length === 0) {
+      selectColumns.push("*");
+    } // Add WHERE conditions for selections
+    if (formState.kementerian.size > 0) {
+      const kementerianList = Array.from(formState.kementerian)
+        .map((k) => `'${k}'`)
+        .join(", ");
+      whereConditions.push(`a.kddept IN (${kementerianList})`);
+    }
+    if (formState.satker.size > 0) {
+      const satkerList = Array.from(formState.satker)
+        .map((k) => `'${k}'`)
+        .join(", ");
+      whereConditions.push(`a.kdsatker IN (${satkerList})`);
+    }
+
+    return {
+      selectColumns,
+      groupByColumns: [],
+      whereConditions,
+      needsJoin: joinClauses.length > 0,
+      joinClauses,
+      mainTable,
+    };
+  }
+
+  /**
+   * Build configuration for EselonI + Satker standard queries
+   */
+  private static buildEselonSatkerStandardConfig(
+    params: CombinedQueryParams
+  ): CombinedQueryConfig {
+    const { formState, selectedTahun } = params;
+
+    let selectColumns: string[] = [];
+    let whereConditions: string[] = ["1=1"];
+    let joinClauses: string[] = [];
+
+    const mainTable = `${this.getTableName(selectedTahun)} a`;
+
+    // Handle EselonI columns
+    if (
+      formState.eselonTampilan &&
+      formState.eselonTampilan !== "jangan_tampilkan"
+    ) {
+      switch (formState.eselonTampilan) {
+        case "kode":
+          selectColumns.push("a.kdunit");
+          break;
+        case "uraian":
+          selectColumns.push("c.nmunit");
+          joinClauses.push(
+            "LEFT JOIN dbref.t_unit_2025 c ON a.kdunit = c.kdunit AND a.kddept = c.kddept"
+          );
+          break;
+        case "kode_uraian":
+          selectColumns.push("a.kdunit", "c.nmunit");
+          joinClauses.push(
+            "LEFT JOIN dbref.t_unit_2025 c ON a.kdunit = c.kdunit AND a.kddept = c.kddept"
+          );
+          break;
+      }
+    }
+
+    // Handle Satker columns
+    if (
+      formState.satkerTampilan &&
+      formState.satkerTampilan !== "jangan_tampilkan"
+    ) {
+      switch (formState.satkerTampilan) {
+        case "kode":
+          selectColumns.push("a.kdsatker");
+          break;
+        case "uraian":
+          selectColumns.push("d.nmsatker");
+          joinClauses.push(
+            "LEFT JOIN dbref.t_satker_2025 d ON a.kdsatker = d.kdsatker AND a.kdunit = d.kdunit AND a.kddept = d.kddept"
+          );
+          break;
+        case "kode_uraian":
+          selectColumns.push("a.kdsatker", "d.nmsatker");
+          joinClauses.push(
+            "LEFT JOIN dbref.t_satker_2025 d ON a.kdsatker = d.kdsatker AND a.kdunit = d.kdunit AND a.kddept = d.kddept"
+          );
+          break;
+      }
+    }
+
+    // If no specific columns, show all
+    if (selectColumns.length === 0) {
+      selectColumns.push("*");
+    }
+
+    // Add WHERE conditions for selections
+    if (formState.eselonI.size > 0) {
+      const eselonIList = Array.from(formState.eselonI)
+        .map((k) => `'${k}'`)
+        .join(", ");
+      whereConditions.push(`a.kdunit IN (${eselonIList})`);
+    }
+    if (formState.satker.size > 0) {
+      const satkerList = Array.from(formState.satker)
+        .map((k) => `'${k}'`)
+        .join(", ");
+      whereConditions.push(`a.kdsatker IN (${satkerList})`);
+    }
+
+    return {
+      selectColumns,
+      groupByColumns: [],
+      whereConditions,
+      needsJoin: joinClauses.length > 0,
+      joinClauses,
+      mainTable,
+    };
+  }
+
+  /**
+   * Build configuration for Kementerian + EselonI + Satker standard queries
+   */
+  private static buildKementerianEselonSatkerStandardConfig(
+    params: CombinedQueryParams
+  ): CombinedQueryConfig {
+    const { formState, selectedTahun } = params;
+
+    let selectColumns: string[] = [];
+    let whereConditions: string[] = ["1=1"];
+    let joinClauses: string[] = [];
+
+    const mainTable = `${this.getTableName(selectedTahun)} a`;
+
+    // Handle Kementerian columns
+    if (
+      formState.kementerianTampilan &&
+      formState.kementerianTampilan !== "jangan_tampilkan"
+    ) {
+      switch (formState.kementerianTampilan) {
+        case "kode":
+          selectColumns.push("a.kddept");
+          break;
+        case "uraian":
+          selectColumns.push("b.nmdept");
+          joinClauses.push(
+            "LEFT JOIN dbref.t_dept_2023 b ON a.kddept = b.kddept"
+          );
+          break;
+        case "kode_uraian":
+          selectColumns.push("a.kddept", "b.nmdept");
+          joinClauses.push(
+            "LEFT JOIN dbref.t_dept_2023 b ON a.kddept = b.kddept"
+          );
+          break;
+      }
+    }
+
+    // Handle EselonI columns
+    if (
+      formState.eselonTampilan &&
+      formState.eselonTampilan !== "jangan_tampilkan"
+    ) {
+      switch (formState.eselonTampilan) {
+        case "kode":
+          selectColumns.push("a.kdunit");
+          break;
+        case "uraian":
+          selectColumns.push("c.nmunit");
+          joinClauses.push(
+            "LEFT JOIN dbref.t_unit_2025 c ON a.kdunit = c.kdunit AND a.kddept = c.kddept"
+          );
+          break;
+        case "kode_uraian":
+          selectColumns.push("a.kdunit", "c.nmunit");
+          joinClauses.push(
+            "LEFT JOIN dbref.t_unit_2025 c ON a.kdunit = c.kdunit AND a.kddept = c.kddept"
+          );
+          break;
+      }
+    }
+
+    // Handle Satker columns
+    if (
+      formState.satkerTampilan &&
+      formState.satkerTampilan !== "jangan_tampilkan"
+    ) {
+      switch (formState.satkerTampilan) {
+        case "kode":
+          selectColumns.push("a.kdsatker");
+          break;
+        case "uraian":
+          selectColumns.push("d.nmsatker");
+          joinClauses.push(
+            "LEFT JOIN dbref.t_satker_2025 d ON a.kdsatker = d.kdsatker AND a.kdunit = d.kdunit AND a.kddept = d.kddept"
+          );
+          break;
+        case "kode_uraian":
+          selectColumns.push("a.kdsatker", "d.nmsatker");
+          joinClauses.push(
+            "LEFT JOIN dbref.t_satker_2025 d ON a.kdsatker = d.kdsatker AND a.kdunit = d.kdunit AND a.kddept = d.kddept"
+          );
+          break;
+      }
+    } // If no specific columns, show all
+    if (selectColumns.length === 0) {
+      selectColumns.push("*");
+    }
+
+    // Add WHERE conditions for selections
+    if (formState.kementerian.size > 0) {
+      const kementerianList = Array.from(formState.kementerian)
+        .map((k) => `'${k}'`)
+        .join(", ");
+      whereConditions.push(`a.kddept IN (${kementerianList})`);
+    }
+    if (formState.eselonI.size > 0) {
+      const eselonIList = Array.from(formState.eselonI)
+        .map((k) => `'${k}'`)
+        .join(", ");
+      whereConditions.push(`a.kdunit IN (${eselonIList})`);
+    }
+    if (formState.satker.size > 0) {
+      const satkerList = Array.from(formState.satker)
+        .map((k) => `'${k}'`)
+        .join(", ");
+      whereConditions.push(`a.kdsatker IN (${satkerList})`);
+    }
+
+    return {
+      selectColumns,
+      groupByColumns: [],
+      whereConditions,
+      needsJoin: joinClauses.length > 0,
+      joinClauses,
+      mainTable,
+    };
+  }
+
   /**
    * Generic multi-filter query for complex combinations
    */
   private static generateGenericMultiFilterQuery(
     params: CombinedQueryParams
   ): string {
-    // This would be a more complex implementation for handling
-    // arbitrary combinations of filters
-    // For now, return a basic query with warning
     console.warn("Using generic multi-filter fallback");
     let query = `SELECT * FROM ${this.getTableName(
       params.selectedTahun
@@ -460,7 +1181,7 @@ export class CombinedQueryGenerator {
     // Apply cutoff filtering - always applied regardless of switch state
     if (params.formState.cutOff) {
       query = CutOffQueryGenerator.addCutOffFilter(query, {
-        cutOffEnabled: true, // Always enabled for filtering
+        cutOffEnabled: true,
         cutOff: params.formState.cutOff,
         selectedJenisLaporan: params.selectedJenisLaporan,
         selectedTahun: params.selectedTahun,
@@ -470,16 +1191,19 @@ export class CombinedQueryGenerator {
 
     return query;
   }
+
   /**
    * Basic query when no filters are active
-   */ private static generateBasicQuery(params: CombinedQueryParams): string {
-    const { selectedTahun } = params;
-    let query = `SELECT * FROM ${this.getTableName(selectedTahun)} WHERE 1=1;`;
+   */
+  private static generateBasicQuery(params: CombinedQueryParams): string {
+    let query = `SELECT * FROM ${this.getTableName(
+      params.selectedTahun
+    )} WHERE 1=1;`;
 
     // Apply cutoff filtering - always applied regardless of switch state
     if (params.formState.cutOff) {
       query = CutOffQueryGenerator.addCutOffFilter(query, {
-        cutOffEnabled: true, // Always enabled for filtering
+        cutOffEnabled: true,
         cutOff: params.formState.cutOff,
         selectedJenisLaporan: params.selectedJenisLaporan,
         selectedTahun: params.selectedTahun,
@@ -497,56 +1221,44 @@ export class CombinedQueryGenerator {
     config: CombinedQueryConfig,
     params: CombinedQueryParams
   ): string {
-    const { formState, switches } = params;
+    const {
+      selectColumns,
+      groupByColumns,
+      whereConditions,
+      joinClauses,
+      mainTable,
+    } = config;
 
-    // Build SELECT clause
-    const selectClause = config.selectColumns.join(", ");
+    let query = `SELECT ${selectColumns.join(", ")} FROM ${mainTable}`;
 
-    // Build FROM clause with JOINs
-    let fromClause = config.mainTable;
-    if (config.needsJoin && config.joinClauses.length > 0) {
-      fromClause += " " + config.joinClauses.join(" ");
+    // Add joins
+    if (joinClauses.length > 0) {
+      query += ` ${joinClauses.join(" ")}`;
     }
 
-    // Build WHERE clause
-    let whereConditions = [...config.whereConditions];
-    const whereClause = whereConditions.join(" AND ");
-
-    // Build GROUP BY clause
-    let groupByClause = "";
-    if (config.groupByColumns.length > 0) {
-      groupByClause = ` GROUP BY ${config.groupByColumns.join(", ")}`;
-    }
-
-    // Build ORDER BY clause (optional)
-    let orderByClause = "";
-    if (config.orderByColumns && config.orderByColumns.length > 0) {
-      orderByClause = ` ORDER BY ${config.orderByColumns.join(", ")}`;
-    }
-
-    // Construct final query - only add WHERE if there are meaningful conditions
-    let query = `SELECT ${selectClause} FROM ${fromClause}`;
+    // Add WHERE conditions
     if (whereConditions.length > 0) {
-      // Filter out default "1=1" if there are other conditions
-      const meaningfulConditions = whereConditions.filter(
-        (condition) => condition !== "1=1"
-      );
-      if (meaningfulConditions.length > 0) {
-        query += ` WHERE ${meaningfulConditions.join(" AND ")}`;
-      }
+      query += ` WHERE ${whereConditions.join(" AND ")}`;
     }
-    query += `${groupByClause}${orderByClause};`; // Apply cutoff filtering to the final query - always applied regardless of switch state
-    if (formState.cutOff) {
+
+    // Add GROUP BY if needed
+    if (groupByColumns.length > 0) {
+      query += ` GROUP BY ${groupByColumns.join(", ")}`;
+    }
+
+    query += ";";
+
+    // Apply cutoff filtering - always applied regardless of switch state
+    if (params.formState.cutOff) {
       query = CutOffQueryGenerator.addCutOffFilter(query, {
-        cutOffEnabled: true, // Always enabled for filtering
-        cutOff: formState.cutOff,
+        cutOffEnabled: true,
+        cutOff: params.formState.cutOff,
         selectedJenisLaporan: params.selectedJenisLaporan,
         selectedTahun: params.selectedTahun,
         selectedPembulatan: params.selectedPembulatan,
       });
     }
 
-    console.log("✅ Combined Query Generated:", query);
     return query;
   }
 
@@ -557,13 +1269,14 @@ export class CombinedQueryGenerator {
     return [
       "kementerian only",
       "eselonI only",
+      "satker only",
       "kementerian + eselonI",
-      // Future combinations:
-      // "kementerian + satker",
-      // "eselonI + satker",
-      // "kementerian + eselonI + satker"
+      "kementerian + satker",
+      "eselonI + satker",
+      "kementerian + eselonI + satker",
     ];
   }
+
   /**
    * Check if a filter combination is supported
    */
@@ -574,20 +1287,31 @@ export class CombinedQueryGenerator {
 
     // Single filters (excluding cutOff)
     if (activeFilters.length === 1) {
-      return ["kementerian", "eselonI"].includes(activeFilters[0]);
+      return ["kementerian", "eselonI", "satker"].includes(activeFilters[0]);
     }
 
-    // Multiple filters (excluding cutOff)
+    // Two-filter combinations
     if (activeFilters.length === 2) {
+      const hasKementerian = activeFilters.includes("kementerian");
+      const hasEselon = activeFilters.includes("eselonI");
+      const hasSatker = activeFilters.includes("satker");
+
       return (
-        activeFilters.includes("kementerian") &&
-        activeFilters.includes("eselonI")
+        (hasKementerian && hasEselon) ||
+        (hasKementerian && hasSatker) ||
+        (hasEselon && hasSatker)
       );
     }
 
-    // More complex combinations not yet supported
+    // Three-filter combination
+    if (activeFilters.length === 3) {
+      return (
+        activeFilters.includes("kementerian") &&
+        activeFilters.includes("eselonI") &&
+        activeFilters.includes("satker")
+      );
+    }
+
     return false;
   }
 }
-
-// Types are already exported above with the interfaces

@@ -24,6 +24,13 @@ import {
   type CutOffQueryParams,
 } from "./CutOffQueryGenerator";
 
+import {
+  SatkerQueryGenerator,
+  type SatkerQueryParams,
+  type SatkerQueryConfig,
+  type SatkerCombinedQueryParams,
+} from "./SatkerQueryGenerator";
+
 export {
   KementerianQueryGenerator,
   type KementerianQueryParams,
@@ -31,6 +38,10 @@ export {
   EselonIQueryGenerator,
   type EselonIQueryParams,
   type EselonIQueryConfig,
+  SatkerQueryGenerator,
+  type SatkerQueryParams,
+  type SatkerQueryConfig,
+  type SatkerCombinedQueryParams,
   CombinedQueryGenerator,
   type CombinedQueryParams,
   type CombinedQueryConfig,
@@ -39,7 +50,6 @@ export {
 };
 
 // TODO: Add other query generators as needed
-// export { SatkerQueryGenerator } from './SatkerQueryGenerator';
 
 // Central query orchestrator
 export interface QueryGeneratorParams {
@@ -100,7 +110,37 @@ export class QueryOrchestrator {
         selectedPembulatan:
           selectedPembulatan || formState.selectedPembulatan || "Rupiah",
       });
-    } // Generate basic query
+    }
+
+    // Handle eselon queries
+    if (switches.eselonI) {
+      return EselonIQueryGenerator.generateQuery({
+        eselonIEnabled: switches.eselonI,
+        eselonI: formState.eselonI,
+        eselonITampilan: formState.eselonTampilan,
+        cutOff: formState.cutOff,
+        selectedJenisLaporan,
+        selectedTahun: selectedTahun || formState.selectedTahun || "2025",
+        selectedPembulatan:
+          selectedPembulatan || formState.selectedPembulatan || "Rupiah",
+      });
+    }
+
+    // Handle satker queries
+    if (switches.satker) {
+      return SatkerQueryGenerator.generateQuery({
+        satkerEnabled: switches.satker,
+        satker: formState.satker,
+        satkerTampilan: formState.satkerTampilan,
+        cutOff: formState.cutOff,
+        selectedJenisLaporan,
+        selectedTahun: selectedTahun || formState.selectedTahun || "2025",
+        selectedPembulatan:
+          selectedPembulatan || formState.selectedPembulatan || "Rupiah",
+      });
+    }
+
+    // Generate basic query
     let query =
       "SELECT * FROM monev2025.pagu_real_detail_harian_2025 LIMIT 100";
 
