@@ -32,7 +32,7 @@ export const Layout = ({ children }: Props) => {
         </div>
 
         {/* Main content area with navbar and desktop sidebar */}
-        <div className="flex-1">
+        <div className="flex-1 bg-slate-100 dark:bg-black">
           <NavbarWrapper>
             {/* Desktop Horizontal Sidebar - positioned below navbar (XL screens only) */}
             <div className="hidden xl:block">
