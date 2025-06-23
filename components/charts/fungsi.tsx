@@ -17,7 +17,7 @@ const Chart = dynamic(() => import("./client-chart"), {
   ),
 });
 
-import MyContext from "@/utils/Contex";
+import MyContext from "@/utils/Context";
 import Encrypt from "@/utils/Encrypt";
 import { handleHttpError } from "@/utils/handleError";
 import { useToast } from "../context/ToastContext";

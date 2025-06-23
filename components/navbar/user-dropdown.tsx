@@ -11,7 +11,7 @@ import React, { useCallback, useContext } from "react";
 
 import { useRouter } from "next/navigation";
 import { deleteAuthCookie } from "@/actions/auth.action";
-import MyContext from "@/utils/Contex";
+import MyContext from "@/utils/Context";
 import Link from "next/link";
 
 export const UserDropdown = () => {

@@ -1,0 +1,22 @@
+import React, { useState } from "react";
+import { Textarea } from "@heroui/react";
+
+function InputKataProgram({ , status }) {
+  const handleInputChange = (event) => {
+    const value = event.target.value;
+    (value);
+  };
+
+  return (
+    <Textarea
+      minRows={3}
+      placeholder="misalkan dukungan manajemen ..."
+      isDisabled={status !== "kataprogram"}
+      onChange={handleInputChange}
+      isRequired
+      size="sm"
+    />
+  );
+}
+
+export default InputKataProgram;

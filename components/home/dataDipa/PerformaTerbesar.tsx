@@ -3,7 +3,7 @@
 import { useContext, useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 
-import MyContext from "@/utils/Contex";
+import MyContext from "@/utils/Context";
 import Encrypt from "@/utils/Encrypt";
 import { handleHttpError } from "@/utils/handleError";
 import {

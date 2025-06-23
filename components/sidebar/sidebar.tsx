@@ -77,6 +77,7 @@ export const SidebarWrapper = () => {
                   icon={<ChartCandlestick className="text-default-500" />}
                   items={[
                     "Belanja",
+                    "Belanja2",
                     "Tematik",
                     "Kontrak",
                     "UP/TUP",
@@ -164,6 +165,7 @@ export const SidebarWrapper = () => {
                 icon={<ChartCandlestick className="text-default-500" />}
                 items={[
                   "Belanja",
+                  "Belanja2",
                   "Tematik",
                   "Kontrak",
                   "UP/TUP",

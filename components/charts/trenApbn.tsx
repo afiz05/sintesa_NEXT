@@ -6,7 +6,7 @@ import { useTheme } from "next-themes";
 import Chart, { Props } from "react-apexcharts";
 import { TrendingUp, Database, FileX } from "lucide-react";
 
-import MyContext from "@/utils/Contex";
+import MyContext from "@/utils/Context";
 import Encrypt from "@/utils/Encrypt";
 import { handleHttpError } from "@/utils/handleError";
 

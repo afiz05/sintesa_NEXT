@@ -7,7 +7,9 @@ import {
 } from "next-themes";
 import { NotificationProvider } from "@/components/context/NotificationContext";
 import { ToastProvider } from "@/components/context/ToastContext";
-import { MyContextProvider } from "@/utils/Contex";
+import MyContext, { MyContextProvider } from "@/utils/Context";
+// import { MyContextProvider } from "@/utils/Context";
+// import { MyContextProvider } from "@/utils/Context";
 
 export interface ProvidersProps {
   children: React.ReactNode;
