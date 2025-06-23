@@ -6,7 +6,7 @@ import { Button, Card, CardBody } from "@heroui/react";
 // import { Dialog, Transition, Listbox, Switch } from "@headlessui/react";
 // Remove heroicons imports - use react-icons instead
 import { FaChevronDown, FaCheck, FaTimes } from "react-icons/fa";
-
+// import LoadingSpinner from "../../components/accounts/landing.tsx";
 import { Simpan } from "../simpanquery/simpan";
 
 import Thang from "../referensi_belanja/Thang";
@@ -2531,6 +2531,7 @@ const Inquiry = () => {
   // console.log(sql);
   return (
     <>
+      {/* <LoadingSpinner /> */}
       <div className="h-full lg:px-6 pt-4">
         <div className="w-full mb-8">
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-6 backdrop-blur-sm">
