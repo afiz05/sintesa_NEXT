@@ -16,7 +16,7 @@ import React, {
   useMemo,
 } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import MyContext from "@/utils/Contex";
+import MyContext from "@/utils/Context";
 import Encrypt from "@/utils/Encrypt";
 import { useToast } from "../context/ToastContext";
 

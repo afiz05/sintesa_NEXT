@@ -1,5 +1,5 @@
 "use client";
-import MyContext from "@/utils/Contex";
+import MyContext from "@/utils/Contextt";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect } from "react";
 

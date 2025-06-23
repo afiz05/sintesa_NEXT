@@ -18,7 +18,7 @@ import {
 import { X, Search } from "lucide-react";
 import { useToast } from "@/components/context/ToastContext";
 import Encrypt from "@/utils/Encrypt";
-import MyContext from "@/utils/Contex";
+import MyContext from "@/utils/Context";
 
 interface ModalProps {
   isOpen: boolean;

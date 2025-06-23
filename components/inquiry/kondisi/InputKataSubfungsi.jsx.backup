@@ -1,0 +1,22 @@
+import React, { useState } from "react";
+import { Textarea } from "@heroui/react";
+
+function InputKataSubfungsi({ , status }) {
+  const handleInputChange = (event) => {
+    const value = event.target.value;
+    (value);
+  };
+
+  return (
+    <Textarea
+      minRows={3}
+      placeholder="misalkan pendidikan kedinasan ..."
+      isDisabled={status !== "katasubfungsi"}
+      onChange={handleInputChange}
+      isRequired
+      size="sm"
+    />
+  );
+}
+
+export default InputKataSubfungsi;

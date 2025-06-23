@@ -48,10 +48,8 @@ const HasilQuery = (props) => {
 
     try {
       const response = await axiosJWT.get(
-        import.meta.env.VITE_REACT_APP_LOCAL_INQUIRY
-          ? `${
-              import.meta.env.VITE_REACT_APP_LOCAL_INQUIRYBELANJA
-            }${encryptedQuery}&page=${page}&limit=${limit}&user=${username}`
+        process.env.NEXT_PUBLIC_LOCAL_INQUIRY
+          ? `${process.env.NEXT_PUBLIC_LOCAL_INQUIRYBELANJA}${encryptedQuery}&page=${page}&limit=${limit}&user=${username}`
           : "",
         {
           headers: {
@@ -318,10 +316,8 @@ function Tgupdate(props) {
     setLoading(true);
     try {
       const response = await axiosJWT.get(
-        import.meta.env.VITE_REACT_APP_LOCAL_TGUPDATE
-          ? `${import.meta.env.VITE_REACT_APP_LOCAL_TGUPDATE}?thang=${
-              props.thang
-            }`
+        process.env.NEXT_PUBLIC_LOCAL_TGUPDATE
+          ? `${process.env.NEXT_PUBLIC_LOCAL_TGUPDATE}?thang=${props.thang}`
           : "",
         {
           headers: {
