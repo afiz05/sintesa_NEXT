@@ -15,8 +15,12 @@ import React, {
   forwardRef,
   useMemo,
 } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
-import MyContext from "@/utils/Context";
+import { useInfiniteScroll } from "@heroui/use-infinite-scroll";
+import { useAsyncList } from "@react-stately/data";
+import { Search } from "lucide-react";
+
+import MyContext from "@/utils/Contex";
+
 import Encrypt from "@/utils/Encrypt";
 import { useToast } from "../context/ToastContext";
 
