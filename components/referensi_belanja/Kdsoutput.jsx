@@ -1,18 +1,22 @@
 import React from "react";
+import { Select, SelectItem } from "@heroui/react";
 
 const Kdsoutput = (props) => {
   return (
     <div className="mt-2">
-      <select
-        value={props.kdoutput}
-        onChange={(e) => props.onChange(e.target.value)}
+      <Select
+        selectedKey={props.kdoutput}
+        onSelectionChange={props.onChange}
         className="form-select form-select-sm"
         aria-label=".form-select-sm"
-        disabled={props.status !== "pilihsuboutput"}
+        isDisabled={props.status !== "pilihsuboutput"}
+        disallowEmptySelection={false}
+        placeholder="Pilih Sub Output"
       >
-        {/* <option value="XX">-- Pilih Sub Output --</option> */}
-        <option value="SEMUASUBOUTPUT">Semua Sub Output</option>
-      </select>
+        <SelectItem key="SEMUASUBOUTPUT" value="SEMUASUBOUTPUT">
+          Semua Sub Output
+        </SelectItem>
+      </Select>
     </div>
   );
 };

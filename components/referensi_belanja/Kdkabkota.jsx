@@ -1,32 +1,30 @@
 import React, { useContext } from "react";
 import MyContext from "@/utils/Context";
-
+import { Select, SelectItem } from "@heroui/react";
 import data from "../../data/Kdkabkota.json";
+
 const Kdkabkota = (props) => {
   const { role, kdlokasi } = useContext(MyContext);
   return (
-    <div>
-      <div className="mt-2">
-        <select
-          value={props.kabkota}
-          onChange={(e) => props.onChange(e.target.value)}
-          className="form-select form-select-sm"
-          aria-label=".form-select-sm tahun"
-          disabled={props.status !== "pilihkdkabkota"}
-        >
-          {/* <option value="XX">-- Pilih Kab/ Kota --</option> */}
-          <option value="ALL">Semua Kab/ Kota</option>
-
-          {data
-            .filter((item) => item.kdlokasi === props.kdlokasi)
-            .map((item, index) => (
-              <option value={item.kdkabkota}>
-                {item.kdkabkota} - {item.nmkabkota}
-              </option>
-            ))}
-        </select>
-      </div>
-    </div>
+    <Select
+      selectedKey={props.value ?? "00"}
+      onSelectionChange={props.onChange}
+      isDisabled={props.status !== "pilihkdkabkota"}
+      size={props.size || "sm"}
+      placeholder={props.placeholder || "Pilih Kabupaten/Kota"}
+      className={props.className || "min-w-0 flex-[2]"}
+    >
+      <SelectItem key="00" value="00">
+        Semua Kabupaten/Kota
+      </SelectItem>
+      {data
+        .filter((item) => item.kdlokasi === (props.kdlokasi || kdlokasi))
+        .map((item) => (
+          <SelectItem key={item.kabkota} value={item.kabkota}>
+            {item.kabkota} - {item.nmkabkota}
+          </SelectItem>
+        ))}
+    </Select>
   );
 };
 

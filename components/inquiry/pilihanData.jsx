@@ -1,36 +1,34 @@
+"use client";
 import React, { useState, useEffect } from "react";
-// import { Form } from "react-bootstrap";
-import { Switch } from "@headlessui/react";
+import { Switch } from "@heroui/react";
 
-export const PilihSemua = ({ onChange }) => {
+export const PilihSemua = ({ onChange, setAllSwitches = [] }) => {
   const [pilihSemua, setPilihSemua] = useState(true);
 
   const handlePilihSemua = () => {
     const newPilihSemua = !pilihSemua;
     setPilihSemua(newPilihSemua);
     onChange(newPilihSemua);
+    // Set all other switches to the same value
+    if (Array.isArray(setAllSwitches)) {
+      setAllSwitches.forEach(
+        (fn) => typeof fn === "function" && fn(newPilihSemua)
+      );
+    } else if (typeof setAllSwitches === "function") {
+      setAllSwitches(newPilihSemua);
+    }
   };
   return (
-    <>
-      <Switch.Group as="div" className="flex items-center">
-        <Switch.Label className="mr-3 text-sm font-medium text-gray-900">
-          Cutoff
-        </Switch.Label>
-        <Switch
-          checked={pilihSemua}
-          onChange={handlePilihSemua}
-          className={`${
-            pilihSemua ? "bg-blue-600" : "bg-gray-200"
-          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-        >
-          <span
-            className={`${
-              pilihSemua ? "translate-x-6" : "translate-x-1"
-            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-          />
-        </Switch>
-      </Switch.Group>
-    </>
+    <div className="flex items-center">
+      <Switch
+        isSelected={pilihSemua}
+        onValueChange={handlePilihSemua}
+        size="sm"
+        color="primary"
+        className="mr-3"
+      />
+      <label className="text-sm font-medium text-gray-900">Pilih Semua</label>
+    </div>
   );
 };
 
@@ -43,26 +41,16 @@ export const SwitchCutoff = ({ onChange }) => {
     onChange(newSwitchCutoff);
   };
   return (
-    <>
-      <Switch.Group as="div" className="flex items-center">
-        <Switch.Label className="mr-3 text-sm font-medium text-gray-900">
-          Cutoff
-        </Switch.Label>
-        <Switch
-          checked={switchCutoff}
-          onChange={handleSwitchCutoff}
-          className={`${
-            switchCutoff ? "bg-blue-600" : "bg-gray-200"
-          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-        >
-          <span
-            className={`${
-              switchCutoff ? "translate-x-6" : "translate-x-1"
-            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-          />
-        </Switch>
-      </Switch.Group>
-    </>
+    <div className="flex items-center">
+      <Switch
+        isSelected={switchCutoff}
+        onValueChange={handleSwitchCutoff}
+        size="sm"
+        color="primary"
+        className="mr-3"
+      />
+      <label className="text-sm font-medium text-gray-900">Cut-Off</label>
+    </div>
   );
 };
 
@@ -83,33 +71,23 @@ export const SwitchTanggal = ({ onChange, jenlap }) => {
     jenlap === "7";
 
   return (
-    <>
-      <Switch.Group as="div" className="flex items-center">
-        <Switch.Label
-          className={`mr-3 text-sm font-medium ${
-            isDisabled ? "text-gray-400" : "text-gray-900"
-          }`}
-        >
-          Cut Off
-        </Switch.Label>
-        <Switch
-          checked={switchTanggal}
-          onChange={handleSwitchTanggal}
-          disabled={isDisabled}
-          className={`${
-            switchTanggal && !isDisabled ? "bg-blue-600" : "bg-gray-200"
-          } ${
-            isDisabled ? "opacity-50 cursor-not-allowed" : ""
-          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-        >
-          <span
-            className={`${
-              switchTanggal ? "translate-x-6" : "translate-x-1"
-            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-          />
-        </Switch>
-      </Switch.Group>
-    </>
+    <div className="flex items-center">
+      <Switch
+        isSelected={switchTanggal}
+        onValueChange={handleSwitchTanggal}
+        isDisabled={isDisabled}
+        size="sm"
+        color="primary"
+        className="mr-3"
+      />
+      <label
+        className={`text-sm font-medium ${
+          isDisabled ? "text-gray-400" : "text-gray-900"
+        }`}
+      >
+        Cut Off
+      </label>
+    </div>
   );
 };
 
@@ -121,26 +99,16 @@ export const SwitchKddept = ({ onChange }) => {
     onChange(newSwitchDept);
   };
   return (
-    <>
-      <Switch.Group as="div" className="flex items-center">
-        <Switch.Label className="mr-3 text-sm font-medium text-gray-900">
-          Kementerian
-        </Switch.Label>
-        <Switch
-          checked={switchDept}
-          onChange={handleSwitchDept}
-          className={`${
-            switchDept ? "bg-blue-600" : "bg-gray-200"
-          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-        >
-          <span
-            className={`${
-              switchDept ? "translate-x-6" : "translate-x-1"
-            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-          />
-        </Switch>
-      </Switch.Group>
-    </>
+    <div className="flex items-center">
+      <Switch
+        isSelected={switchDept}
+        onValueChange={handleSwitchDept}
+        size="sm"
+        color="primary"
+        className="mr-3"
+      />
+      <label className="text-sm font-medium text-gray-900">Kementerian</label>
+    </div>
   );
 };
 
@@ -152,26 +120,16 @@ export const SwitchKdUnit = ({ onChange }) => {
     onChange(newSwitchUnit);
   };
   return (
-    <>
-      <Switch.Group as="div" className="flex items-center">
-        <Switch.Label className="mr-3 text-sm font-medium text-gray-900">
-          Eselon I
-        </Switch.Label>
-        <Switch
-          checked={switchUnit}
-          onChange={handleSwitchUnit}
-          className={`${
-            switchUnit ? "bg-blue-600" : "bg-gray-200"
-          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-        >
-          <span
-            className={`${
-              switchUnit ? "translate-x-6" : "translate-x-1"
-            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-          />
-        </Switch>
-      </Switch.Group>
-    </>
+    <div className="flex items-center">
+      <Switch
+        isSelected={switchUnit}
+        onValueChange={handleSwitchUnit}
+        size="sm"
+        color="primary"
+        className="mr-3"
+      />
+      <label className="text-sm font-medium text-gray-900">Eselon I</label>
+    </div>
   );
 };
 
@@ -183,26 +141,16 @@ export const SwitchKddekon = ({ onChange }) => {
     onChange(newSwitchDekon);
   };
   return (
-    <>
-      <Switch.Group as="div" className="flex items-center">
-        <Switch.Label className="mr-3 text-sm font-medium text-gray-900">
-          Kewenangan
-        </Switch.Label>
-        <Switch
-          checked={switchDekon}
-          onChange={handleSwitchDekon}
-          className={`${
-            switchDekon ? "bg-blue-600" : "bg-gray-200"
-          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-        >
-          <span
-            className={`${
-              switchDekon ? "translate-x-6" : "translate-x-1"
-            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-          />
-        </Switch>
-      </Switch.Group>
-    </>
+    <div className="flex items-center">
+      <Switch
+        isSelected={switchDekon}
+        onValueChange={handleSwitchDekon}
+        size="sm"
+        color="primary"
+        className="mr-3"
+      />
+      <label className="text-sm font-medium text-gray-900">Kewenangan</label>
+    </div>
   );
 };
 
@@ -214,26 +162,16 @@ export const SwitchProvinsi = ({ onChange }) => {
     onChange(newSwitchProvinsi);
   };
   return (
-    <>
-      <Switch.Group as="div" className="flex items-center">
-        <Switch.Label className="mr-3 text-sm font-medium text-gray-900">
-          Provinsi
-        </Switch.Label>
-        <Switch
-          checked={switchProvinsi}
-          onChange={handleSwitchProvinsi}
-          className={`${
-            switchProvinsi ? "bg-blue-600" : "bg-gray-200"
-          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-        >
-          <span
-            className={`${
-              switchProvinsi ? "translate-x-6" : "translate-x-1"
-            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-          />
-        </Switch>
-      </Switch.Group>
-    </>
+    <div className="flex items-center">
+      <Switch
+        isSelected={switchProvinsi}
+        onValueChange={handleSwitchProvinsi}
+        size="sm"
+        color="primary"
+        className="mr-3"
+      />
+      <label className="text-sm font-medium text-gray-900">Provinsi</label>
+    </div>
   );
 };
 
@@ -245,26 +183,16 @@ export const SwitchKabkota = ({ onChange }) => {
     onChange(newSwitchKabkota);
   };
   return (
-    <>
-      <Switch.Group as="div" className="flex items-center">
-        <Switch.Label className="mr-3 text-sm font-medium text-gray-900">
-          Kab/Kota
-        </Switch.Label>
-        <Switch
-          checked={switchKabkota}
-          onChange={handleSwitchKabkota}
-          className={`${
-            switchKabkota ? "bg-blue-600" : "bg-gray-200"
-          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-        >
-          <span
-            className={`${
-              switchKabkota ? "translate-x-6" : "translate-x-1"
-            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-          />
-        </Switch>
-      </Switch.Group>
-    </>
+    <div className="flex items-center">
+      <Switch
+        isSelected={switchKabkota}
+        onValueChange={handleSwitchKabkota}
+        size="sm"
+        color="primary"
+        className="mr-3"
+      />
+      <label className="text-sm font-medium text-gray-900">Kab/Kota</label>
+    </div>
   );
 };
 
@@ -276,26 +204,16 @@ export const SwitchKanwil = ({ onChange }) => {
     onChange(newSwitchKanwil);
   };
   return (
-    <>
-      <Switch.Group as="div" className="flex items-center">
-        <Switch.Label className="mr-3 text-sm font-medium text-gray-900">
-          Kanwil
-        </Switch.Label>
-        <Switch
-          checked={switchKanwil}
-          onChange={handleSwitchKanwil}
-          className={`${
-            switchKanwil ? "bg-blue-600" : "bg-gray-200"
-          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-        >
-          <span
-            className={`${
-              switchKanwil ? "translate-x-6" : "translate-x-1"
-            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-          />
-        </Switch>
-      </Switch.Group>
-    </>
+    <div className="flex items-center">
+      <Switch
+        isSelected={switchKanwil}
+        onValueChange={handleSwitchKanwil}
+        size="sm"
+        color="primary"
+        className="mr-3"
+      />
+      <label className="text-sm font-medium text-gray-900">Kanwil</label>
+    </div>
   );
 };
 
@@ -307,26 +225,16 @@ export const SwitchKppn = ({ onChange }) => {
     onChange(newSwitchKppn);
   };
   return (
-    <>
-      <Switch.Group as="div" className="flex items-center">
-        <Switch.Label className="mr-3 text-sm font-medium text-gray-900">
-          KPPN
-        </Switch.Label>
-        <Switch
-          checked={switchKppn}
-          onChange={handleSwitchKppn}
-          className={`${
-            switchKppn ? "bg-blue-600" : "bg-gray-200"
-          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-        >
-          <span
-            className={`${
-              switchKppn ? "translate-x-6" : "translate-x-1"
-            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-          />
-        </Switch>
-      </Switch.Group>
-    </>
+    <div className="flex items-center">
+      <Switch
+        isSelected={switchKppn}
+        onValueChange={handleSwitchKppn}
+        size="sm"
+        color="primary"
+        className="mr-3"
+      />
+      <label className="text-sm font-medium text-gray-900">KPPN</label>
+    </div>
   );
 };
 
@@ -338,26 +246,16 @@ export const SwitchSatker = ({ onChange }) => {
     onChange(newSwitchSatker);
   };
   return (
-    <>
-      <Switch.Group as="div" className="flex items-center">
-        <Switch.Label className="mr-3 text-sm font-medium text-gray-900">
-          Satker
-        </Switch.Label>
-        <Switch
-          checked={switchSatker}
-          onChange={handleSwitchSatker}
-          className={`${
-            switchSatker ? "bg-blue-600" : "bg-gray-200"
-          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-        >
-          <span
-            className={`${
-              switchSatker ? "translate-x-6" : "translate-x-1"
-            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-          />
-        </Switch>
-      </Switch.Group>
-    </>
+    <div className="flex items-center">
+      <Switch
+        isSelected={switchSatker}
+        onValueChange={handleSwitchSatker}
+        size="sm"
+        color="primary"
+        className="mr-3"
+      />
+      <label className="text-sm font-medium text-gray-900">Satker</label>
+    </div>
   );
 };
 
@@ -377,33 +275,23 @@ export const SwitchFungsi = ({ onChange, jenlap, setKdfungsi, setFungsi }) => {
   const isDisabled = jenlap === "6";
 
   return (
-    <>
-      <Switch.Group as="div" className="flex items-center">
-        <Switch.Label
-          className={`mr-3 text-sm font-medium ${
-            isDisabled ? "text-gray-400" : "text-gray-900"
-          }`}
-        >
-          Fungsi
-        </Switch.Label>
-        <Switch
-          checked={switchFungsi}
-          onChange={handleSwitchFungsi}
-          disabled={isDisabled}
-          className={`${
-            switchFungsi && !isDisabled ? "bg-blue-600" : "bg-gray-200"
-          } ${
-            isDisabled ? "opacity-50 cursor-not-allowed" : ""
-          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-        >
-          <span
-            className={`${
-              switchFungsi ? "translate-x-6" : "translate-x-1"
-            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-          />
-        </Switch>
-      </Switch.Group>
-    </>
+    <div className="flex items-center">
+      <Switch
+        isSelected={switchFungsi}
+        onValueChange={handleSwitchFungsi}
+        isDisabled={isDisabled}
+        size="sm"
+        color="primary"
+        className="mr-3"
+      />
+      <label
+        className={`text-sm font-medium ${
+          isDisabled ? "text-gray-400" : "text-gray-900"
+        }`}
+      >
+        Fungsi
+      </label>
+    </div>
   );
 };
 
@@ -428,33 +316,23 @@ export const SwitchSubfungsi = ({
   const isDisabled = jenlap === "6";
 
   return (
-    <>
-      <Switch.Group as="div" className="flex items-center">
-        <Switch.Label
-          className={`mr-3 text-sm font-medium ${
-            isDisabled ? "text-gray-400" : "text-gray-900"
-          }`}
-        >
-          Sub Fungsi
-        </Switch.Label>
-        <Switch
-          checked={switchSubfungsi}
-          onChange={handleSwitchSubfungsi}
-          disabled={isDisabled}
-          className={`${
-            switchSubfungsi && !isDisabled ? "bg-blue-600" : "bg-gray-200"
-          } ${
-            isDisabled ? "opacity-50 cursor-not-allowed" : ""
-          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-        >
-          <span
-            className={`${
-              switchSubfungsi ? "translate-x-6" : "translate-x-1"
-            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-          />
-        </Switch>
-      </Switch.Group>
-    </>
+    <div className="flex items-center">
+      <Switch
+        isSelected={switchSubfungsi}
+        onValueChange={handleSwitchSubfungsi}
+        isDisabled={isDisabled}
+        size="sm"
+        color="primary"
+        className="mr-3"
+      />
+      <label
+        className={`text-sm font-medium ${
+          isDisabled ? "text-gray-400" : "text-gray-900"
+        }`}
+      >
+        Sub Fungsi
+      </label>
+    </div>
   );
 };
 
@@ -466,26 +344,16 @@ export const SwitchProgram = ({ onChange }) => {
     onChange(newSwitchProgram);
   };
   return (
-    <>
-      <Switch.Group as="div" className="flex items-center">
-        <Switch.Label className="mr-3 text-sm font-medium text-gray-900">
-          Program
-        </Switch.Label>
-        <Switch
-          checked={switchProgram}
-          onChange={handleSwitchProgram}
-          className={`${
-            switchProgram ? "bg-blue-600" : "bg-gray-200"
-          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-        >
-          <span
-            className={`${
-              switchProgram ? "translate-x-6" : "translate-x-1"
-            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-          />
-        </Switch>
-      </Switch.Group>
-    </>
+    <div className="flex items-center">
+      <Switch
+        isSelected={switchProgram}
+        onValueChange={handleSwitchProgram}
+        size="sm"
+        color="primary"
+        className="mr-3"
+      />
+      <label className="text-sm font-medium text-gray-900">Program</label>
+    </div>
   );
 };
 
@@ -497,26 +365,16 @@ export const SwitchKegiatan = ({ onChange }) => {
     onChange(newSwitchKegiatan);
   };
   return (
-    <>
-      <Switch.Group as="div" className="flex items-center">
-        <Switch.Label className="mr-3 text-sm font-medium text-gray-900">
-          Kegiatan
-        </Switch.Label>
-        <Switch
-          checked={switchKegiatan}
-          onChange={handleSwitchKegiatan}
-          className={`${
-            switchKegiatan ? "bg-blue-600" : "bg-gray-200"
-          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-        >
-          <span
-            className={`${
-              switchKegiatan ? "translate-x-6" : "translate-x-1"
-            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-          />
-        </Switch>
-      </Switch.Group>
-    </>
+    <div className="flex items-center">
+      <Switch
+        isSelected={switchKegiatan}
+        onValueChange={handleSwitchKegiatan}
+        size="sm"
+        color="primary"
+        className="mr-3"
+      />
+      <label className="text-sm font-medium text-gray-900">Kegiatan</label>
+    </div>
   );
 };
 
@@ -528,26 +386,16 @@ export const SwitchOutput = ({ onChange }) => {
     onChange(newSwitchOutput);
   };
   return (
-    <>
-      <Switch.Group as="div" className="flex items-center">
-        <Switch.Label className="mr-3 text-sm font-medium text-gray-900">
-          Output
-        </Switch.Label>
-        <Switch
-          checked={switchOutput}
-          onChange={handleSwitchOutput}
-          className={`${
-            switchOutput ? "bg-blue-600" : "bg-gray-200"
-          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-        >
-          <span
-            className={`${
-              switchOutput ? "translate-x-6" : "translate-x-1"
-            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-          />
-        </Switch>
-      </Switch.Group>
-    </>
+    <div className="flex items-center">
+      <Switch
+        isSelected={switchOutput}
+        onValueChange={handleSwitchOutput}
+        size="sm"
+        color="primary"
+        className="mr-3"
+      />
+      <label className="text-sm font-medium text-gray-900">Output</label>
+    </div>
   );
 };
 
@@ -572,33 +420,23 @@ export const SwitchSuboutput = ({
   const isDisabled = jenlap === "6";
 
   return (
-    <>
-      <Switch.Group as="div" className="flex items-center">
-        <Switch.Label
-          className={`mr-3 text-sm font-medium ${
-            isDisabled ? "text-gray-400" : "text-gray-900"
-          }`}
-        >
-          Sub Output
-        </Switch.Label>
-        <Switch
-          checked={switchSuboutput}
-          onChange={handleSwitchSuboutput}
-          disabled={isDisabled}
-          className={`${
-            switchSuboutput && !isDisabled ? "bg-blue-600" : "bg-gray-200"
-          } ${
-            isDisabled ? "opacity-50 cursor-not-allowed" : ""
-          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-        >
-          <span
-            className={`${
-              switchSuboutput ? "translate-x-6" : "translate-x-1"
-            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-          />
-        </Switch>
-      </Switch.Group>
-    </>
+    <div className="flex items-center">
+      <Switch
+        isSelected={switchSuboutput}
+        onValueChange={handleSwitchSuboutput}
+        isDisabled={isDisabled}
+        size="sm"
+        color="primary"
+        className="mr-3"
+      />
+      <label
+        className={`text-sm font-medium ${
+          isDisabled ? "text-gray-400" : "text-gray-900"
+        }`}
+      >
+        Sub Output
+      </label>
+    </div>
   );
 };
 
@@ -618,33 +456,23 @@ export const SwitchAkun = ({ onChange, jenlap, setKdakun, setAkun }) => {
   const isDisabled = jenlap === "6";
 
   return (
-    <>
-      <Switch.Group as="div" className="flex items-center">
-        <Switch.Label
-          className={`mr-3 text-sm font-medium ${
-            isDisabled ? "text-gray-400" : "text-gray-900"
-          }`}
-        >
-          Akun
-        </Switch.Label>
-        <Switch
-          checked={switchAkun}
-          onChange={handleSwitchAkun}
-          disabled={isDisabled}
-          className={`${
-            switchAkun && !isDisabled ? "bg-blue-600" : "bg-gray-200"
-          } ${
-            isDisabled ? "opacity-50 cursor-not-allowed" : ""
-          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-        >
-          <span
-            className={`${
-              switchAkun ? "translate-x-6" : "translate-x-1"
-            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-          />
-        </Switch>
-      </Switch.Group>
-    </>
+    <div className="flex items-center">
+      <Switch
+        isSelected={switchAkun}
+        onValueChange={handleSwitchAkun}
+        isDisabled={isDisabled}
+        size="sm"
+        color="primary"
+        className="mr-3"
+      />
+      <label
+        className={`text-sm font-medium ${
+          isDisabled ? "text-gray-400" : "text-gray-900"
+        }`}
+      >
+        Akun
+      </label>
+    </div>
   );
 };
 
@@ -664,33 +492,23 @@ export const SwitchSdana = ({ onChange, jenlap, setKdsdana, setSdana }) => {
   const isDisabled = jenlap === "6";
 
   return (
-    <>
-      <Switch.Group as="div" className="flex items-center">
-        <Switch.Label
-          className={`mr-3 text-sm font-medium ${
-            isDisabled ? "text-gray-400" : "text-gray-900"
-          }`}
-        >
-          Sumber Dana
-        </Switch.Label>
-        <Switch
-          checked={switchSdana}
-          onChange={handleSwitchSdana}
-          disabled={isDisabled}
-          className={`${
-            switchSdana && !isDisabled ? "bg-blue-600" : "bg-gray-200"
-          } ${
-            isDisabled ? "opacity-50 cursor-not-allowed" : ""
-          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-        >
-          <span
-            className={`${
-              switchSdana ? "translate-x-6" : "translate-x-1"
-            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-          />
-        </Switch>
-      </Switch.Group>
-    </>
+    <div className="flex items-center">
+      <Switch
+        isSelected={switchSdana}
+        onValueChange={handleSwitchSdana}
+        isDisabled={isDisabled}
+        size="sm"
+        color="primary"
+        className="mr-3"
+      />
+      <label
+        className={`text-sm font-medium ${
+          isDisabled ? "text-gray-400" : "text-gray-900"
+        }`}
+      >
+        Sumber Dana
+      </label>
+    </div>
   );
 };
 
@@ -715,33 +533,23 @@ export const SwitchRegister = ({
   const isDisabled = jenlap === "6";
 
   return (
-    <>
-      <Switch.Group as="div" className="flex items-center">
-        <Switch.Label
-          className={`mr-3 text-sm font-medium ${
-            isDisabled ? "text-gray-400" : "text-gray-900"
-          }`}
-        >
-          Register
-        </Switch.Label>
-        <Switch
-          checked={switchRegister}
-          onChange={handleSwitchRegister}
-          disabled={isDisabled}
-          className={`${
-            switchRegister && !isDisabled ? "bg-blue-600" : "bg-gray-200"
-          } ${
-            isDisabled ? "opacity-50 cursor-not-allowed" : ""
-          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-        >
-          <span
-            className={`${
-              switchRegister ? "translate-x-6" : "translate-x-1"
-            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-          />
-        </Switch>
-      </Switch.Group>
-    </>
+    <div className="flex items-center">
+      <Switch
+        isSelected={switchRegister}
+        onValueChange={handleSwitchRegister}
+        isDisabled={isDisabled}
+        size="sm"
+        color="primary"
+        className="mr-3"
+      />
+      <label
+        className={`text-sm font-medium ${
+          isDisabled ? "text-gray-400" : "text-gray-900"
+        }`}
+      >
+        Register
+      </label>
+    </div>
   );
 };
 
@@ -761,33 +569,23 @@ export const SwitchPN = ({ onChange, kdPN, jenlap, setKdPN, setPN }) => {
   const isDisabled = jenlap !== "6";
 
   return (
-    <>
-      <Switch.Group as="div" className="flex items-center">
-        <Switch.Label
-          className={`mr-3 text-sm font-medium ${
-            isDisabled ? "text-gray-400" : "text-gray-900"
-          }`}
-        >
-          PN
-        </Switch.Label>
-        <Switch
-          checked={switchPN}
-          onChange={handleSwitchPN}
-          disabled={isDisabled}
-          className={`${
-            switchPN && !isDisabled ? "bg-blue-600" : "bg-gray-200"
-          } ${
-            isDisabled ? "opacity-50 cursor-not-allowed" : ""
-          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-        >
-          <span
-            className={`${
-              switchPN ? "translate-x-6" : "translate-x-1"
-            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-          />
-        </Switch>
-      </Switch.Group>
-    </>
+    <div className="flex items-center">
+      <Switch
+        isSelected={switchPN}
+        onValueChange={handleSwitchPN}
+        isDisabled={isDisabled}
+        size="sm"
+        color="primary"
+        className="mr-3"
+      />
+      <label
+        className={`text-sm font-medium ${
+          isDisabled ? "text-gray-400" : "text-gray-900"
+        }`}
+      >
+        PN
+      </label>
+    </div>
   );
 };
 
@@ -807,33 +605,23 @@ export const SwitchPP = ({ onChange, jenlap, setKdPP, setPP }) => {
   const isDisabled = jenlap !== "6";
 
   return (
-    <>
-      <Switch.Group as="div" className="flex items-center">
-        <Switch.Label
-          className={`mr-3 text-sm font-medium ${
-            isDisabled ? "text-gray-400" : "text-gray-900"
-          }`}
-        >
-          PP
-        </Switch.Label>
-        <Switch
-          checked={switchPP}
-          onChange={handleSwitchPP}
-          disabled={isDisabled}
-          className={`${
-            switchPP && !isDisabled ? "bg-blue-600" : "bg-gray-200"
-          } ${
-            isDisabled ? "opacity-50 cursor-not-allowed" : ""
-          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-        >
-          <span
-            className={`${
-              switchPP ? "translate-x-6" : "translate-x-1"
-            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-          />
-        </Switch>
-      </Switch.Group>
-    </>
+    <div className="flex items-center">
+      <Switch
+        isSelected={switchPP}
+        onValueChange={handleSwitchPP}
+        isDisabled={isDisabled}
+        size="sm"
+        color="primary"
+        className="mr-3"
+      />
+      <label
+        className={`text-sm font-medium ${
+          isDisabled ? "text-gray-400" : "text-gray-900"
+        }`}
+      >
+        PP
+      </label>
+    </div>
   );
 };
 
@@ -849,33 +637,23 @@ export const SwitchKegPP = ({ onChange, jenlap }) => {
   const isDisabled = jenlap !== "6";
 
   return (
-    <>
-      <Switch.Group as="div" className="flex items-center">
-        <Switch.Label
-          className={`mr-3 text-sm font-medium ${
-            isDisabled ? "text-gray-400" : "text-gray-900"
-          }`}
-        >
-          Keg PP
-        </Switch.Label>
-        <Switch
-          checked={switchKegPP}
-          onChange={handleSwitchKegPP}
-          disabled={isDisabled}
-          className={`${
-            switchKegPP && !isDisabled ? "bg-blue-600" : "bg-gray-200"
-          } ${
-            isDisabled ? "opacity-50 cursor-not-allowed" : ""
-          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-        >
-          <span
-            className={`${
-              switchKegPP ? "translate-x-6" : "translate-x-1"
-            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-          />
-        </Switch>
-      </Switch.Group>
-    </>
+    <div className="flex items-center">
+      <Switch
+        isSelected={switchKegPP}
+        onValueChange={handleSwitchKegPP}
+        isDisabled={isDisabled}
+        size="sm"
+        color="primary"
+        className="mr-3"
+      />
+      <label
+        className={`text-sm font-medium ${
+          isDisabled ? "text-gray-400" : "text-gray-900"
+        }`}
+      >
+        Keg PP
+      </label>
+    </div>
   );
 };
 

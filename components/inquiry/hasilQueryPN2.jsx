@@ -1,275 +1,201 @@
 import React, { useState, useContext, useEffect } from "react";
 import MyContext from "../../utils/Context";
 import numeral from "numeral";
-// import { Modal, Spinner, Form, Alert } from "react-bootstrap"
-import { Dialog, Transition } from "@headlessui/react";
-// import { useNavigate } from "react-router-dom";
+import { handleHttpError } from "../notifikasi/toastError";
+import DataExport from "../CSV/formatCSV";
 import ReactPaginate from "react-paginate";
 import { Tgupdate } from "./hasilQuery";
-import Notifikasi from "../notifikasi/notif";
-import DataExport from "../CSV/formatCSV";
-// import "../../layout/layout.css";
-import { handleHttpError } from "../notifikasi/toastError";
-// import ToastError from "../notifikasi/toastError";
 
 const HasilQueryPN2 = (props) => {
-  // const navigate = useNavigate();
-
   const { showModalPN2, closeModalPN2 } = props;
-  const { axiosJWT, token } = useContext(MyContext);
-  const [loading, setLoading] = useState(false);
-  const [sql] = useState(props.queryPN2);
+  const { axiosJWT, token, sql, from, thang } = useContext(MyContext);
   const [data, setData] = useState([]);
-  const [dataerror, setError] = useState("");
-  const [dataerr, setErr] = useState(false);
-  const [fulls, setFulls] = useState(false);
-  const [page, setPage] = useState(0);
-  const [limit, setLimit] = useState(50);
-  const [pages, setPages] = useState(0);
-  const [rows, setRows] = useState(0);
-  const [msg, setMsg] = useState("");
-  const [fit, setFit] = useState("table-scroll");
+  const [loading, setLoading] = useState(false);
+  const [pageCount, setPageCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalData, setTotalData] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredData, setFilteredData] = useState([]);
+  const [executionTime, setExecutionTime] = useState(null);
+  const itemsPerPage = 10;
 
   useEffect(() => {
-    getData();
-  }, [sql, page]);
+    if (showModalPN2) {
+      fetchData();
+    }
+  }, [showModalPN2, currentPage]);
 
-  function full(event) {
-    const isChecked = event.target.checked;
-    setFulls(isChecked);
-    isChecked ? setFit("table-scroll2") : setFit("table-scroll");
-  }
+  useEffect(() => {
+    if (data.length > 0) {
+      const results = data.filter(item => 
+        Object.values(item).some(val => 
+          val && val.toString().toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+      setFilteredData(results);
+    }
+  }, [searchTerm, data]);
 
-  const getData = async () => {
-    setError("");
-    setErr(false);
+  const fetchData = async () => {
     setLoading(true);
-    const encodedQuery = encodeURIComponent(sql);
     try {
-      const response = await axiosJWT.get(
-        process.env.NEXT_PUBLIC_LOCAL_INQUIRY
-          ? `${process.env.NEXT_PUBLIC_LOCAL_INQUIRY}${encodedQuery}&page=${page}&limit=${limit}`
-          : "",
+      const startTime = performance.now();
+      const response = await axiosJWT.post(
+        "/api/inquiry/getPN2",
+        {
+          sql,
+          page: currentPage,
+          limit: itemsPerPage
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-
-      setData(response.data.result.filter((item) => item.kddept !== "000"));
-      setPages(response.data.totalPages);
-      setRows(response.data.totalRows);
-      setLoading(false);
+      const endTime = performance.now();
+      setExecutionTime((endTime - startTime) / 1000); // Convert to seconds
+      
+      if (response.data) {
+        setData(response.data.data || []);
+        setTotalData(response.data.total || 0);
+        setPageCount(Math.ceil((response.data.total || 0) / itemsPerPage));
+      }
     } catch (error) {
-      const { status, data } = error.response || {};
-      handleHttpError(
-        status,
-        (data && data.error) ||
-          "Terjadi Permasalahan Koneksi atau Server Backend"
-      );
-
+      handleHttpError(error);
+    } finally {
       setLoading(false);
-      setErr(true);
     }
   };
 
-  const tutupModalPN2 = () => {
-    closeModalPN2();
+  const handlePageClick = (event) => {
+    setCurrentPage(event.selected);
   };
 
-  const cekerror = () => {
-    setErr(false);
+  const formatNumber = (num) => {
+    return numeral(num).format("0,0");
   };
 
-  const columns = Object.keys(data[0] || {});
-  const jumlahKolom = Object.keys(data[0] || {}).length;
-  const columnTotals = new Array(17).fill(0);
-
-  data.forEach((row) => {
-    for (
-      let cellIndex = jumlahKolom - 17;
-      cellIndex < jumlahKolom;
-      cellIndex++
-    ) {
-      columnTotals[cellIndex - (jumlahKolom - 17)] += Number(
-        row[Object.keys(row)[cellIndex]]
-      );
-    }
-  });
-  const changePage = ({ selected }) => {
-    setPage(selected);
-    setFulls(true);
-    setFit("table-scroll2");
-    if (selected === 9) {
-      setMsg(
-        "Jika tidak menemukan data yang Anda cari, silahkan cari data dengan kata kunci spesifik!"
-      );
-    } else {
-      setMsg("");
-    }
+  // Function to determine if a column should be right-aligned (for numeric values)
+  const isNumericColumn = (header) => {
+    return ['pagu', 'jan', 'feb', 'mar', 'apr', 'mei', 'jun', 'jul', 'ags', 'sep', 'okt', 'nov', 'des', 'vol'].includes(header.toLowerCase());
   };
+
+  if (!showModalPN2) return null;
 
   return (
-    <>
-      <Modal
-        onHide={tutupModalPN2}
-        show={showModalPN2}
-        backdrop="static"
-        keyboard={false}
-        size="xl"
-        animation={false}
-        fullscreen={fulls}
-        dialogClassName="custom-modal"
-        contentClassName="modal-content"
-      >
-        <Modal.Header closeButton>
-          <Modal.Title style={{ fontSize: "15px" }}>
-            <span>
-              <Form.Check
-                inline
-                className="fw-normal mx-2 text-dark"
-                type="checkbox"
-                label="Full Screen"
-                onChange={full}
-                checked={fulls}
-              />
-            </span>
-          </Modal.Title>
-        </Modal.Header>
-        {loading && (
-          <div className="loading-container">
-            <Spinner
-              className="loading-spinner"
-              as="span"
-              animation="border"
-              size="md"
-              role="status"
-              aria-hidden="true"
-            />
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+        <div className="p-6 border-b">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold">Data Capaian Output {thang}</h2>
+            <button 
+              onClick={closeModalPN2}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
           </div>
-        )}
-
-        <Modal.Body>
-          <>
-            {rows === 0 ? (
-              <>
-                {!loading && (
-                  <p className="text-danger text-center datakosong">
-                    Data Tidak Ditemukan
-                  </p>
-                )}
-              </>
-            ) : (
-              <>
-                <div className="d-flex justify-content-between my-2">
-                  <div>
-                    <Tgupdate thang={props.thang} />
-                  </div>
-                  <div>
-                    <DataExport data={data} filename="data.csv" />
-                  </div>
-                </div>
-              </>
-            )}
-
-            <div className={fit}>
-              <table
-                className="table real-table table-hover table-responsive "
-                width="100%"
-              >
-                <thead>
-                  <tr>
-                    {data.length > 0 && <th className="text-header">No</th>}
-                    {columns.map((column, index) => (
-                      <th key={index} className="text-header">
-                        {column}
-                      </th>
+          
+          {executionTime && (
+            <p className="text-sm text-gray-500 mt-1">
+              Query executed in {executionTime.toFixed(2)} seconds
+            </p>
+          )}
+          
+          <div className="mt-4 flex justify-between items-center">
+            <div className="flex items-center">
+              <input
+                type="text"
+                placeholder="Search..."
+                className="border rounded px-3 py-2 w-64"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="text-sm text-gray-600">
+              Total: {totalData} records
+            </div>
+          </div>
+          
+          <div className="mt-2">
+            <Tgupdate />
+          </div>
+          
+          <div className="mt-2">
+            <DataExport data={data} filename={`capaian_output_${thang}`} />
+          </div>
+        </div>
+        
+        <div className="overflow-auto max-h-[calc(90vh-200px)]">
+          {loading ? (
+            <div className="flex justify-center items-center p-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : data.length === 0 ? (
+            <div className="text-center p-8 text-gray-500">
+              No data available
+            </div>
+          ) : (
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50 sticky top-0">
+                <tr>
+                  {data.length > 0 && Object.keys(data[0]).map((header, index) => (
+                    <th 
+                      key={index}
+                      className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${
+                        isNumericColumn(header) ? 'text-right' : 'text-left'
+                      }`}
+                    >
+                      {header}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {(searchTerm ? filteredData : data).map((row, rowIndex) => (
+                  <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                    {Object.entries(row).map(([key, value], cellIndex) => (
+                      <td 
+                        key={cellIndex}
+                        className={`px-6 py-4 whitespace-nowrap text-sm text-gray-500 ${
+                          isNumericColumn(key) ? 'text-right' : 'text-left'
+                        }`}
+                      >
+                        {isNumericColumn(key) && typeof value === 'number' 
+                          ? formatNumber(value) 
+                          : value}
+                      </td>
                     ))}
                   </tr>
-                </thead>
-
-                <tbody>
-                  {data
-                    .filter((item) => item.kddept !== "000")
-                    .map((row, index) => (
-                      <tr key={index}>
-                        <td className="text-tengah">
-                          {index + 1 + page * limit}
-                        </td>
-                        {Object.values(row).map((cell, index) => (
-                          <React.Fragment key={index}>
-                            {index > jumlahKolom - 18 ? (
-                              <td className="text-kanan">
-                                {numeral(cell).format("0,0")}
-                              </td>
-                            ) : (
-                              <td className="text-tengah">{cell}</td>
-                            )}
-                          </React.Fragment>
-                        ))}
-                      </tr>
-                    ))}
-                </tbody>
-
-                {jumlahKolom !== 0 && (
-                  <tfoot>
-                    <tr>
-                      <td
-                        className="text-end  baris-total"
-                        colSpan={jumlahKolom - 16}
-                      >
-                        TOTAL
-                      </td>
-                      {columnTotals.map((total, totalIndex) => (
-                        <td key={totalIndex} className="text-end  baris-total">
-                          {numeral(total).format("0,0")}
-                        </td>
-                      ))}
-                    </tr>
-                  </tfoot>
-                )}
-              </table>
-            </div>
-          </>
-
-          {data.length > 0 && (
-            <>
-              <p className="pagination justify-content-between mt-2 ">
-                <span>
-                  Total Baris: {numeral(rows).format("0,0")}, &nbsp; Halaman :{" "}
-                  {rows ? page + 1 : 0} dari {pages}
-                </span>
-                {/* <p className="text-center text-danger">{msg}</p> */}
-                <nav>
-                  <ReactPaginate
-                    breakLabel="..."
-                    nextLabel="›"
-                    onPageChange={changePage}
-                    pageRangeDisplayed={3}
-                    marginPagesDisplayed={1}
-                    pageCount={pages}
-                    previousLabel="‹"
-                    renderOnZeroPageCount={null}
-                    containerClassName="justify-content-center pagination"
-                    previousClassName="page-item"
-                    previousLinkClassName="page-link"
-                    nextClassName="page-item"
-                    nextLinkClassName="page-link"
-                    pageClassName="page-item"
-                    pageLinkClassName="page-link"
-                    breakClassName="page-item"
-                    breakLinkClassName="page-link"
-                    activeClassName="active"
-                    disabledClassName="disabled"
-                  />
-                </nav>{" "}
-              </p>
-            </>
+                ))}
+              </tbody>
+            </table>
           )}
-        </Modal.Body>
-      </Modal>
-    </>
+        </div>
+        
+        <div className="p-4 border-t">
+          <ReactPaginate
+            previousLabel={"Previous"}
+            nextLabel={"Next"}
+            breakLabel={"..."}
+            pageCount={pageCount}
+            marginPagesDisplayed={2}
+            pageRangeDisplayed={5}
+            onPageChange={handlePageClick}
+            containerClassName={"flex justify-center mt-4 space-x-1"}
+            pageClassName={"px-3 py-1 rounded border hover:bg-gray-100"}
+            previousClassName={"px-3 py-1 rounded border hover:bg-gray-100"}
+            nextClassName={"px-3 py-1 rounded border hover:bg-gray-100"}
+            breakClassName={"px-3 py-1"}
+            activeClassName={"bg-blue-500 text-white"}
+          />
+        </div>
+      </div>
+    </div>
   );
 };
+
 export default HasilQueryPN2;

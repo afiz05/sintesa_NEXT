@@ -1,33 +1,34 @@
 import React from "react";
 import data from "../../data/Kdsatker.json";
+import { Select, SelectItem } from "@heroui/react";
 
 const Kdsatker = (props) => {
   return (
     <div>
       <div className="mt-2">
-        <select
-          // value={value}
-          // onChange={(event) => setValue(event.target.value)}
-          value={props.kdsatker}
-          onChange={(e) => props.onChange(e.target.value)}
+        <Select
+          selectedKey={props.kdsatker}
+          onSelectionChange={props.onChange}
           className="form-select form-select-sm"
           aria-label=".form-select-sm"
-          disabled={props.status !== "pilihsatker"}
+          isDisabled={props.status !== "pilihsatker"}
+          disallowEmptySelection={false}
+          placeholder="Pilih Satker"
         >
-          {/* <option value="XXX">-- Pilih Satker --</option> */}
-          <option value="SEMUASATKER">Semua Satker</option>
-
+          <SelectItem key="SEMUASATKER" value="SEMUASATKER">
+            Semua Satker
+          </SelectItem>
           {data
             .filter(
               (item) =>
                 item.kddept === props.kddept && item.kdunit === props.kdunit
             )
             .map((item) => (
-              <option value={item.kdsatker}>
+              <SelectItem key={item.kdsatker} value={item.kdsatker}>
                 {item.kdsatker} - {item.nmsatker}
-              </option>
+              </SelectItem>
             ))}
-        </select>
+        </Select>
       </div>
     </div>
   );

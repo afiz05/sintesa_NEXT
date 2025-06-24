@@ -1,34 +1,45 @@
 import React from "react";
+import { Select, SelectItem } from "@heroui/react";
 
 const Kdakun = (props) => {
   return (
-    <div>
-      <div className="mt-2">
-        <select
-          value={props.kdakun}
-          onChange={(e) => props.onChange(e.target.value)}
-          className="form-select form-select-sm"
-          aria-label=".form-select-sm"
-          disabled={props.status !== "pilihakun"}
-        >
-          {props.jenlap === "1" ? (
-            <option value="JENBEL">Jenis Belanja</option>
+    <Select
+      selectedKeys={props.kdakun ? [props.kdakun] : ["AKUN"]}
+      onSelectionChange={(keys) => {
+        const value = Array.from(keys)[0];
+        props.onChange(value);
+      }}
+      isDisabled={props.status !== "pilihakun"}
+      size="sm"
+      placeholder="Pilih Akun"
+      className="max-w-xs mb-2"
+    >
+      {props.jenlap === "1" ? (
+        <SelectItem key="JENBEL" value="JENBEL">
+          Jenis Belanja
+        </SelectItem>
+      ) : (
+        <>
+          {props.jenis === "tematik" ? (
+            <SelectItem key="BKPK" value="BKPK">
+              Kode BKPK
+            </SelectItem>
           ) : (
             <>
-              {props.jenis === "tematik" ? (
-                <option value="BKPK">Kode BKPK</option>
-              ) : (
-                <>
-                  <option value="AKUN">Kode Akun</option>
-                  <option value="BKPK">Kode BKPK</option>
-                  <option value="JENBEL">Jenis Belanja</option>
-                </>
-              )}
+              <SelectItem key="AKUN" value="AKUN">
+                Kode Akun
+              </SelectItem>
+              <SelectItem key="BKPK" value="BKPK">
+                Kode BKPK
+              </SelectItem>
+              <SelectItem key="JENBEL" value="JENBEL">
+                Jenis Belanja
+              </SelectItem>
             </>
           )}
-        </select>
-      </div>
-    </div>
+        </>
+      )}
+    </Select>
   );
 };
 

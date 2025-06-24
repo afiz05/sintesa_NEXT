@@ -3,31 +3,73 @@ import { Select, SelectItem } from "@heroui/react";
 import data from "../../data/Kdunit.json";
 
 const Kdunit = (props) => {
-  const filteredData = data.filter((item) => item.kddept === props.value);
+  // Destructure props for easier access and clarity
+  const {
+    value,
+    onChange,
+    status,
+    size,
+    placeholder,
+    className,
+    kddept,
+    popoverClassName,
+    triggerClassName,
+  } = props;
+
+  // Handler to always pass a string value to the parent component.
+  // This matches the robust handler from Kddept.jsx
+  const handleSelectionChange = (keys) => {
+    const val = Array.from(keys)[0] || "XX";
+    if (onChange) onChange(val);
+  };
 
   return (
-    <div className="mt-2">
-      <Select
-        selectedKeys={props.kdunit ? [props.kdunit] : ["00"]}
-        onSelectionChange={(keys) => {
-          const value = Array.from(keys)[0];
-          props.onChange(value);
-        }}
-        isDisabled={props.status !== "pilihunit"}
-        size="sm"
-        placeholder="Pilih Unit"
-        className="max-w-xs"
-      >
-        <SelectItem key="00" value="00">
-          Semua Unit
-        </SelectItem>
-        {filteredData.map((item, index) => (
-          <SelectItem key={item.kdunit} value={item.kdunit}>
-            {item.kdunit} - {item.nmunit}
+    <Select
+      isVirtualized
+      // Use selectedKeys (plural) which expects an array
+      selectedKeys={[value || "XX"]}
+      onSelectionChange={handleSelectionChange}
+      // Preserve the original disabled logic
+      isDisabled={status !== "pilihunit"}
+      size={size || "sm"}
+      placeholder={placeholder || "Pilih Unit"}
+      className={className || "w-full min-w-0 max-w-full"}
+      disallowEmptySelection
+      aria-label="Pilih Unit"
+      classNames={{
+        // Apply custom class from props for popover width, with a sensible default
+        popoverContent: popoverClassName || "w-80 sm:w-96",
+        // Make trigger responsive - full width by default, can be overridden
+        trigger: `${triggerClassName || "w-full"} max-w-full`,
+        // Fix the value display to prevent stretching when long text is selected
+        value: "truncate pr-8 max-w-full overflow-hidden",
+        // Ensure the main input area doesn't expand
+        mainWrapper: "w-full max-w-full",
+        innerWrapper: "w-full max-w-full overflow-hidden",
+        // Additional constraint on the base element
+        base: "w-full max-w-full",
+        // Ensure the label area doesn't expand
+        label: "truncate",
+      }}
+    >
+      <SelectItem key="XX" textValue="Semua Unit">
+        Semua Unit
+      </SelectItem>
+      {data
+        // Preserve the crucial filtering logic from the original component
+        .filter((item) => !kddept || item.kddept === kddept)
+        .map((item) => (
+          <SelectItem
+            key={item.kdunit}
+            textValue={`${item.kdunit} - ${item.nmunit}`}
+          >
+            {/* This span applies ellipsis for clean UI with long text */}
+            <span className="block whitespace-nowrap overflow-hidden text-ellipsis">
+              {item.kdunit} - {item.nmunit}
+            </span>
           </SelectItem>
         ))}
-      </Select>
-    </div>
+    </Select>
   );
 };
 

@@ -1,19 +1,23 @@
 import React from "react";
 import data from "../../data/Kdoutput.json";
+import { Select, SelectItem } from "@heroui/react";
 
 const Kdoutput = (props) => {
   return (
     <div>
       <div className="mt-2">
-        <select
-          value={props.kdoutput}
-          onChange={(e) => props.onChange(e.target.value)}
+        <Select
+          selectedKey={props.kdoutput}
+          onSelectionChange={props.onChange}
           className="form-select form-select-sm"
           aria-label=".form-select-sm"
-          disabled={props.status !== "pilihoutput"}
+          isDisabled={props.status !== "pilihoutput"}
+          disallowEmptySelection={false}
+          placeholder="Pilih Output"
         >
-          {/* <option value="XX">-- Pilih Output --</option> */}
-          <option value="SEMUAOUTPUT">Semua Output</option>
+          <SelectItem key="SEMUAOUTPUT" value="SEMUAOUTPUT">
+            Semua Output
+          </SelectItem>
           {data
             .filter(
               (item) =>
@@ -23,11 +27,11 @@ const Kdoutput = (props) => {
                 item.kdgiat === props.kdgiat
             )
             .map((item) => (
-              <option value={item.kdoutput}>
+              <SelectItem key={item.kdoutput} value={item.kdoutput}>
                 {item.kdoutput} - {item.nmoutput}
-              </option>
+              </SelectItem>
             ))}
-        </select>
+        </Select>
       </div>
     </div>
   );

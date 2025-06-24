@@ -1,7 +1,9 @@
+"use client";
 import React, { useState, useContext, useEffect } from "react";
 import MyContext from "@/utils/Context";
 import Encrypt from "@/utils/Encrypt";
 import { handleHttpError } from "@/utils/handleError";
+import { Select, SelectItem } from "@heroui/react";
 
 const KodePRI = (props) => {
   const { axiosJWT, token } = useContext(MyContext);
@@ -38,7 +40,6 @@ const KodePRI = (props) => {
         (data && data.error) ||
           "Terjadi Permasalahan Koneksi atau Server Backend"
       );
-
       setLoading(false);
     }
   };
@@ -47,22 +48,26 @@ const KodePRI = (props) => {
     <>Loading ...</>
   ) : (
     <>
-      <select
-        value={props.kdproy}
-        onChange={(e) => props.onChange(e.target.value)}
+      <Select
+        selectedKey={props.kdproy}
+        onSelectionChange={props.onChange}
         className="form-select form-select-sm text-select"
         aria-label=".form-select-sm"
+        disallowEmptySelection={false}
+        placeholder="Pilih Proyek Prioritas"
       >
-        <option value="00">Semua Proyek Prioritas</option>
+        <SelectItem key="00" value="00">
+          Semua Proyek Prioritas
+        </SelectItem>
         {data
           .filter((item) => item.kdpp === props.kdPP)
           .filter((item) => item.kdkp === props.KegPP)
-          .map((pn, index) => (
-            <option key={index} value={pn.kdproy}>
-              {pn.kdproy} - {pn.nmproy}
-            </option>
+          .map((item) => (
+            <SelectItem key={item.kdproy} value={item.kdproy}>
+              {item.kdproy} - {item.nmpriproy}
+            </SelectItem>
           ))}
-      </select>
+      </Select>
     </>
   );
 };
