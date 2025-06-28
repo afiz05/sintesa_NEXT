@@ -1,3 +1,4 @@
+"use client";
 import React, { createContext, useState, useEffect } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
@@ -16,6 +17,7 @@ const MyContext = createContext({
   name: "",
   statusLogin: false,
   token: "",
+  axiosJWT: null,
   // Add other default values as needed
 });
 

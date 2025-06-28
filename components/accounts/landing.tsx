@@ -22,7 +22,7 @@ import { useInfiniteScroll } from "@heroui/use-infinite-scroll";
 import { useAsyncList } from "@react-stately/data";
 import { Search } from "lucide-react";
 
-import MyContext from "@/utils/Contex";
+import MyContext from "@/utils/Context";
 
 import Encrypt from "@/utils/Encrypt";
 import { useToast } from "../context/ToastContext";
@@ -66,10 +66,15 @@ const User = forwardRef<{ reloadData: () => void }, any>((props, ref) => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
-  const { showToast } = useToast();
+  const { showToast } = useToast() as any; // Type assertion to fix TypeScript issues
   const context = useContext(MyContext);
 
-  const { token, axiosJWT } = context!;
+  // Handle case where context might be undefined during initial render
+  if (!context) {
+    return <div>Loading...</div>;
+  }
+
+  const { token, axiosJWT } = context as any; // Type assertion to fix TypeScript issues
 
   // --- SEARCH LOGIC FIX ---
   // Remove frontend filtering, rely on backend search only
@@ -83,8 +88,11 @@ const User = forwardRef<{ reloadData: () => void }, any>((props, ref) => {
     query += ` order by role desc LIMIT ${LIMIT} OFFSET ${offset}`;
 
     const encryptedQuery = Encrypt(query.trim());
-
     try {
+      if (!axiosJWT) {
+        throw new Error("Network connection not available");
+      }
+
       const res = await axiosJWT.post(
         process.env.NEXT_PUBLIC_GET_USERS ?? "",
         { query: encryptedQuery },
@@ -105,7 +113,9 @@ const User = forwardRef<{ reloadData: () => void }, any>((props, ref) => {
       setIsInitialLoading(false);
     } catch (err: any) {
       const { data } = err.response || {};
-      showToast(data && data.error, "error");
+      if (data && data.error) {
+        showToast(data.error, "error");
+      }
       setHasMore(false);
       setIsInitialLoading(false);
     }

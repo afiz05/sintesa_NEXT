@@ -1,743 +1,1112 @@
-
 [
   {
     "kdkppn": "001",
+    "kdkanwil": "01",
+    "kdlokasi": "06",
     "nmkppn": "BANDA ACEH"
   },
   {
     "kdkppn": "002",
+    "kdkanwil": "01",
+    "kdlokasi": "06",
     "nmkppn": "L A N G S A"
   },
   {
     "kdkppn": "003",
+    "kdkanwil": "01",
+    "kdlokasi": "06",
     "nmkppn": "MEULABOH"
   },
   {
     "kdkppn": "004",
+    "kdkanwil": "02",
+    "kdlokasi": "07",
     "nmkppn": "M E D A N   I"
   },
   {
     "kdkppn": "005",
+    "kdkanwil": "02",
+    "kdlokasi": "07",
     "nmkppn": "PEMATANG SIANTAR"
   },
   {
     "kdkppn": "006",
+    "kdkanwil": "02",
+    "kdlokasi": "07",
     "nmkppn": "PADANG SIDEMPUAN"
   },
   {
     "kdkppn": "007",
+    "kdkanwil": "02",
+    "kdlokasi": "07",
     "nmkppn": "GUNUNG SITOLI"
   },
   {
     "kdkppn": "008",
+    "kdkanwil": "04",
+    "kdlokasi": "09",
     "nmkppn": "PEKANBARU"
   },
   {
     "kdkppn": "009",
+    "kdkanwil": "31",
+    "kdlokasi": "32",
     "nmkppn": "TANJUNG PINANG"
   },
   {
     "kdkppn": "010",
+    "kdkanwil": "03",
+    "kdlokasi": "08",
     "nmkppn": "P A D A N G"
   },
   {
     "kdkppn": "011",
+    "kdkanwil": "03",
+    "kdlokasi": "08",
     "nmkppn": "BUKITTINGGI"
   },
   {
     "kdkppn": "012",
+    "kdkanwil": "05",
+    "kdlokasi": "10",
     "nmkppn": "J A M B I"
   },
   {
     "kdkppn": "013",
+    "kdkanwil": "05",
+    "kdlokasi": "10",
     "nmkppn": "SUNGAI PENUH"
   },
   {
     "kdkppn": "014",
+    "kdkanwil": "06",
+    "kdlokasi": "11",
     "nmkppn": "PALEMBANG"
   },
   {
     "kdkppn": "015",
+    "kdkanwil": "09",
+    "kdlokasi": "30",
     "nmkppn": "PANGKAL PINANG"
   },
   {
     "kdkppn": "016",
+    "kdkanwil": "08",
+    "kdlokasi": "26",
     "nmkppn": "B E N G K U L U"
   },
   {
     "kdkppn": "017",
+    "kdkanwil": "07",
+    "kdlokasi": "12",
     "nmkppn": "BANDAR LAMPUNG"
   },
   {
     "kdkppn": "018",
+    "kdkanwil": "11",
+    "kdlokasi": "01",
     "nmkppn": "JAKARTA I"
   },
   {
     "kdkppn": "019",
+    "kdkanwil": "11",
+    "kdlokasi": "01",
     "nmkppn": "JAKARTA II"
   },
   {
     "kdkppn": "020",
+    "kdkanwil": "10",
+    "kdlokasi": "29",
     "nmkppn": "S E R A N G"
   },
   {
     "kdkppn": "021",
+    "kdkanwil": "12",
+    "kdlokasi": "02",
     "nmkppn": "PURWAKARTA"
   },
   {
     "kdkppn": "022",
+    "kdkanwil": "12",
+    "kdlokasi": "02",
     "nmkppn": "BANDUNG  I"
   },
   {
     "kdkppn": "023",
+    "kdkanwil": "12",
+    "kdlokasi": "02",
     "nmkppn": "B O G O R"
   },
   {
     "kdkppn": "024",
+    "kdkanwil": "12",
+    "kdlokasi": "02",
     "nmkppn": "C I R E B O N"
   },
   {
     "kdkppn": "025",
+    "kdkanwil": "12",
+    "kdlokasi": "02",
     "nmkppn": "TASIKMALAYA"
   },
   {
     "kdkppn": "026",
+    "kdkanwil": "13",
+    "kdlokasi": "03",
     "nmkppn": "SEMARANG I"
   },
   {
     "kdkppn": "027",
+    "kdkanwil": "13",
+    "kdlokasi": "03",
     "nmkppn": "PURWOREJO"
   },
   {
     "kdkppn": "028",
+    "kdkanwil": "13",
+    "kdlokasi": "03",
     "nmkppn": "SURAKARTA"
   },
   {
     "kdkppn": "029",
+    "kdkanwil": "13",
+    "kdlokasi": "03",
     "nmkppn": "PURWOKERTO"
   },
   {
     "kdkppn": "030",
+    "kdkanwil": "14",
+    "kdlokasi": "04",
     "nmkppn": "YOGYAKARTA"
   },
   {
     "kdkppn": "031",
+    "kdkanwil": "15",
+    "kdlokasi": "05",
     "nmkppn": "SURABAYA I"
   },
   {
     "kdkppn": "032",
+    "kdkanwil": "15",
+    "kdlokasi": "05",
     "nmkppn": "M A L A N G"
   },
   {
     "kdkppn": "033",
+    "kdkanwil": "15",
+    "kdlokasi": "05",
     "nmkppn": "M A D I U N"
   },
   {
     "kdkppn": "034",
+    "kdkanwil": "15",
+    "kdlokasi": "05",
     "nmkppn": "K E D I R I"
   },
   {
     "kdkppn": "035",
+    "kdkanwil": "15",
+    "kdlokasi": "05",
     "nmkppn": "BONDOWOSO"
   },
   {
     "kdkppn": "036",
+    "kdkanwil": "15",
+    "kdlokasi": "05",
     "nmkppn": "PAMEKASAN"
   },
   {
     "kdkppn": "037",
+    "kdkanwil": "20",
+    "kdlokasi": "22",
     "nmkppn": "D E N P A S A R"
   },
   {
     "kdkppn": "038",
+    "kdkanwil": "21",
+    "kdlokasi": "23",
     "nmkppn": "M A T A R A M"
   },
   {
     "kdkppn": "039",
+    "kdkanwil": "22",
+    "kdlokasi": "24",
     "nmkppn": "K U P A N G"
   },
   {
     "kdkppn": "040",
+    "kdkanwil": "22",
+    "kdlokasi": "24",
     "nmkppn": "E N D E"
   },
   {
     "kdkppn": "041",
+    "kdkanwil": "22",
+    "kdlokasi": "24",
     "nmkppn": "WAINGAPU"
   },
   {
     "kdkppn": "042",
+    "kdkanwil": "16",
+    "kdlokasi": "13",
     "nmkppn": "PONTIANAK"
   },
   {
     "kdkppn": "043",
+    "kdkanwil": "17",
+    "kdlokasi": "14",
     "nmkppn": "PALANGKARAYA"
   },
   {
     "kdkppn": "044",
+    "kdkanwil": "17",
+    "kdlokasi": "14",
     "nmkppn": "S A M P I T"
   },
   {
     "kdkppn": "045",
+    "kdkanwil": "18",
+    "kdlokasi": "15",
     "nmkppn": "BANJARMASIN"
   },
   {
     "kdkppn": "046",
+    "kdkanwil": "19",
+    "kdlokasi": "16",
     "nmkppn": "SAMARINDA"
   },
   {
     "kdkppn": "047",
+    "kdkanwil": "19",
+    "kdlokasi": "16",
     "nmkppn": "BALIKPAPAN"
   },
   {
     "kdkppn": "048",
+    "kdkanwil": "34",
+    "kdlokasi": "35",
     "nmkppn": "T A R A K A N"
   },
   {
     "kdkppn": "049",
+    "kdkanwil": "27",
+    "kdlokasi": "17",
     "nmkppn": "M A N A D O"
   },
   {
     "kdkppn": "050",
+    "kdkanwil": "26",
+    "kdlokasi": "31",
     "nmkppn": "GORONTALO"
   },
   {
     "kdkppn": "051",
+    "kdkanwil": "24",
+    "kdlokasi": "18",
     "nmkppn": "P A L U"
   },
   {
     "kdkppn": "052",
+    "kdkanwil": "24",
+    "kdlokasi": "18",
     "nmkppn": "P O S O"
   },
   {
     "kdkppn": "053",
+    "kdkanwil": "24",
+    "kdlokasi": "18",
     "nmkppn": "L U W U K"
   },
   {
     "kdkppn": "054",
+    "kdkanwil": "23",
+    "kdlokasi": "19",
     "nmkppn": "MAKASSAR I"
   },
   {
     "kdkppn": "055",
+    "kdkanwil": "23",
+    "kdlokasi": "19",
     "nmkppn": "WATAMPONE"
   },
   {
     "kdkppn": "056",
+    "kdkanwil": "23",
+    "kdlokasi": "19",
     "nmkppn": "BANTAENG"
   },
   {
     "kdkppn": "057",
+    "kdkanwil": "23",
+    "kdlokasi": "19",
     "nmkppn": "PARE - PARE"
   },
   {
     "kdkppn": "058",
+    "kdkanwil": "23",
+    "kdlokasi": "19",
     "nmkppn": "P A L O P O"
   },
   {
     "kdkppn": "059",
+    "kdkanwil": "32",
+    "kdlokasi": "34",
     "nmkppn": "M A J E N E"
   },
   {
     "kdkppn": "060",
+    "kdkanwil": "25",
+    "kdlokasi": "20",
     "nmkppn": "K E N D A R I"
   },
   {
     "kdkppn": "061",
+    "kdkanwil": "29",
+    "kdlokasi": "21",
     "nmkppn": "A M B O N"
   },
   {
     "kdkppn": "062",
+    "kdkanwil": "28",
+    "kdlokasi": "28",
     "nmkppn": "T E R N A T E"
   },
   {
     "kdkppn": "063",
+    "kdkanwil": "30",
+    "kdlokasi": "25",
     "nmkppn": "JAYAPURA"
   },
   {
     "kdkppn": "064",
+    "kdkanwil": "30",
+    "kdlokasi": "25",
     "nmkppn": "B I A K"
   },
   {
     "kdkppn": "065",
+    "kdkanwil": "33",
+    "kdlokasi": "33",
     "nmkppn": "MANOKWARI"
   },
   {
     "kdkppn": "066",
+    "kdkanwil": "33",
+    "kdlokasi": "33",
     "nmkppn": "S O R O N G"
   },
   {
     "kdkppn": "067",
+    "kdkanwil": "33",
+    "kdlokasi": "33",
     "nmkppn": "FAK - FAK"
   },
   {
     "kdkppn": "068",
+    "kdkanwil": "30",
+    "kdlokasi": "25",
     "nmkppn": "MERAUKE"
   },
   {
     "kdkppn": "071",
+    "kdkanwil": "21",
+    "kdlokasi": "23",
     "nmkppn": "B I M A"
   },
   {
     "kdkppn": "072",
+    "kdkanwil": "13",
+    "kdlokasi": "03",
     "nmkppn": "PEKALONGAN"
   },
   {
     "kdkppn": "073",
+    "kdkanwil": "15",
+    "kdlokasi": "05",
     "nmkppn": "BOJONEGORO"
   },
   {
     "kdkppn": "074",
+    "kdkanwil": "01",
+    "kdlokasi": "06",
     "nmkppn": "TAPAKTUAN"
   },
   {
     "kdkppn": "075",
+    "kdkanwil": "02",
+    "kdlokasi": "07",
     "nmkppn": "RANTAU PRAPAT"
   },
   {
     "kdkppn": "076",
+    "kdkanwil": "02",
+    "kdlokasi": "07",
     "nmkppn": "TANJUNG BALAI ASAHAN"
   },
   {
     "kdkppn": "078",
+    "kdkanwil": "05",
+    "kdlokasi": "10",
     "nmkppn": "MUARA BUNGO"
   },
   {
     "kdkppn": "079",
+    "kdkanwil": "16",
+    "kdlokasi": "13",
     "nmkppn": "S I N T A N G"
   },
   {
     "kdkppn": "080",
+    "kdkanwil": "17",
+    "kdlokasi": "14",
     "nmkppn": "B U N T O K"
   },
   {
     "kdkppn": "081",
+    "kdkanwil": "18",
+    "kdlokasi": "15",
     "nmkppn": "KOTABARU"
   },
   {
     "kdkppn": "082",
+    "kdkanwil": "24",
+    "kdlokasi": "18",
     "nmkppn": "TOLI - TOLI"
   },
   {
     "kdkppn": "083",
+    "kdkanwil": "27",
+    "kdlokasi": "17",
     "nmkppn": "T A H U N A"
   },
   {
     "kdkppn": "084",
+    "kdkanwil": "29",
+    "kdlokasi": "21",
     "nmkppn": "T U A L"
   },
   {
     "kdkppn": "085",
+    "kdkanwil": "30",
+    "kdlokasi": "25",
     "nmkppn": "N A B I R E"
   },
   {
     "kdkppn": "086",
+    "kdkanwil": "12",
+    "kdlokasi": "02",
     "nmkppn": "KARAWANG"
   },
   {
     "kdkppn": "087",
+    "kdkanwil": "12",
+    "kdlokasi": "02",
     "nmkppn": "SUMEDANG"
   },
   {
     "kdkppn": "088",
+    "kdkanwil": "11",
+    "kdlokasi": "01",
     "nmkppn": "JAKARTA III"
   },
   {
     "kdkppn": "089",
+    "kdkanwil": "01",
+    "kdlokasi": "06",
     "nmkppn": "LHOKSEUMAWE"
   },
   {
     "kdkppn": "090",
+    "kdkanwil": "03",
+    "kdlokasi": "08",
     "nmkppn": "S O L O K"
   },
   {
     "kdkppn": "091",
+    "kdkanwil": "03",
+    "kdlokasi": "08",
     "nmkppn": "LUBUK SIKAPING"
   },
   {
     "kdkppn": "092",
+    "kdkanwil": "04",
+    "kdlokasi": "09",
     "nmkppn": "R E N G A T"
   },
   {
     "kdkppn": "093",
+    "kdkanwil": "16",
+    "kdlokasi": "13",
     "nmkppn": "SINGKAWANG"
   },
   {
     "kdkppn": "094",
+    "kdkanwil": "16",
+    "kdlokasi": "13",
     "nmkppn": "KETAPANG"
   },
   {
     "kdkppn": "096",
+    "kdkanwil": "12",
+    "kdlokasi": "02",
     "nmkppn": "G A R U T"
   },
   {
     "kdkppn": "097",
+    "kdkanwil": "13",
+    "kdlokasi": "03",
     "nmkppn": "P A T I"
   },
   {
     "kdkppn": "098",
+    "kdkanwil": "15",
+    "kdlokasi": "05",
     "nmkppn": "MOJOKERTO"
   },
   {
     "kdkppn": "099",
+    "kdkanwil": "15",
+    "kdlokasi": "05",
     "nmkppn": "PACITAN"
   },
   {
     "kdkppn": "100",
+    "kdkanwil": "15",
+    "kdlokasi": "05",
     "nmkppn": "BANYUWANGI"
   },
   {
     "kdkppn": "101",
+    "kdkanwil": "21",
+    "kdlokasi": "23",
     "nmkppn": "SUMBAWA BESAR"
   },
   {
     "kdkppn": "102",
+    "kdkanwil": "17",
+    "kdlokasi": "14",
     "nmkppn": "PANGKALAN BUN"
   },
   {
     "kdkppn": "103",
+    "kdkanwil": "25",
+    "kdlokasi": "20",
     "nmkppn": "B A U - B A U"
   },
   {
     "kdkppn": "104",
+    "kdkanwil": "29",
+    "kdlokasi": "21",
     "nmkppn": "SAUMLAKI"
   },
   {
     "kdkppn": "105",
+    "kdkanwil": "01",
+    "kdlokasi": "06",
     "nmkppn": "KUTACANE"
   },
   {
     "kdkppn": "106",
+    "kdkanwil": "02",
+    "kdlokasi": "07",
     "nmkppn": "SIBOLGA"
   },
   {
     "kdkppn": "107",
+    "kdkanwil": "09",
+    "kdlokasi": "30",
     "nmkppn": "TANJUNG PANDAN"
   },
   {
     "kdkppn": "109",
+    "kdkanwil": "06",
+    "kdlokasi": "11",
     "nmkppn": "BATURAJA"
   },
   {
     "kdkppn": "110",
+    "kdkanwil": "18",
+    "kdlokasi": "15",
     "nmkppn": "BARABAI"
   },
   {
     "kdkppn": "111",
+    "kdkanwil": "22",
+    "kdlokasi": "24",
     "nmkppn": "R U T E N G"
   },
   {
     "kdkppn": "113",
+    "kdkanwil": "30",
+    "kdlokasi": "25",
     "nmkppn": "W A M E N A"
   },
   {
     "kdkppn": "115",
+    "kdkanwil": "13",
+    "kdlokasi": "03",
     "nmkppn": "MAGELANG"
   },
   {
     "kdkppn": "116",
+    "kdkanwil": "07",
+    "kdlokasi": "12",
     "nmkppn": "KOTABUMI"
   },
   {
     "kdkppn": "117",
+    "kdkanwil": "16",
+    "kdlokasi": "13",
     "nmkppn": "PUTUSSIBAU"
   },
   {
     "kdkppn": "118",
+    "kdkanwil": "13",
+    "kdlokasi": "03",
     "nmkppn": "T E G A L"
   },
   {
     "kdkppn": "120",
+    "kdkanwil": "04",
+    "kdlokasi": "09",
     "nmkppn": "D U M A I"
   },
   {
     "kdkppn": "121",
+    "kdkanwil": "08",
+    "kdlokasi": "26",
     "nmkppn": "M A N N A"
   },
   {
     "kdkppn": "122",
+    "kdkanwil": "01",
+    "kdlokasi": "06",
     "nmkppn": "TAKENGON"
   },
   {
     "kdkppn": "124",
+    "kdkanwil": "02",
+    "kdlokasi": "07",
     "nmkppn": "TEBING TINGGI"
   },
   {
     "kdkppn": "125",
+    "kdkanwil": "02",
+    "kdlokasi": "07",
     "nmkppn": "BALIGE"
   },
   {
     "kdkppn": "126",
+    "kdkanwil": "07",
+    "kdlokasi": "12",
     "nmkppn": "METRO LAMPUNG"
   },
   {
     "kdkppn": "128",
+    "kdkanwil": "12",
+    "kdlokasi": "02",
     "nmkppn": "SUKABUMI"
   },
   {
     "kdkppn": "129",
+    "kdkanwil": "13",
+    "kdlokasi": "03",
     "nmkppn": "K U D U S"
   },
   {
     "kdkppn": "130",
+    "kdkanwil": "13",
+    "kdlokasi": "03",
     "nmkppn": "CILACAP"
   },
   {
     "kdkppn": "131",
+    "kdkanwil": "15",
+    "kdlokasi": "05",
     "nmkppn": "J E M B E R"
   },
   {
     "kdkppn": "132",
+    "kdkanwil": "20",
+    "kdlokasi": "22",
     "nmkppn": "SINGARAJA"
   },
   {
     "kdkppn": "133",
+    "kdkanwil": "11",
+    "kdlokasi": "01",
     "nmkppn": "JAKARTA IV"
   },
   {
     "kdkppn": "137",
+    "kdkanwil": "31",
+    "kdlokasi": "32",
     "nmkppn": "B A T A M"
   },
   {
     "kdkppn": "138",
+    "kdkanwil": "30",
+    "kdlokasi": "25",
     "nmkppn": "S E R U I"
   },
   {
     "kdkppn": "139",
+    "kdkanwil": "11",
+    "kdlokasi": "01",
     "nmkppn": "JAKARTA V"
   },
   {
     "kdkppn": "070",
+    "kdkanwil": "06",
+    "kdlokasi": "11",
     "nmkppn": "LUBUK LINGGAU"
   },
   {
     "kdkppn": "077",
+    "kdkanwil": "03",
+    "kdlokasi": "08",
     "nmkppn": "SIJUNJUNG"
   },
   {
     "kdkppn": "119",
+    "kdkanwil": "02",
+    "kdlokasi": "07",
     "nmkppn": "SIDIKALANG"
   },
   {
     "kdkppn": "127",
+    "kdkanwil": "10",
+    "kdlokasi": "29",
     "nmkppn": "TANGERANG"
   },
   {
     "kdkppn": "140",
+    "kdkanwil": "11",
+    "kdlokasi": "01",
     "nmkppn": "KHUSUS PINJAMAN DAN HIBAH"
   },
   {
     "kdkppn": "141",
+    "kdkanwil": "30",
+    "kdlokasi": "25",
     "nmkppn": "T I M I K A"
   },
   {
     "kdkppn": "142",
+    "kdkanwil": "03",
+    "kdlokasi": "08",
     "nmkppn": "P A I N A N"
   },
   {
     "kdkppn": "143",
+    "kdkanwil": "05",
+    "kdlokasi": "10",
     "nmkppn": "KUALA TUNGKAL"
   },
   {
     "kdkppn": "144",
+    "kdkanwil": "06",
+    "kdlokasi": "11",
     "nmkppn": "L A H A T"
   },
   {
     "kdkppn": "145",
+    "kdkanwil": "07",
+    "kdlokasi": "12",
     "nmkppn": "L I W A"
   },
   {
     "kdkppn": "146",
+    "kdkanwil": "08",
+    "kdlokasi": "26",
     "nmkppn": "C U R U P"
   },
   {
     "kdkppn": "147",
+    "kdkanwil": "12",
+    "kdlokasi": "02",
     "nmkppn": "KUNINGAN"
   },
   {
     "kdkppn": "148",
+    "kdkanwil": "13",
+    "kdlokasi": "03",
     "nmkppn": "K L A T E N"
   },
   {
     "kdkppn": "149",
+    "kdkanwil": "14",
+    "kdlokasi": "04",
     "nmkppn": "WONOSARI"
   },
   {
     "kdkppn": "150",
+    "kdkanwil": "15",
+    "kdlokasi": "05",
     "nmkppn": "B L I T A R"
   },
   {
     "kdkppn": "151",
+    "kdkanwil": "18",
+    "kdlokasi": "15",
     "nmkppn": "T A N J U N G"
   },
   {
     "kdkppn": "152",
+    "kdkanwil": "34",
+    "kdlokasi": "35",
     "nmkppn": "NUNUKAN"
   },
   {
     "kdkppn": "153",
+    "kdkanwil": "19",
+    "kdlokasi": "16",
     "nmkppn": "TANJUNG REDEP"
   },
   {
     "kdkppn": "154",
+    "kdkanwil": "20",
+    "kdlokasi": "22",
     "nmkppn": "AMLAPURA"
   },
   {
     "kdkppn": "155",
+    "kdkanwil": "23",
+    "kdlokasi": "19",
     "nmkppn": "BENTENG"
   },
   {
     "kdkppn": "156",
+    "kdkanwil": "25",
+    "kdlokasi": "20",
     "nmkppn": "K O L A K A"
   },
   {
     "kdkppn": "157",
+    "kdkanwil": "25",
+    "kdlokasi": "20",
     "nmkppn": "R A H A"
   },
   {
     "kdkppn": "158",
+    "kdkanwil": "27",
+    "kdlokasi": "17",
     "nmkppn": "KOTAMOBAGU"
   },
   {
     "kdkppn": "159",
+    "kdkanwil": "05",
+    "kdlokasi": "10",
     "nmkppn": "B A N G K O"
   },
   {
     "kdkppn": "160",
+    "kdkanwil": "06",
+    "kdlokasi": "11",
     "nmkppn": "S E K A Y U"
   },
   {
     "kdkppn": "161",
+    "kdkanwil": "10",
+    "kdlokasi": "29",
     "nmkppn": "RANGKASBITUNG"
   },
   {
     "kdkppn": "162",
+    "kdkanwil": "13",
+    "kdlokasi": "03",
     "nmkppn": "S R A G E N"
   },
   {
     "kdkppn": "163",
+    "kdkanwil": "13",
+    "kdlokasi": "03",
     "nmkppn": "PURWODADI"
   },
   {
     "kdkppn": "164",
+    "kdkanwil": "13",
+    "kdlokasi": "03",
     "nmkppn": "BANJARNEGARA"
   },
   {
     "kdkppn": "165",
+    "kdkanwil": "15",
+    "kdlokasi": "05",
     "nmkppn": "SIDOARJO"
   },
   {
     "kdkppn": "166",
+    "kdkanwil": "15",
+    "kdlokasi": "05",
     "nmkppn": "T U B A N"
   },
   {
     "kdkppn": "167",
+    "kdkanwil": "16",
+    "kdlokasi": "13",
     "nmkppn": "SANGGAU"
   },
   {
     "kdkppn": "168",
+    "kdkanwil": "18",
+    "kdlokasi": "15",
     "nmkppn": "PELAIHARI"
   },
   {
     "kdkppn": "169",
+    "kdkanwil": "21",
+    "kdlokasi": "23",
     "nmkppn": "S E L O N G"
   },
   {
     "kdkppn": "170",
+    "kdkanwil": "23",
+    "kdlokasi": "19",
     "nmkppn": "M A K A L E"
   },
   {
     "kdkppn": "171",
+    "kdkanwil": "12",
+    "kdlokasi": "02",
     "nmkppn": "B E K A S I"
   },
   {
     "kdkppn": "172",
+    "kdkanwil": "22",
+    "kdlokasi": "24",
     "nmkppn": "ATAMBUA"
   },
   {
     "kdkppn": "173",
+    "kdkanwil": "29",
+    "kdlokasi": "21",
     "nmkppn": "M A S O H I"
   },
   {
     "kdkppn": "112",
+    "kdkanwil": "28",
+    "kdlokasi": "28",
     "nmkppn": "TOBELO"
   },
   {
     "kdkppn": "174",
+    "kdkanwil": "22",
+    "kdlokasi": "24",
     "nmkppn": "LARANTUKA"
   },
   {
     "kdkppn": "999",
+    "kdkanwil": "11",
+    "kdlokasi": "01",
     "nmkppn": "DIREKTORAT PENGELOLAAN KAS NEGARA"
   },
   {
     "kdkppn": "175",
+    "kdkanwil": "11",
+    "kdlokasi": "01",
     "nmkppn": "JAKARTA VI"
   },
   {
     "kdkppn": "136",
+    "kdkanwil": "23",
+    "kdlokasi": "19",
     "nmkppn": "MAKASSAR II"
   },
   {
     "kdkppn": "135",
+    "kdkanwil": "15",
+    "kdlokasi": "05",
     "nmkppn": "SURABAYA II"
   },
   {
     "kdkppn": "123",
+    "kdkanwil": "02",
+    "kdlokasi": "07",
     "nmkppn": "M E D A N   II"
   },
   {
     "kdkppn": "095",
+    "kdkanwil": "12",
+    "kdlokasi": "02",
     "nmkppn": "BANDUNG  II"
   },
   {
     "kdkppn": "134",
+    "kdkanwil": "13",
+    "kdlokasi": "03",
     "nmkppn": "SEMARANG II"
   },
   {
     "kdkppn": "178",
+    "kdkanwil": "32",
+    "kdlokasi": "34",
     "nmkppn": "MAMUJU"
   },
   {
     "kdkppn": "176",
+    "kdkanwil": "14",
+    "kdlokasi": "04",
     "nmkppn": "W A T E S"
   },
   {
     "kdkppn": "177",
+    "kdkanwil": "23",
+    "kdlokasi": "19",
     "nmkppn": "SINJAI"
   },
   {
     "kdkppn": "179",
+    "kdkanwil": "27",
+    "kdlokasi": "17",
     "nmkppn": "BITUNG"
   },
   {
     "kdkppn": "180",
+    "kdkanwil": "26",
+    "kdlokasi": "31",
     "nmkppn": "MARISA"
   },
   {
     "kdkppn": "181",
+    "kdkanwil": "08",
+    "kdlokasi": "26",
     "nmkppn": "MUKOMUKO"
   },
   {
     "kdkppn": "901",
+    "kdkanwil": "11",
+    "kdlokasi": "01",
     "nmkppn": "PENERIMAAN NEGARA (Dit. PKN)"
   },
   {
     "kdkppn": "666",
+    "kdkanwil": "11",
+    "kdlokasi": "01",
     "nmkppn": "TRIAL REVISI"
   },
   {
     "kdkppn": "182",
+    "kdkanwil": "11",
+    "kdlokasi": "01",
     "nmkppn": "JAKARTA VII"
   },
   {
     "kdkppn": "183",
+    "kdkanwil": "11",
+    "kdlokasi": "01",
     "nmkppn": "KHUSUS PENERIMAAN"
   },
   {
     "kdkppn": "184",
+    "kdkanwil": "11",
+    "kdlokasi": "01",
     "nmkppn": "KHUSUS INVESTASI"
   },
   {
     "kdkppn": "185",
+    "kdkanwil": "34",
+    "kdlokasi": "35",
     "nmkppn": "TANJUNG SELOR"
   }
 ]

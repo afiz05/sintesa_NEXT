@@ -1,52 +1,27 @@
 import React from "react";
-// import { Form } from "react-bootstrap"
-import { Dialog, Transition } from "@headlessui/react";
+import { RadioGroup, Radio } from "@heroui/react";
 
 function PanganRadio({ panganRadio, selectedValue }) {
-  const handleRadioChange = (event) => {
-    const value = event.target.value;
+  const handleRadioChange = (value) => {
     panganRadio(value);
   };
 
   return (
-    <span className="fade-in pilihan">
-      <Checkbox
-        inline
-        type="radio"
-        label="Kode"
-        name="radioGrouppangan"
-        value="1"
-        checked={selectedValue === "1"}
-        onChange={handleRadioChange}
-      />
-      <Checkbox
-        inline
-        type="radio"
-        label="Kode Uraian"
-        name="radioGrouppangan"
-        checked={selectedValue === "2"}
-        value="2"
-        onChange={handleRadioChange}
-      />
-      <Checkbox
-        inline
-        type="radio"
-        label="Uraian"
-        name="radioGrouppangan"
-        checked={selectedValue === "3"}
-        value="3"
-        onChange={handleRadioChange}
-      />
-      {/* <Checkbox 
-        inline
-        type="radio"
-        label="Jangan Tampil"
-        checked={selectedValue === "4"}
-        name="dekoradioGrouppp"
-        value="4"
-        onChange={handleRadioChange}
-      /> */}
-    </span>
+    <div className="fade-in pilihan">
+      <RadioGroup
+        value={selectedValue}
+        onValueChange={handleRadioChange}
+        orientation="horizontal"
+        size="sm"
+      >
+        <Radio value="1">Kode</Radio>
+        <Radio value="2">Kode Uraian</Radio>
+        <Radio value="3">Uraian</Radio>
+        {/* Uncomment if needed:
+        <Radio value="4">Jangan Tampil</Radio>
+        */}
+      </RadioGroup>
+    </div>
   );
 }
 
