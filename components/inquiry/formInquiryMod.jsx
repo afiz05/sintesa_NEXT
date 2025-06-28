@@ -463,25 +463,19 @@ const InquiryMod = () => {
     return generateUnifiedQuery();
   };
 
-  // Add state for storing query result data for export
-  const [dataToExport, setDataToExport] = React.useState([]);
+  // This state is no longer needed here as the modal fetches its own data.
+  // const [inquiryData, setInquiryData] = React.useState([]);
 
-  // **UPDATED** - Execute query handler now uses unified query generation
   const handlegetQuery = async () => {
-    const sql = generateUnifiedQuery(); // Generate consistent SQL
-    inquiry.setSql(sql); // Store for modal display
+    const sql = generateUnifiedQuery();
+    inquiry.setSql(sql); // Set the SQL for the modal to use
 
-    // TODO: Replace with actual API call using the generated SQL
-    // const fetchedData = await fetchDataFromAPI(sql);
-    // setDataToExport(fetchedData);
-
-    // Open appropriate modal based on report type
+    // The modal is now responsible for fetching its own data.
+    // This function just needs to open the correct modal based on the report type.
     if (jenlap === "1") {
       setShowModalApbn(true);
     } else if (jenlap === "2") {
       setShowModal(true);
-      setShowModalKedua(true);
-      settampilAI(true);
     } else if (jenlap === "3") {
       setShowModalAkumulasi(true);
     } else if (jenlap === "4") {

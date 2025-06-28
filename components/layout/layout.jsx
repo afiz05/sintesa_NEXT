@@ -5,6 +5,7 @@ import { useLockedBody } from "../hooks/useBodyLock";
 import { NavbarWrapper } from "../navbar/navbar";
 import { SidebarWrapper } from "../sidebar/sidebar";
 import { SidebarContext } from "./layout-context";
+import { MyContextProvider } from "@/utils/Context";
 
 export const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);

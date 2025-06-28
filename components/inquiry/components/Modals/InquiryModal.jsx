@@ -1,28 +1,51 @@
 "use client";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useMemo } from "react";
 import MyContext from "../../../../utils/Context";
 import { handleHttpError } from "../../../notifikasi/toastError";
-import ReactPaginate from "react-paginate";
 import numeral from "numeral";
+import { Search, X, Download } from "lucide-react";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+  Spinner,
+  Checkbox,
+  Pagination,
+  Input,
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+} from "@heroui/react";
+import DataExport from "../../../CSV/formatCSV";
 
 const InquiryModal = ({ isOpen, onClose, sql, from, thang }) => {
-  const { axiosJWT, token } = useContext(MyContext);
+  const { axiosJWT, token, statusLogin } = useContext(MyContext);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pageCount, setPageCount] = useState(0);
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0); // 0-indexed for pagination
   const [totalData, setTotalData] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [executionTime, setExecutionTime] = useState(null);
-  const itemsPerPage = 10;
+  const [fullscreen, setFullscreen] = useState(false);
+  const itemsPerPage = 100; // Match backend pagination limit
 
+  // Fetch data when the modal opens or when the current page changes
   useEffect(() => {
-    if (isOpen) {
+    // Only fetch data if the modal is open AND the user is logged in.
+    if (isOpen && statusLogin) {
       fetchData();
     }
-  }, [isOpen, currentPage]);
+  }, [isOpen, currentPage, statusLogin]); // Add statusLogin to the dependency array
 
+  // Effect for client-side search.
   useEffect(() => {
     if (data.length > 0) {
       const results = data.filter((item) =>
@@ -33,19 +56,32 @@ const InquiryModal = ({ isOpen, onClose, sql, from, thang }) => {
         )
       );
       setFilteredData(results);
+    } else {
+      setFilteredData([]);
     }
   }, [searchTerm, data]);
 
+  const handleFullscreenToggle = (event) => {
+    const isChecked = event.target.checked;
+    setFullscreen(isChecked);
+  };
+
   const fetchData = async () => {
     setLoading(true);
+    setSearchTerm(""); // Reset search when fetching new page data
+
     try {
       const startTime = performance.now();
+
+      // !!! IMPORTANT !!!
+      // Please confirm or change this URL to your actual backend server address.
+      const backendUrl = "http://localhost:88";
+
       const response = await axiosJWT.post(
-        "/api/inquiry/getdata",
+        `${backendUrl}/next/inquiry`, // Use the new backend route
         {
           sql,
-          page: currentPage,
-          limit: itemsPerPage,
+          page: currentPage + 1, // Backend expects a 1-based page index
         },
         {
           headers: {
@@ -54,145 +90,222 @@ const InquiryModal = ({ isOpen, onClose, sql, from, thang }) => {
         }
       );
       const endTime = performance.now();
-      setExecutionTime((endTime - startTime) / 1000); // Convert to seconds
+      setExecutionTime((endTime - startTime) / 1000);
 
       if (response.data) {
         setData(response.data.data || []);
         setTotalData(response.data.total || 0);
-        setPageCount(Math.ceil((response.data.total || 0) / itemsPerPage));
+        setPageCount(response.data.totalPages || 0);
+      } else {
+        // Handle cases where response.data is null/undefined
+        setData([]);
+        setTotalData(0);
+        setPageCount(0);
       }
     } catch (error) {
       handleHttpError(error);
+      // Clear data on error to prevent showing stale results
+      setData([]);
+      setTotalData(0);
+      setPageCount(0);
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePageClick = (event) => {
-    setCurrentPage(event.selected);
+  const handlePageChange = (page) => {
+    setCurrentPage(page - 1);
   };
 
   const formatNumber = (num) => {
     return numeral(num).format("0,0");
   };
 
-  if (!isOpen) return null;
+  // Determine columns and which ones are numeric
+  const columns = useMemo(() => {
+    if (data.length === 0) return [];
+    return Object.keys(data[0]);
+  }, [data]);
+
+  // Identify numeric columns for formatting
+  const numericColumns = useMemo(() => {
+    if (data.length === 0) return {};
+
+    return columns.reduce((acc, column) => {
+      // Check if this column contains numeric data in most rows
+      const numericCount = data.reduce((count, row) => {
+        const value = row[column];
+        return !isNaN(Number(value)) &&
+          value !== "" &&
+          typeof value !== "boolean"
+          ? count + 1
+          : count;
+      }, 0);
+
+      // If more than 70% of rows have numeric values in this column, consider it numeric
+      if (numericCount / data.length > 0.7) {
+        acc[column] = true;
+      }
+      return acc;
+    }, {});
+  }, [data, columns]);
+
+  // Prepare the data for display
+  const displayData = useMemo(() => {
+    return searchTerm ? filteredData : data;
+  }, [searchTerm, filteredData, data]);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
-        <div className="p-6 border-b">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold">Hasil Inquiry</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-500 hover:text-gray-700"
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size={fullscreen ? "full" : "5xl"}
+      scrollBehavior="inside"
+    >
+      <ModalContent>
+        <ModalHeader className="flex justify-between items-center">
+          <div className="text-lg font-semibold">Hasil Inquiry</div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              isSelected={fullscreen}
+              onValueChange={setFullscreen}
+              onChange={handleFullscreenToggle}
+              size="sm"
             >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                ></path>
-              </svg>
-            </button>
+              <span className="text-sm">Layar Penuh</span>
+            </Checkbox>
           </div>
+        </ModalHeader>
 
-          {executionTime && (
-            <p className="text-sm text-gray-500 mt-1">
-              Query executed in {executionTime.toFixed(3)} seconds
-            </p>
-          )}
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-50">
+            <Spinner size="lg" color="primary" />
+          </div>
+        )}
 
-          <div className="mt-4 flex justify-between items-center">
-            <div className="flex items-center">
-              <input
-                type="text"
-                placeholder="Search..."
-                className="border rounded px-3 py-2 w-64"
+        <ModalBody>
+          <div className="flex justify-between items-center mb-4">
+            <div>
+              {executionTime && (
+                <p className="text-sm text-gray-500">
+                  Query executed in {executionTime.toFixed(3)} seconds
+                </p>
+              )}
+            </div>
+            <div className="flex space-x-2">
+              <Input
+                placeholder="Cari data..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                startContent={<Search size={16} />}
+                size="sm"
+                className="w-64"
               />
-            </div>
-            <div className="text-sm text-gray-600">
-              Total: {totalData} records
+              {data.length > 0 && (
+                <DataExport data={data} filename="inquiry_data.csv" />
+              )}
             </div>
           </div>
-        </div>
 
-        <div className="overflow-auto max-h-[calc(90vh-200px)]">
-          {loading ? (
-            <div className="flex justify-center items-center p-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
-          ) : data.length === 0 ? (
+          {data.length === 0 && !loading ? (
             <div className="text-center p-8 text-gray-500">
               No data available
             </div>
           ) : (
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50 sticky top-0">
-                <tr>
-                  {data.length > 0 &&
-                    Object.keys(data[0]).map((header, index) => (
-                      <th
-                        key={index}
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            <div className={fullscreen ? "h-[calc(100vh-250px)]" : "h-[500px]"}>
+              <Table
+                aria-label="Inquiry results table"
+                removeWrapper
+                isHeaderSticky
+                classNames={{
+                  base: "max-h-full",
+                  table: "min-h-[150px]",
+                }}
+              >
+                <TableHeader>
+                  <TableColumn key="index" className="text-center w-12">
+                    No
+                  </TableColumn>
+                  {columns.map((column) => (
+                    <TableColumn
+                      key={column}
+                      className={
+                        numericColumns[column] ? "text-right" : "text-center"
+                      }
+                    >
+                      {column}
+                    </TableColumn>
+                  ))}
+                </TableHeader>
+                <TableBody>
+                  {displayData.length === 0 ? (
+                    <TableRow>
+                      <TableCell
+                        colSpan={columns.length + 1}
+                        className="text-center"
                       >
-                        {header}
-                      </th>
-                    ))}
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {(searchTerm ? filteredData : data).map((row, rowIndex) => (
-                  <tr
-                    key={rowIndex}
-                    className={rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"}
-                  >
-                    {Object.entries(row).map(([key, value], cellIndex) => (
-                      <td
-                        key={cellIndex}
-                        className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                      >
-                        {typeof value === "number"
-                          ? formatNumber(value)
-                          : value}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                        No data available
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    displayData.map((item, index) => (
+                      <TableRow key={index}>
+                        <TableCell className="text-center">
+                          {index + 1 + currentPage * itemsPerPage}
+                        </TableCell>
+                        {columns.map((column) => (
+                          <TableCell
+                            key={column}
+                            className={
+                              numericColumns[column]
+                                ? "text-right"
+                                : "text-center"
+                            }
+                          >
+                            {numericColumns[column] &&
+                            !isNaN(Number(item[column]))
+                              ? formatNumber(item[column])
+                              : item[column]}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           )}
-        </div>
 
-        <div className="p-4 border-t">
-          <ReactPaginate
-            previousLabel={"Previous"}
-            nextLabel={"Next"}
-            breakLabel={"..."}
-            pageCount={pageCount}
-            marginPagesDisplayed={2}
-            pageRangeDisplayed={5}
-            onPageChange={handlePageClick}
-            containerClassName={"flex justify-center mt-4 space-x-1"}
-            pageClassName={"px-3 py-1 rounded border hover:bg-gray-100"}
-            previousClassName={"px-3 py-1 rounded border hover:bg-gray-100"}
-            nextClassName={"px-3 py-1 rounded border hover:bg-gray-100"}
-            breakClassName={"px-3 py-1"}
-            activeClassName={"bg-blue-500 text-white"}
-          />
-        </div>
-      </div>
-    </div>
+          {/* Pagination moved outside the table component */}
+        </ModalBody>
+
+        <ModalFooter>
+          {totalData > 0 && (
+            <div className="flex justify-between items-center gap-8">
+              <div className="flex text-sm">
+                Total Baris: {numeral(totalData).format("0,0")}, Halaman:{" "}
+                {currentPage + 1} dari {pageCount}
+              </div>
+              <Pagination
+                total={pageCount}
+                initialPage={currentPage + 1}
+                onChange={handlePageChange}
+                showControls
+                size="sm"
+              />
+              <Button
+                color="danger"
+                variant="light"
+                onPress={onClose}
+                startContent={<X size={16} />}
+              >
+                Tutup
+              </Button>
+            </div>
+          )}
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 };
 
