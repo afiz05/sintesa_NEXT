@@ -150,32 +150,54 @@ export const MyContextProvider = ({ children }) => {
   axiosJWT.interceptors.request.use(
     async (config) => {
       const currentTime = Date.now() / 1000;
+
+      // 1. Check if the token is expired
       if (expire < currentTime && localStorage.getItem("status")) {
-        const response = await axios.get(process.env.NEXT_PUBLIC_REFRESH_TOKEN);
-        config.headers.Authorization = `Bearer ${response.data.accessToken}`;
-        setToken(response.data.accessToken);
-        const decoded = jwtDecode(decryptData(response.data.accessToken));
-        // console.log(decoded);
-        setTelp(decoded.telp);
-        setName(decoded.name);
-        setExpire(decoded.exp);
-        setstatusLogin(true);
-        setRole(decoded.role);
-        setKdkanwil(decoded.kdkanwil);
-        setKdkppn(decoded.kdkppn);
-        setKdlokasi(decoded.kdlokasi);
-        setActive(decoded.active);
-        setDeptlimit(decoded.dept_limit);
-        setNmrole(decoded.namarole);
-        setIduser(decoded.userId);
-        setUrl(decoded.url);
-        setUsername(decoded.username);
-        setMode(decoded.mode);
-        setTampil(decoded.tampil);
-        setTampilverify(decoded.tampilverify);
-        setSession(decoded.session);
-        setVerified(decoded.verified);
+        try {
+          // If expired, get a new token
+          const response = await axios.get(
+            process.env.NEXT_PUBLIC_REFRESH_TOKEN
+          );
+          const newAccessToken = response.data.accessToken;
+
+          // Update the token in the context state
+          setToken(newAccessToken);
+
+          // Decode and update all user details in the context
+          const decoded = jwtDecode(decryptData(newAccessToken));
+          setName(decoded.name);
+          setExpire(decoded.exp);
+          setstatusLogin(true);
+          setRole(decoded.role);
+          setKdkanwil(decoded.kdkanwil);
+          setKdkppn(decoded.kdkppn);
+          setKdlokasi(decoded.kdlokasi);
+          setActive(decoded.active);
+          setDeptlimit(decoded.dept_limit);
+          setNmrole(decoded.namarole);
+          setIduser(decoded.userId);
+          setUrl(decoded.url);
+          setUsername(decoded.username);
+          setMode(decoded.mode);
+          setTampil(decoded.tampil);
+          setTampilverify(decoded.tampilverify);
+          setSession(decoded.session);
+          setVerified(decoded.verified);
+          setTelp(decoded.telp);
+
+          // 2. Set the header for the current request with the NEW token
+          config.headers.Authorization = `Bearer ${newAccessToken}`;
+        } catch (error) {
+          // Handle token refresh failure (e.g., redirect to login)
+          console.error("Failed to refresh token", error);
+          logout(); // Or handle the error as you see fit
+          return Promise.reject(error);
+        }
+      } else {
+        // 3. If token is NOT expired, set the header with the CURRENT token
+        config.headers.Authorization = `Bearer ${token}`;
       }
+
       return config;
     },
     (error) => {

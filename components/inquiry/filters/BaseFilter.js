@@ -213,6 +213,15 @@ class BaseFilter {
 
     return result;
   }
+
+  getEmptyResult() {
+    return {
+      columns: [],
+      joinClause: "",
+      whereConditions: [],
+      groupBy: [],
+    };
+  }
 }
 
 export default BaseFilter;
