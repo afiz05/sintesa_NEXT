@@ -1,16 +1,32 @@
 import React from "react";
 import { Button, Input, Select, SelectItem } from "@heroui/react";
-import Kddept from "../../../referensi_belanja/Kddept";
+import Kddept from "../../../referensi_belanja/referensi_inquiryMod/Kddept";
 import { Building } from "lucide-react";
 
-const KementerianFilter = ({ inquiryState, onFilterChange, status }) => {
-  // State for all filter fields
-  const [dept, setDept] = React.useState("000"); // Default to 'Semua Kementerian' (000)
-  const [deptkondisi, setDeptkondisi] = React.useState(""); // Masukkan Kondisi
-  const [katadept, setKatadept] = React.useState(""); // Mengandung Kata
-  const [deptradio, setDeptradio] = React.useState("1"); // Select value: "1", "2", "3", "4"
+const KementerianFilter = ({ inquiryState, status }) => {
+  // Use inquiryState for dept, deptradio, deptkondisi, katadept
+  const {
+    dept,
+    setDept,
+    deptradio,
+    setDeptradio,
+    deptkondisi,
+    setDeptkondisi,
+    katadept,
+    setKatadept,
+  } = inquiryState || {};
 
-  // Options for select (radio replacement)
+  // Determine which filter type is currently active (priority order)
+  const hasKataFilter = katadept && katadept.trim() !== "";
+  const hasKondisiFilter = deptkondisi && deptkondisi.trim() !== "";
+  const hasPilihFilter =
+    dept && dept !== "XXX" && dept !== "000" && dept !== "XX";
+
+  // Disable other inputs based on active filter
+  const isKddeptDisabled = hasKataFilter || hasKondisiFilter;
+  const isKondisiDisabled = hasKataFilter || hasPilihFilter;
+  const isKataDisabled = hasKondisiFilter || hasPilihFilter;
+
   const KementerianOptions = [
     { value: "1", label: "Kode" },
     { value: "2", label: "Kode Uraian" },
@@ -18,17 +34,6 @@ const KementerianFilter = ({ inquiryState, onFilterChange, status }) => {
     { value: "4", label: "Jangan Tampilkan" },
   ];
 
-  // Notify parent or query generator whenever any filter changes
-  React.useEffect(() => {
-    if (onFilterChange) {
-      onFilterChange({
-        dept,
-        deptkondisi,
-        katadept,
-        deptradio,
-      });
-    }
-  }, [dept, deptkondisi, katadept, deptradio, onFilterChange]);
   return (
     <div className="w-full p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-red-100 to-amber-100 shadow-sm">
       {/* Mobile/Tablet: Stack vertically, Desktop: Row layout */}
@@ -45,68 +50,132 @@ const KementerianFilter = ({ inquiryState, onFilterChange, status }) => {
             {" "}
             {/* Kddept */}
             <div className="flex flex-col gap-1 w-full xl:flex-1 min-w-0 max-w-full overflow-hidden">
-              <label className="text-sm font-medium text-gray-700">
-                Pilih Kementerian
-              </label>
+              <div className="flex items-center justify-between">
+                <label
+                  className={`text-sm font-medium ${
+                    isKddeptDisabled ? "text-gray-400" : "text-gray-700"
+                  }`}
+                >
+                  Pilih Kementerian
+                </label>
+                {hasPilihFilter && !isKddeptDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onPress={() => setDept && setDept("000")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Kddept
                 value={dept}
                 onChange={setDept}
                 className="w-full min-w-0 max-w-full"
                 size="sm"
                 status={status}
+                isDisabled={isKddeptDisabled}
               />
             </div>
             {/* Kondisi */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
-              <label className="text-sm font-medium text-gray-700">
-                Masukkan Kondisi
-              </label>
+              <div className="flex items-center justify-between">
+                <label
+                  className={`text-sm font-medium ${
+                    isKondisiDisabled ? "text-gray-400" : "text-gray-700"
+                  }`}
+                >
+                  Masukkan Kondisi
+                </label>
+                {hasKondisiFilter && !isKondisiDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onPress={() => setDeptkondisi && setDeptkondisi("")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Input
                 placeholder="misalkan: 001,002,003, dst"
                 className="w-full min-w-0"
                 size="sm"
-                value={deptkondisi}
-                onChange={(e) => setDeptkondisi(e.target.value)}
+                value={deptkondisi || ""}
+                isDisabled={isKondisiDisabled}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setDeptkondisi && setDeptkondisi(value);
+                }}
               />
               {/* Helper text - show immediately below on mobile */}
-              <p className="text-xs text-gray-500 xl:hidden">
+              <p
+                className={`text-xs xl:hidden ${
+                  isKondisiDisabled ? "text-gray-400" : "text-gray-500"
+                }`}
+              >
                 untuk banyak kode pisahkan dengan koma, gunakan tanda ! di depan
                 untuk exclude
               </p>
             </div>
             {/* Kata */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
-              <label className="text-sm font-medium text-gray-700">
-                Mengandung Kata
-              </label>
+              <div className="flex items-center justify-between">
+                <label
+                  className={`text-sm font-medium ${
+                    isKataDisabled ? "text-gray-400" : "text-gray-700"
+                  }`}
+                >
+                  Mengandung Kata
+                </label>
+                {hasKataFilter && !isKataDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onPress={() => setKatadept && setKatadept("")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Input
                 placeholder="misalkan: keuangan"
                 className="w-full min-w-0"
                 size="sm"
-                value={katadept}
-                onChange={(e) => setKatadept(e.target.value)}
+                value={katadept || ""}
+                isDisabled={isKataDisabled}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setKatadept && setKatadept(value);
+                }}
               />
             </div>
             {/* Jenis Tampilan */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
               <label className="text-sm font-medium text-gray-700">
                 Jenis Tampilan
-              </label>
+              </label>{" "}
               <Select
                 aria-label="Pilih tampilan"
                 className="w-full min-w-0"
                 size="sm"
-                selectedKeys={[deptradio]}
+                selectedKeys={[deptradio || "1"]}
                 onSelectionChange={(key) => {
                   let selected = key;
                   if (key && typeof key !== "string" && key.size) {
                     selected = Array.from(key)[0];
                   }
                   if (!selected) {
-                    setDeptradio("1");
+                    setDeptradio && setDeptradio("1");
                     return;
                   }
-                  setDeptradio(selected);
+                  setDeptradio && setDeptradio(selected);
                 }}
                 disallowEmptySelection
               >
@@ -124,7 +193,11 @@ const KementerianFilter = ({ inquiryState, onFilterChange, status }) => {
             <div className="flex-1"></div>
             {/* Helper text under Kondisi */}
             <div className="flex-1">
-              <p className="text-xs text-gray-500">
+              <p
+                className={`text-xs ${
+                  isKondisiDisabled ? "text-gray-400" : "text-gray-500"
+                }`}
+              >
                 untuk banyak kode pisahkan dengan koma, gunakan tanda ! di depan
                 untuk exclude
               </p>

@@ -1,17 +1,31 @@
 import React from "react";
-import { Input, Select, SelectItem } from "@heroui/react";
+import { Button, Input, Select, SelectItem } from "@heroui/react";
 import { Layers } from "lucide-react";
-import Kdunit from "../../../referensi_belanja/Kdunit";
+import Kdunit from "../../../referensi_belanja/referensi_inquiryMod/Kdunit";
 
-const UnitFilter = ({ inquiryState, onFilterChange }) => {
-  // Get the selected department from the parent state to filter the unit list
-  const { dept } = inquiryState;
+const UnitFilter = ({ inquiryState }) => {
+  // Use inquiryState for unit values and dept dependency
+  const {
+    dept, // Get dept to filter unit list
+    kdunit: unit, // Use kdunit from shared state
+    setKdunit: setUnit,
+    unitkondisi,
+    setUnitkondisi,
+    kataunit,
+    setKataunit,
+    unitradio,
+    setUnitradio,
+  } = inquiryState || {};
 
-  // Local state for all fields within this filter component
-  const [unit, setUnit] = React.useState("XX"); // Default to 'Semua Unit'
-  const [unitkondisi, setUnitkondisi] = React.useState(""); // Masukkan Kondisi
-  const [kataunit, setKataunit] = React.useState(""); // Mengandung Kata
-  const [unitradio, setUnitradio] = React.useState("1"); // Select value: "1", "2", "3", "4"
+  // Determine which filter type is currently active (priority order)
+  const hasKataFilter = kataunit && kataunit.trim() !== "";
+  const hasKondisiFilter = unitkondisi && unitkondisi.trim() !== "";
+  const hasPilihFilter = unit && unit !== "XXX" && unit !== "XX";
+
+  // Disable other inputs based on active filter
+  const isKdunitDisabled = hasKataFilter || hasKondisiFilter;
+  const isKondisiDisabled = hasKataFilter || hasPilihFilter;
+  const isKataDisabled = hasKondisiFilter || hasPilihFilter;
 
   // 4 display options, matching KementerianFilter
   const UnitOptions = [
@@ -21,22 +35,12 @@ const UnitFilter = ({ inquiryState, onFilterChange }) => {
     { value: "4", label: "Jangan Tampilkan" },
   ];
 
-  // Notify parent or query generator whenever any filter changes
-  React.useEffect(() => {
-    if (onFilterChange) {
-      onFilterChange({
-        unit,
-        unitkondisi,
-        kataunit,
-        unitradio,
-      });
-    }
-  }, [unit, unitkondisi, kataunit, unitradio, onFilterChange]);
-
   // When the department changes, reset the selected unit to "Semua Unit"
   React.useEffect(() => {
-    setUnit("XX");
-  }, [dept]);
+    if (setUnit) {
+      setUnit("XX");
+    }
+  }, [dept, setUnit]);
 
   return (
     <div className="w-full p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-orange-100 to-yellow-100 shadow-sm">
@@ -54,9 +58,26 @@ const UnitFilter = ({ inquiryState, onFilterChange }) => {
           <div className="flex flex-col xl:flex xl:flex-row xl:items-end gap-3 xl:gap-4 w-full">
             {/* Kdunit */}
             <div className="flex flex-col gap-1 w-full xl:flex-1 min-w-0 max-w-full overflow-hidden">
-              <label className="text-sm font-medium text-gray-700">
-                Pilih Eselon I
-              </label>
+              <div className="flex items-center justify-between">
+                <label
+                  className={`text-sm font-medium ${
+                    isKdunitDisabled ? "text-gray-400" : "text-gray-700"
+                  }`}
+                >
+                  Pilih Eselon I
+                </label>
+                {hasPilihFilter && !isKdunitDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onPress={() => setUnit && setUnit("XX")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Kdunit
                 value={unit}
                 onChange={setUnit} // The refactored Kdunit passes the value directly
@@ -64,23 +85,48 @@ const UnitFilter = ({ inquiryState, onFilterChange }) => {
                 className="w-full min-w-0 max-w-full"
                 size="sm"
                 status="pilihunit"
+                isDisabled={isKdunitDisabled}
               />
             </div>
 
             {/* Kondisi */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
-              <label className="text-sm font-medium text-gray-700">
-                Masukkan Kondisi
-              </label>
+              <div className="flex items-center justify-between">
+                <label
+                  className={`text-sm font-medium ${
+                    isKondisiDisabled ? "text-gray-400" : "text-gray-700"
+                  }`}
+                >
+                  Masukkan Kondisi
+                </label>
+                {hasKondisiFilter && !isKondisiDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onPress={() => setUnitkondisi && setUnitkondisi("")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Input
                 placeholder="misalkan: 01,02,03, dst"
                 className="w-full min-w-0"
                 size="sm"
-                value={unitkondisi}
-                onChange={(e) => setUnitkondisi(e.target.value)}
+                value={unitkondisi || ""}
+                isDisabled={isKondisiDisabled}
+                onChange={(e) =>
+                  setUnitkondisi && setUnitkondisi(e.target.value)
+                }
               />
               {/* Helper text - show immediately below on mobile */}
-              <p className="text-xs text-gray-500 xl:hidden">
+              <p
+                className={`text-xs xl:hidden ${
+                  isKondisiDisabled ? "text-gray-400" : "text-gray-500"
+                }`}
+              >
                 untuk banyak kode pisahkan dengan koma, gunakan tanda ! di depan
                 untuk exclude
               </p>
@@ -88,15 +134,33 @@ const UnitFilter = ({ inquiryState, onFilterChange }) => {
 
             {/* Kata */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
-              <label className="text-sm font-medium text-gray-700">
-                Mengandung Kata
-              </label>
+              <div className="flex items-center justify-between">
+                <label
+                  className={`text-sm font-medium ${
+                    isKataDisabled ? "text-gray-400" : "text-gray-700"
+                  }`}
+                >
+                  Mengandung Kata
+                </label>
+                {hasKataFilter && !isKataDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onPress={() => setKataunit && setKataunit("")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Input
                 placeholder="misalkan: sekretariat"
                 className="w-full min-w-0"
                 size="sm"
-                value={kataunit}
-                onChange={(e) => setKataunit(e.target.value)}
+                value={kataunit || ""}
+                isDisabled={isKataDisabled}
+                onChange={(e) => setKataunit && setKataunit(e.target.value)}
               />
             </div>
 
@@ -109,17 +173,13 @@ const UnitFilter = ({ inquiryState, onFilterChange }) => {
                 aria-label="Pilih tampilan"
                 className="w-full min-w-0"
                 size="sm"
-                selectedKeys={[unitradio]}
-                onSelectionChange={(key) => {
-                  let selected = key;
-                  if (key && typeof key !== "string" && key.size) {
-                    selected = Array.from(key)[0];
+                selectedKeys={new Set([unitradio || "1"])}
+                onSelectionChange={(keys) => {
+                  // HeroUI Select passes a Set object
+                  const selected = Array.from(keys)[0];
+                  if (selected && setUnitradio) {
+                    setUnitradio(selected);
                   }
-                  if (!selected) {
-                    setUnitradio("1");
-                    return;
-                  }
-                  setUnitradio(selected);
                 }}
                 disallowEmptySelection
               >
@@ -138,7 +198,11 @@ const UnitFilter = ({ inquiryState, onFilterChange }) => {
             <div className="flex-1"></div>
             {/* Helper text under Kondisi */}
             <div className="flex-1">
-              <p className="text-xs text-gray-500">
+              <p
+                className={`text-xs ${
+                  isKondisiDisabled ? "text-gray-400" : "text-gray-500"
+                }`}
+              >
                 untuk banyak kode pisahkan dengan koma, gunakan tanda ! di depan
                 untuk exclude
               </p>

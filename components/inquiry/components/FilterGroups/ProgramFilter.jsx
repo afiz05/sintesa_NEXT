@@ -1,75 +1,195 @@
-import React from "react";
-import { Radio } from "@heroui/react";
-import Kdgiat from "../../../referensi_belanja/Kdgiat";
-import Kdoutput from "../../../referensi_belanja/Kdoutput";
+import React, { useState, useEffect } from "react";
+import {Button, Input, Select, SelectItem} from "@heroui/react";
+import { Settings } from "lucide-react";
+import Kdprogram from "../../../referensi_belanja/referensi_inquiryMod/Kdprogram";
+import { getFilteredPrograms } from "../../utils/filterUtils";
 
-const ProgramFilter = ({ inquiryState }) => {
+const ProgramFilter = ({ inquiryState, type = "program" }) => {
+  // Get different states based on type (program vs activity)
+  const getFilterStates = () => {
+    if (type === "activity") {
+      return {
+        value: inquiryState?.giat,
+        setValue: inquiryState?.setGiat,
+        kondisi: inquiryState?.giatkondisi,
+        setKondisi: inquiryState?.setGiatkondisi,
+        kata: inquiryState?.katagiat,
+        setKata: inquiryState?.setKatagiat,
+        radio: inquiryState?.kegiatanradio,
+        setRadio: inquiryState?.setKegiatanradio,
+        filterProps: {
+          kddept: inquiryState?.dept,
+          kdunit: inquiryState?.kdunit,
+          kdprogram: inquiryState?.program,
+        },
+        title: "Kegiatan",
+        label: "Pilih Kegiatan",
+      };
+    } else {
+      return {
+        value: inquiryState?.program,
+        setValue: inquiryState?.setProgram,
+        kondisi: inquiryState?.programkondisi,
+        setKondisi: inquiryState?.setProgramkondisi,
+        kata: inquiryState?.kataprogram,
+        setKata: inquiryState?.setKataprogram,
+        radio: inquiryState?.programradio,
+        setRadio: inquiryState?.setProgramradio,
+        filterProps: {
+          kddept: inquiryState?.dept,
+          kdunit: inquiryState?.kdunit,
+        },
+        title: "Program",
+        label: "Pilih Program",
+      };
+    }
+  };
+
   const {
-    giat,
-    setGiat,
-    output,
-    setOutput,
-    kddept,
-    kdunit,
-    program, // For filtering activities
-    kegiatanradio,
-    setKegiatanradio,
-  } = inquiryState;
+    value,
+    setValue,
+    kondisi,
+    setKondisi,
+    kata,
+    setKata,
+    radio,
+    setRadio,
+    filterProps,
+    title,
+    label,
+  } = getFilterStates();
+
+  // State for filtered data
+  const [filteredData, setFilteredData] = useState([]);
+
+  // Update filtered data when parent filters change
+  useEffect(() => {
+    if (type === "program") {
+      const filtered = getFilteredPrograms(
+        filterProps.kddept,
+        filterProps.kdunit
+      );
+      setFilteredData(filtered);
+    }
+  }, [type, filterProps.kddept, filterProps.kdunit]);
+
+  // When parent filters change, reset child selection
+  React.useEffect(() => {
+    if (setValue) {
+      setValue("XX");
+    }
+  }, [filterProps.kddept, filterProps.kdunit, filterProps.kdprogram, setValue]);
+
+  const ProgramOptions = [
+    { value: "1", label: "Kode" },
+    { value: "2", label: "Kode Uraian" },
+    { value: "3", label: "Uraian" },
+    { value: "4", label: "Jangan Tampilkan" },
+  ];
 
   return (
-    <div className="border p-4 rounded-md">
-      <h6 className="font-semibold mb-3">Activity & Output Filter</h6>
+    <div className="w-full p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-blue-100 to-cyan-100 shadow-sm">
+      {/* Mobile/Tablet: Stack vertically, Desktop: Row layout */}
+      <div className="flex flex-col lg:flex-row lg:items-center gap-4 w-full">
+        {/* Title - Full width on mobile, fixed width on desktop */}
+        <h6 className="font-semibold flex items-center gap-2 lg:min-w-[100px] lg:flex-[2]">
+          <Settings size={18} className="text-primary" />
+          {title}
+        </h6>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        {/* Activity Selection */}
-        <div>
-          <label className="block text-sm font-medium mb-2">Activity</label>
-          <Kdgiat
-            kdgiat={giat}
-            onChange={setGiat}
-            kddept={kddept}
-            kdunit={kdunit}
-            kdprogram={program}
-            status={"pilihgiat"}
-            className="w-full p-2 border rounded"
-          />
-        </div>
+        {/* Form fields container */}
+        <div className="flex flex-col lg:flex-[8] gap-3 lg:gap-1 w-full">
+          {/* Fields: Stack on mobile/tablet, row on large desktop */}
+          <div className="flex flex-col xl:flex xl:flex-row xl:items-end gap-3 xl:gap-4 w-full">
+            {/* Selection Component */}
+            <div className="flex flex-col gap-1 w-full xl:flex-1 min-w-0 max-w-full overflow-hidden">
+              <label className="text-sm font-medium text-gray-700">
+                {label}
+              </label>
+              <Kdprogram
+                value={value}
+                onChange={setValue}
+                {...filterProps}
+                className="w-full min-w-0 max-w-full"
+                size="sm"
+                placeholder={label}
+                status={type === "activity" ? "pilihgiat" : "pilihprogram"}
+              />
+            </div>
 
-        {/* Output Selection */}
-        <div>
-          <label className="block text-sm font-medium mb-2">Output</label>
-          <Kdoutput
-            value={output}
-            onChange={(e) => setOutput(e.target.value)}
-            kdgiat={giat}
-            className="w-full p-2 border rounded"
-          />
-        </div>
-      </div>
+            {/* Kondisi */}
+            <div className="flex flex-col gap-1 w-full xl:flex-1">
+              <label className="text-sm font-medium text-gray-700">
+                Masukkan Kondisi
+              </label>
+              <Input
+                placeholder="misalkan: 001,002,003, dst"
+                className="w-full min-w-0"
+                size="sm"
+                value={kondisi || ""}
+                onChange={(e) => setKondisi && setKondisi(e.target.value)}
+              />
+              {/* Helper text - show immediately below on mobile */}
+              <p className="text-xs text-gray-500 xl:hidden">
+                untuk banyak kode pisahkan dengan koma, gunakan tanda ! di depan
+                untuk exclude
+              </p>
+            </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div className="flex items-center">
-          <Radio
-            id="kegiatan-radio-1"
-            name="kegiatan-display"
-            checked={kegiatanradio === "1"}
-            onChange={() => setKegiatanradio("1")}
-          />
-          <label htmlFor="kegiatan-radio-1" className="ml-2">
-            Show Code & Description
-          </label>
-        </div>
+            {/* Kata */}
+            <div className="flex flex-col gap-1 w-full xl:flex-1">
+              <label className="text-sm font-medium text-gray-700">
+                Mengandung Kata
+              </label>
+              <Input
+                placeholder="misalkan: pendidikan"
+                className="w-full min-w-0"
+                size="sm"
+                value={kata || ""}
+                onChange={(e) => setKata && setKata(e.target.value)}
+              />
+            </div>
 
-        <div className="flex items-center">
-          <Radio
-            id="kegiatan-radio-2"
-            name="kegiatan-display"
-            checked={kegiatanradio === "2"}
-            onChange={() => setKegiatanradio("2")}
-          />
-          <label htmlFor="kegiatan-radio-2" className="ml-2">
-            Show Description Only
-          </label>
+            {/* Jenis Tampilan */}
+            <div className="flex flex-col gap-1 w-full xl:flex-1">
+              <label className="text-sm font-medium text-gray-700">
+                Jenis Tampilan
+              </label>
+              <Select
+                selectedKeys={radio ? [radio] : ["1"]}
+                onSelectionChange={(keys) => {
+                  const selected = Array.from(keys)[0];
+                  if (setRadio) {
+                    setRadio(selected);
+                  }
+                }}
+                disallowEmptySelection
+              >
+                {ProgramOptions.map((opt) => (
+                  <SelectItem key={opt.value} textValue={opt.label}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </Select>
+            </div>
+          </div>
+
+          {/* Helper text row - only show on extra large screens */}
+          <div className="hidden xl:flex xl:flex-row gap-4 w-full">
+            {/* Spacer for Selection */}
+            <div className="flex-1"></div>
+            {/* Helper text under Kondisi */}
+            <div className="flex-1">
+              <p className="text-xs text-gray-500">
+                untuk banyak kode pisahkan dengan koma, gunakan tanda ! di depan
+                untuk exclude
+              </p>
+            </div>
+            {/* Spacer for Kata */}
+            <div className="flex-1"></div>
+            {/* Spacer for Jenis Tampilan */}
+            <div className="flex-1"></div>
+          </div>
         </div>
       </div>
     </div>

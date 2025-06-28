@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import {
   Modal,
   ModalContent,
@@ -12,7 +12,21 @@ import {
   Spinner,
   Divider,
 } from "@heroui/react";
-import { X, FileSpreadsheet, FileText, Download } from "lucide-react";
+import {
+  X,
+  FileSpreadsheet,
+  FileText,
+  Download,
+  FileType2,
+  FileSignature,
+} from "lucide-react";
+import {
+  exportToJSON,
+  exportToText,
+  exportToExcel,
+  exportToPDF,
+} from "../../exportUtils";
+
 // Assuming useToast is correctly imported and available in your project setup.
 // import { useToast } from "../../../../components/context/ToastContext";
 
@@ -24,115 +38,50 @@ const useToast = () => ({
   },
 });
 
-const ExportModal = ({ isOpen, onClose, data, filename = "data_export" }) => {
-  const [exportFormat, setExportFormat] = useState("csv");
-  const [loading, setLoading] = useState(false);
-  const { showToast } = useToast();
-
+const ExportModal = ({
+  showModalPDF, // boolean: open/close state
+  setShowModalPDF, // function: set modal open/close
+  selectedFormat,
+  setSelectedFormat,
+  fetchExportData, // <-- async function to fetch latest data
+  filename = "data_export",
+  loading,
+}) => {
+  // Handler for export button
   const handleExport = async () => {
-    if (!data || data.length === 0) {
-      showToast("Tidak ada data untuk diekspor", "error");
-      return;
-    }
-
-    setLoading(true);
-
     try {
-      if (exportFormat === "csv") {
-        exportToCSV();
-      } else if (exportFormat === "excel") {
-        // Note: For a true Excel (.xlsx) export, you would typically need a library
-        // This currently just exports a CSV that Excel can open.
-        exportToExcel();
-      } else if (exportFormat === "json") {
-        exportToJSON();
+      const exportData = await fetchExportData();
+      if (!exportData || exportData.length === 0) return;
+      switch (selectedFormat) {
+        case "pdf":
+          await exportToPDF(exportData, `${filename}.pdf`);
+          break;
+        case "excel":
+          await exportToExcel(exportData, `${filename}.xlsx`);
+          break;
+        case "json":
+          exportToJSON(exportData, `${filename}.json`);
+          break;
+        case "text":
+          exportToText(exportData, `${filename}.txt`);
+          break;
+        default:
+          break;
       }
-
-      showToast(
-        `Data berhasil diekspor ke format ${exportFormat.toUpperCase()}`,
-        "success"
-      );
-      onClose();
-    } catch (error) {
-      console.error("Export error:", error);
-      showToast(`Gagal mengekspor data: ${error.message}`, "error");
-    } finally {
-      setLoading(false);
+      setShowModalPDF(false); // Only close after export completes
+    } catch (e) {
+      // Optionally show a toast or error
+      console.error("Export failed", e);
     }
-  };
-
-  const exportToCSV = () => {
-    if (!data || data.length === 0) return; // Defensive check
-
-    // Get headers from the first object
-    const headers = Object.keys(data[0]);
-
-    // Convert data to CSV format
-    let csvContent = headers.map((header) => `"${header}"`).join(",") + "\n"; // Quote headers too
-
-    data.forEach((item) => {
-      const row = headers.map((header) => {
-        // Handle values that need quotes (strings with commas, quotes, or newlines)
-        const cell =
-          item[header] === null || item[header] === undefined
-            ? ""
-            : String(item[header]);
-        // FIX: Escaped double quote here
-        if (cell.includes(",") || cell.includes('"') || cell.includes("\n")) {
-          return `"${cell.replace(/"/g, '""')}"`;
-        }
-        return cell;
-      });
-      csvContent += row.join(",") + "\n";
-    });
-
-    // Create a Blob and download
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `${filename}.csv`);
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url); // Clean up the object URL
-  };
-
-  const exportToExcel = () => {
-    // For Excel export, this implementation still uses CSV, which Excel can open.
-    // For a native .xlsx file, you would integrate a library like 'xlsx' or 'exceljs'.
-    // Example (conceptual, requires library installation):
-    /*
-    import * as XLSX from 'xlsx';
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-    XLSX.writeFile(wb, `${filename}.xlsx`);
-    */
-    showToast(
-      "Exporting to Excel (as CSV compatible). For full .xlsx, a library is needed.",
-      "info"
-    );
-    exportToCSV(); // Fallback to CSV for Excel compatibility
-  };
-
-  const exportToJSON = () => {
-    const jsonContent = JSON.stringify(data, null, 2);
-    const blob = new Blob([jsonContent], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `${filename}.json`);
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url); // Clean up the object URL
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="sm" scrollBehavior="inside">
+    <Modal
+      isOpen={showModalPDF}
+      onClose={() => setShowModalPDF(false)}
+      size="sm"
+      scrollBehavior="inside"
+    >
       <ModalContent>
         <ModalHeader className="flex justify-between items-center">
           <div className="text-lg font-semibold flex items-center">
@@ -140,76 +89,64 @@ const ExportModal = ({ isOpen, onClose, data, filename = "data_export" }) => {
             Ekspor Data
           </div>
         </ModalHeader>
-
         <ModalBody>
           <div className="space-y-4">
             <p className="text-sm text-gray-600">
               Pilih format file untuk mengekspor data:
             </p>
-
             <RadioGroup
-              value={exportFormat}
-              onValueChange={setExportFormat}
+              value={selectedFormat}
+              onValueChange={setSelectedFormat}
               orientation="vertical"
               className="gap-3"
             >
-              <Radio
-                value="csv"
-                description="Format yang kompatibel dengan sebagian besar aplikasi spreadsheet"
-              >
+              <Radio value="pdf">
                 <div className="flex items-center">
-                  <FileText className="mr-2 text-green-600" size={18} />
-                  <span>CSV (Comma Separated Values)</span>
+                  <FileSignature className="mr-2 text-red-600" size={18} />
+                  <span>PDF</span>
                 </div>
               </Radio>
-
-              <Radio
-                value="excel"
-                description="Format Microsoft Excel yang umum digunakan"
-              >
+              <Radio value="excel">
                 <div className="flex items-center">
                   <FileSpreadsheet className="mr-2 text-green-600" size={18} />
                   <span>Excel (.xlsx)</span>
                 </div>
               </Radio>
-
-              <Radio
-                value="json"
-                description="Format data terstruktur untuk pengembang"
-              >
+              <Radio value="json">
                 <div className="flex items-center">
                   <FileText className="mr-2 text-blue-600" size={18} />
                   <span>JSON</span>
                 </div>
               </Radio>
+              <Radio value="text">
+                <div className="flex items-center">
+                  <FileType2 className="mr-2 text-gray-600" size={18} />
+                  <span>Text (.txt)</span>
+                </div>
+              </Radio>
             </RadioGroup>
-
             <Divider className="my-2" />
-
             <div className="text-xs text-gray-500">
-              <p>Total data: {data?.length || 0} baris</p>
               <p>
-                Nama file: {filename}.{exportFormat}
+                Nama file: {filename}.{selectedFormat}
               </p>
             </div>
           </div>
         </ModalBody>
-
         <ModalFooter className="flex justify-between">
           <Button
             color="danger"
             variant="light"
-            onPress={onClose}
+            onPress={() => setShowModalPDF(false)}
             disabled={loading}
             startContent={<X size={16} />}
           >
             Batal
           </Button>
-
           <Button
             color="primary"
             onPress={handleExport}
-            disabled={loading || !data || data.length === 0}
+            disabled={loading}
             startContent={
               loading ? <Spinner size="sm" /> : <Download size={16} />
             }

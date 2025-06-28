@@ -30,11 +30,11 @@ export default function useInquiryState() {
 
   // Form states
   const [jenlap, setJenlap] = useState("2");
-  const [thang, setThang] = useState(new Date().getFullYear());
+  const [thang, setThang] = useState(new Date().getFullYear().toString());
   const [tanggal, setTanggal] = useState(false);
-  const [cutoff, setCutoff] = useState("12");
+  const [cutoff, setCutoff] = useState("0");
   const [pembulatan, setPembulatan] = useState("1");
-  const [akumulatif, setAkumulatif] = useState(false);
+  const [akumulatif, setAkumulatif] = useState("0");
   const [selectedFormat, setSelectedFormat] = useState("pdf");
   const [export2, setExport2] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState(false);
@@ -44,7 +44,7 @@ export default function useInquiryState() {
   const [kddept, setKddept] = useState(true);
   const [unit, setUnit] = useState(false);
   const [kddekon, setKddekon] = useState(false);
-  const [kdprov, setKdprov] = useState(false);
+  const [kdlokasi, setKdlokasi] = useState(false);
   const [kdkabkota, setKdkabkota] = useState(false);
   const [kdkanwil, setKdkanwil] = useState(false);
   const [kdkppn, setKdkppn] = useState(false);
@@ -55,28 +55,84 @@ export default function useInquiryState() {
   const [kdgiat, setKdgiat] = useState(false);
   const [kdoutput, setKdoutput] = useState(false);
   const [kdsoutput, setKdsoutput] = useState(false);
+  const [kdkomponen, setKdkomponen] = useState(false);
+  const [kdskomponen, setKdskomponen] = useState(false);
   const [kdakun, setKdakun] = useState(false);
   const [kdsdana, setKdsdana] = useState(false);
   const [kdregister, setKdregister] = useState(false);
 
+  // Special filter switches
+  const [kdInflasi, setKdInflasi] = useState(false);
+  const [kdIkn, setKdIkn] = useState(false);
+  const [kdKemiskinan, setKdKemiskinan] = useState(false);
+  const [KdPRI, setKdPRI] = useState(false);
+  const [KdPangan, setKdPangan] = useState(false);
+  const [KdStunting, setKdStunting] = useState(false);
+  const [KdPemilu, setKdPemilu] = useState(false);
+  const [KdTema, setKdTema] = useState(false);
+  const [KdPN, setKdPN] = useState(false);
+  const [KdPP, setKdPP] = useState(false);
+  const [KdKegPP, setKdKegPP] = useState(false);
+  const [KdMP, setKdMP] = useState(false);
+
   // Filter values
   const [dept, setDept] = useState("000");
+  const [deptkondisi, setDeptkondisi] = useState(""); // NEW: for advanced Kementerian filter
+  const [katadept, setKatadept] = useState(""); // NEW: for advanced Kementerian filter
   const [kdunit, setKdunit] = useState("XX");
+  const [unitkondisi, setUnitkondisi] = useState(""); // NEW: for advanced Unit filter
+  const [kataunit, setKataunit] = useState(""); // NEW: for advanced Unit filter
   const [dekon, setDekon] = useState("XX");
+  const [dekonkondisi, setDekonkondisi] = useState(""); // NEW: for advanced Dekon filter
+  const [katadekon, setKatadekon] = useState(""); // NEW: for advanced Dekon filter
   const [prov, setProv] = useState("XX");
+  const [lokasikondisi, setLokasikondisi] = useState(""); // NEW: for advanced Lokasi filter
+  const [katalokasi, setKatalokasi] = useState(""); // NEW: for advanced Lokasi filter
   const [kabkota, setKabkota] = useState("XX");
+  const [kabkotakondisi, setKabkotakondisi] = useState(""); // NEW: for advanced Kabkota filter
+  const [katakabkota, setKatakabkota] = useState(""); // NEW: for advanced Kabkota filter
   const [kanwil, setKanwil] = useState("XX");
+  const [kanwilkondisi, setKanwilkondisi] = useState(""); // NEW: for advanced Kanwil filter
+  const [katakanwil, setKatakanwil] = useState(""); // NEW: for advanced Kanwil filter
   const [kppn, setKppn] = useState("XX");
+  const [kppnkondisi, setKppnkondisi] = useState(""); // NEW: for advanced KPPN filter
+  const [katakppn, setKatakppn] = useState(""); // NEW: for advanced KPPN filter
   const [satker, setSatker] = useState("XX");
+  const [satkerkondisi, setSatkerkondisi] = useState(""); // NEW: for advanced Satker filter
+  const [katasatker, setKatasatker] = useState(""); // NEW: for advanced Satker filter
   const [fungsi, setFungsi] = useState("XX");
+  const [fungsikondisi, setFungsikondisi] = useState(""); // NEW: for advanced Fungsi filter
+  const [katafungsi, setKatafungsi] = useState(""); // NEW: for advanced Fungsi filter
   const [sfungsi, setSfungsi] = useState("XX");
+  const [subfungsikondisi, setSubfungsikondisi] = useState(""); // NEW: for advanced Subfungsi filter
+  const [katasubfungsi, setKatasubfungsi] = useState(""); // NEW: for advanced Subfungsi filter
   const [program, setProgram] = useState("XX");
+  const [programkondisi, setProgramkondisi] = useState(""); // NEW: for advanced Program filter
+  const [kataprogram, setKataprogram] = useState(""); // NEW: for advanced Program filter
   const [giat, setGiat] = useState("XX");
+  const [giatkondisi, setGiatkondisi] = useState(""); // NEW: for advanced Giat filter
+  const [katagiat, setKatagiat] = useState(""); // NEW: for advanced Giat filter
   const [output, setOutput] = useState("XX");
+  const [outputkondisi, setOutputkondisi] = useState(""); // NEW: for advanced Output filter
+  const [kataoutput, setKataoutput] = useState(""); // NEW: for advanced Output filter
   const [soutput, setsOutput] = useState("XX");
-  const [akun, setAkun] = useState("XX");
+  const [soutputkondisi, setSoutputkondisi] = useState(""); // NEW: for advanced Soutput filter
+  const [katasoutput, setKatasoutput] = useState(""); // NEW: for advanced Soutput filter
+  const [komponen, setKomponen] = useState("XX");
+  const [komponenkondisi, setKomponenkondisi] = useState(""); // NEW: for advanced Komponen filter
+  const [katakomponen, setKatakomponen] = useState(""); // NEW: for advanced Komponen filter
+  const [skomponen, setSkomponen] = useState("XX");
+  const [skomponenkondisi, setSkomponenkondisi] = useState(""); // NEW: for advanced Subkomponen filter
+  const [kataskomponen, setKataskomponen] = useState(""); // NEW: for advanced Subkomponen filter
+  const [akun, setAkun] = useState("AKUN");
+  const [akunkondisi, setAkunkondisi] = useState(""); // NEW: for advanced Akun filter
+  const [kataakun, setKataakun] = useState(""); // NEW: for advanced Akun filter
   const [sdana, setSdana] = useState("XX");
+  const [sdanakondisi, setSdanakondisi] = useState(""); // NEW: for advanced Sdana filter
+  const [katasdana, setKatasdana] = useState(""); // NEW: for advanced Sdana filter
   const [register, setRegister] = useState("XX");
+  const [registerkondisi, setRegisterkondisi] = useState(""); // NEW: for advanced Register filter
+  const [kataregister, setKataregister] = useState(""); // NEW: for advanced Register filter
   const [PN, setPN] = useState("XX");
   const [PP, setPP] = useState("XX");
   const [KegPP, setKegPP] = useState("XX");
@@ -94,7 +150,7 @@ export default function useInquiryState() {
   const [deptradio, setDeptradio] = useState("1");
   const [unitradio, setUnitradio] = useState("1");
   const [dekonradio, setDekonradio] = useState("1");
-  const [provradio, setProvradio] = useState("1");
+  const [locradio, setLocradio] = useState("1"); // Changed from provradio to locradio
   const [kabkotaradio, setKabkotaradio] = useState("1");
   const [kanwilradio, setKanwilradio] = useState("1");
   const [kppnradio, setKppnradio] = useState("1");
@@ -105,9 +161,29 @@ export default function useInquiryState() {
   const [kegiatanradio, setKegiatanradio] = useState("1");
   const [outputradio, setOutputradio] = useState("1");
   const [soutputradio, setsOutputradio] = useState("1");
+  const [komponenradio, setKomponenradio] = useState("1");
+  const [skomponenradio, setSkomponenradio] = useState("1");
   const [akunradio, setAkunradio] = useState("1");
   const [sdanaradio, setSdanaradio] = useState("1");
   const [registerradio, setRegisterradio] = useState("1");
+  const [inflasiradio, setInflasiradio] = useState("1");
+  const [iknradio, setIknradio] = useState("1");
+  const [kemiskinanradio, setKemiskinanradio] = useState("1");
+  const [priradio, setPriradio] = useState("1");
+  const [panganradio, setPanganradio] = useState("1");
+  const [stuntingradio, setStuntingradio] = useState("1");
+  const [pemiluradio, setPemiluradio] = useState("1");
+  const [pnradio, setPnradio] = useState("1");
+  const [ppradio, setPpradio] = useState("1");
+  const [kegppradio, setKegppradio] = useState("1");
+  const [mpradio, setMpradio] = useState("1");
+  const [temaradio, setTemaradio] = useState("1");
+
+  // Special filter option states
+  const [opsidept, setOpsidept] = useState("pilihdept");
+  const [opsiInflasi, setOpsiInflasi] = useState("pilihInflasi");
+  const [opsiIkn, setOpsiIkn] = useState("pilihikn");
+  const [opsiKemiskinan, setOpsiKemiskinan] = useState("pilihKemiskinan");
 
   // SQL state
   const [sql, setSql] = useState("");
@@ -182,8 +258,8 @@ export default function useInquiryState() {
     setUnit,
     kddekon,
     setKddekon,
-    kdprov,
-    setKdprov,
+    kdlokasi,
+    setKdlokasi,
     kdkabkota,
     setKdkabkota,
     kdkanwil,
@@ -204,48 +280,156 @@ export default function useInquiryState() {
     setKdoutput,
     kdsoutput,
     setKdsoutput,
+    kdkomponen,
+    setKdkomponen,
+    kdskomponen,
+    setKdskomponen,
     kdakun,
     setKdakun,
     kdsdana,
     setKdsdana,
     kdregister,
     setKdregister,
+    kdInflasi,
+    setKdInflasi,
+    kdIkn,
+    setKdIkn,
+    kdKemiskinan,
+    setKdKemiskinan,
+    KdPRI,
+    setKdPRI,
+    KdPangan,
+    setKdPangan,
+    KdStunting,
+    setKdStunting,
+    KdPemilu,
+    setKdPemilu,
+    KdTema,
+    setKdTema,
+    KdPN,
+    setKdPN,
+    KdPP,
+    setKdPP,
+    KdKegPP,
+    setKdKegPP,
+    KdMP,
+    setKdMP,
 
     // Filter values
     dept,
     setDept,
+    deptkondisi,
+    setDeptkondisi,
+    katadept,
+    setKatadept,
     kdunit,
     setKdunit,
+    unitkondisi,
+    setUnitkondisi,
+    kataunit,
+    setKataunit,
     dekon,
     setDekon,
+    dekonkondisi,
+    setDekonkondisi,
+    katadekon,
+    setKatadekon,
     prov,
     setProv,
+    lokasikondisi,
+    setLokasikondisi,
+    katalokasi,
+    setKatalokasi,
     kabkota,
     setKabkota,
+    kabkotakondisi,
+    setKabkotakondisi,
+    katakabkota,
+    setKatakabkota,
     kanwil,
     setKanwil,
+    kanwilkondisi,
+    setKanwilkondisi,
+    katakanwil,
+    setKatakanwil,
     kppn,
     setKppn,
+    kppnkondisi,
+    setKppnkondisi,
+    katakppn,
+    setKatakppn,
     satker,
     setSatker,
+    satkerkondisi,
+    setSatkerkondisi,
+    katasatker,
+    setKatasatker,
     fungsi,
     setFungsi,
+    fungsikondisi,
+    setFungsikondisi,
+    katafungsi,
+    setKatafungsi,
     sfungsi,
     setSfungsi,
+    subfungsikondisi,
+    setSubfungsikondisi,
+    katasubfungsi,
+    setKatasubfungsi,
     program,
     setProgram,
+    programkondisi,
+    setProgramkondisi,
+    kataprogram,
+    setKataprogram,
     giat,
     setGiat,
+    giatkondisi,
+    setGiatkondisi,
+    katagiat,
+    setKatagiat,
     output,
     setOutput,
+    outputkondisi,
+    setOutputkondisi,
+    kataoutput,
+    setKataoutput,
     soutput,
     setsOutput,
+    soutputkondisi,
+    setSoutputkondisi,
+    katasoutput,
+    setKatasoutput,
+    komponen,
+    setKomponen,
+    komponenkondisi,
+    setKomponenkondisi,
+    katakomponen,
+    setKatakomponen,
+    skomponen,
+    setSkomponen,
+    skomponenkondisi,
+    setSkomponenkondisi,
+    kataskomponen,
+    setKataskomponen,
     akun,
     setAkun,
+    akunkondisi,
+    setAkunkondisi,
+    kataakun,
+    setKataakun,
     sdana,
     setSdana,
+    sdanakondisi,
+    setSdanakondisi,
+    katasdana,
+    setKatasdana,
     register,
     setRegister,
+    registerkondisi,
+    setRegisterkondisi,
+    kataregister,
+    setKataregister,
     PN,
     setPN,
     PP,
@@ -264,5 +448,93 @@ export default function useInquiryState() {
     setStunting,
     Miskin,
     setMiskin,
+    Pemilu,
+    setPemilu,
+    Ikn,
+    setIkn,
+    Pangan,
+    setPangan,
+
+    // Radio states
+    deptradio,
+    setDeptradio,
+    unitradio,
+    setUnitradio,
+    dekonradio,
+    setDekonradio,
+    locradio,
+    setLocradio,
+    kabkotaradio,
+    setKabkotaradio,
+    kanwilradio,
+    setKanwilradio,
+    kppnradio,
+    setKppnradio,
+    satkerradio,
+    setSatkerradio,
+    fungsiradio,
+    setFungsiradio,
+    subfungsiradio,
+    setSubfungsiradio,
+    programradio,
+    setProgramradio,
+    kegiatanradio,
+    setKegiatanradio,
+    outputradio,
+    setOutputradio,
+    soutputradio,
+    setsOutputradio,
+    komponenradio,
+    setKomponenradio,
+    skomponenradio,
+    setSkomponenradio,
+    akunradio,
+    setAkunradio,
+    sdanaradio,
+    setSdanaradio,
+    registerradio,
+    setRegisterradio,
+    inflasiradio,
+    setInflasiradio,
+    iknradio,
+    setIknradio,
+    kemiskinanradio,
+    setKemiskinanradio,
+    priradio,
+    setPriradio,
+    panganradio,
+    setPanganradio,
+    stuntingradio,
+    setStuntingradio,
+    pemiluradio,
+    setPemiluradio,
+    pnradio,
+    setPnradio,
+    ppradio,
+    setPpradio,
+    kegppradio,
+    setKegppradio,
+    mpradio,
+    setMpradio,
+    temaradio,
+    setTemaradio,
+
+    // Special filter option states
+    opsidept,
+    setOpsidept,
+    opsiInflasi,
+    setOpsiInflasi,
+    opsiIkn,
+    setOpsiIkn,
+    opsiKemiskinan,
+    setOpsiKemiskinan,
+
+    // SQL state
+    sql,
+    setSql,
+    from,
+    setFrom,
+    select,
+    setSelect,
   };
 }

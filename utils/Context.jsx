@@ -17,6 +17,7 @@ const MyContext = createContext({
   name: "",
   statusLogin: false,
   token: "",
+  axiosJWT: null,
   // Add other default values as needed
 });
 

@@ -12,63 +12,60 @@ import AkumulasiModal from "./components/Modals/AkumulasiModal";
 import BulananModal from "./components/Modals/BulananModal";
 import JnsBlokirModal from "./components/Modals/JnsBlokirModal";
 import PN2Modal from "./components/Modals/PN2Modal";
-import SwitchesGrid from "./switchesGrid";
 import Thang from "../referensi_belanja/Thang";
-import Kddept from "../referensi_belanja/Kddept";
-import Kdunit from "../referensi_belanja/Kdunit";
-import Kddekon from "../referensi_belanja/Kddekon";
-import Kdlokasi from "../referensi_belanja/Kdlokasi";
-import Kdkabkota from "../referensi_belanja/Kdkabkota";
-import Kdkanwil from "../referensi_belanja/Kdkanwil";
-import Kdkppn from "../referensi_belanja/Kdkppn";
-import Kdsatker from "../referensi_belanja/Kdsatker";
-import Kdfungsi from "../referensi_belanja/Kdfungsi";
-import Kdsfungsi from "../referensi_belanja/Kdsfungsi";
-import Kdprogram from "../referensi_belanja/Kdprogram";
-import Kdgiat from "../referensi_belanja/Kdgiat";
-import Kdoutput from "../referensi_belanja/Kdoutput";
-import Kdakun from "../referensi_belanja/Kdakun";
-import Kdsdana from "../referensi_belanja/Kdsdana";
-import Kdregister from "../referensi_belanja/Kdregister";
-import AccountFilter from "./components/FilterGroups/AccountFilter";
+import Kddept from "../referensi_belanja/referensi_inquiryMod/Kddept";
+import Kdunit from "../referensi_belanja/referensi_inquiryMod/Kdunit";
+import Kddekon from "../referensi_belanja/referensi_inquiryMod/Kddekon";
+import Kdlokasi from "../referensi_belanja/referensi_inquiryMod/Kdlokasi";
+import Kdkabkota from "../referensi_belanja/referensi_inquiryMod/Kdkabkota";
+import Kdkanwil from "../referensi_belanja/referensi_inquiryMod/Kdkanwil";
+import Kdkppn from "../referensi_belanja/referensi_inquiryMod/Kdkppn";
+import Kdsatker from "../referensi_belanja/referensi_inquiryMod/Kdsatker";
+import Kdfungsi from "../referensi_belanja/referensi_inquiryMod/Kdfungsi";
+import Kdsfungsi from "../referensi_belanja/referensi_inquiryMod/Kdsfungsi";
+import Kdprogram from "../referensi_belanja/referensi_inquiryMod/Kdprogram";
+import Kdgiat from "../referensi_belanja/referensi_inquiryMod/Kdgiat";
+import Kdoutput from "../referensi_belanja/referensi_inquiryMod/Kdoutput";
+import Kdakun from "../referensi_belanja/referensi_inquiryMod/Kdakun";
+import Kdsdana from "../referensi_belanja/referensi_inquiryMod/Kdsdana";
+import Kdregister from "../referensi_belanja/referensi_inquiryMod/Kdregister";
+import AccountFilter from "./components/FilterGroups/AkunFilter";
 import KementerianFilter from "./components/FilterGroups/KementerianFilter";
-import FunctionFilter from "./components/FilterGroups/FunctionFilter";
-import FundingFilter from "./components/FilterGroups/FundingFilter";
+import FungsiFilter from "./components/FilterGroups/FungsiFilter";
+import FundingFilter from "./components/FilterGroups/SumberDanaFilter";
 import LokasiFilter from "./components/FilterGroups/LokasiFilter";
 import OutputFilter from "./components/FilterGroups/ProgramFilter";
 import UnitFilter from "./components/FilterGroups/UnitFilter";
 import ProgramFilter from "./components/FilterGroups/ProgramFilter";
 import DekonFilter from "./components/FilterGroups/DekonFilter";
-import DisplayOptions from "./components/DisplayOptions";
-import FilterSection from "./components/FilterSection";
+
+import FilterSection from "./components/FilterSelector";
 import QueryButtons from "./components/QueryButtons";
-import ReportTypeSelector from "./components/ReportTypeSelector";
+import ReportTypeSelector from "./components/LaporanSelector";
 
 import useInquiryState from "./hooks/useInquiryState";
-import useQueryBuilder from "./hooks/useQueryBuilder";
-import IknRadio from "../inquiry/radio/IknRadio";
-import JenisIkn from "../referensi_belanja/JenisIkn";
-import InflasiRadio from "../inquiry/radio/InflasiRadio";
-import JenisInflasiInquiry from "../referensi_belanja/JenisInflasiInquiry";
-import MiskinRadio from "../inquiry/radio/MiskinRadio";
-import JenisMiskin from "../referensi_belanja/JenisMiskin";
+import useQueryBuilder from "./hooks/useQueryBuilderModular";
+// Note: IKN, Inflasi, and Kemiskinan filter components moved to FilterGroups
+// import IknRadio from "../inquiry/radio/IknRadio";
+// import JenisIkn from "../referensi_belanja/JenisIkn";
+// import InflasiRadio from "../inquiry/radio/InflasiRadio";
+// import JenisInflasiInquiry from "../referensi_belanja/JenisInflasiInquiry";
+// import MiskinRadio from "../inquiry/radio/MiskinRadio";
+// import JenisMiskin from "../referensi_belanja/JenisMiskin";
 import MpRadio from "../inquiry/radio/MpRadio";
-import KodePRI from "../referensi_belanja/KdPRI";
-import PriRadio from "./radio/priRadio";
-import InputPRI from "./kondisi/InputPRI";
-import JenisPangan from "../referensi_belanja/JenisPangan";
-import PanganRadio from "./radio/PanganRadio";
-import JenisPemilu from "../referensi_belanja/JenisPemilu";
-import PemiluRadio from "./radio/PemiluRadio";
-import JenisStuntingInquiry from "../referensi_belanja/JenisStuntingInquiry";
-import StuntingRadio from "./radio/StuntingRadio";
 import CutoffMonthSelector from "./CutoffMonthSelector";
+import {
+  exportToCSV,
+  exportToExcel,
+  exportToJSON,
+  exportToText,
+} from "./exportUtils";
 
 const InquiryMod = () => {
   // Use modular inquiry state hook
   const inquiry = useInquiryState();
   // Use modular query builder hook
-  const { buildQuery, generateSqlPreview } = useQueryBuilder(inquiry);
+  const { buildQuery } = useQueryBuilder(inquiry);
   // Destructure all needed state and setters from inquiry
   const {
     role,
@@ -129,8 +126,8 @@ const InquiryMod = () => {
     setUnit,
     kddekon,
     setKddekon,
-    kdprov,
-    setKdprov,
+    kdlokasi,
+    setKdlokasi,
     kdkabkota,
     setKdkabkota,
     kdkanwil,
@@ -151,46 +148,158 @@ const InquiryMod = () => {
     setKdoutput,
     kdsoutput,
     setKdsoutput,
+    kdkomponen,
+    setKdkomponen,
+    kdskomponen,
+    setKdskomponen,
     kdakun,
     setKdakun,
     kdsdana,
     setKdsdana,
     kdregister,
     setKdregister,
+    kdInflasi,
+    setKdInflasi,
+    kdIkn,
+    setKdIkn,
+    kdKemiskinan,
+    setKdKemiskinan,
+    KdPRI,
+    setKdPRI,
+    KdPangan,
+    setKdPangan,
+    KdPemilu,
+    setKdPemilu,
+    KdStunting,
+    setKdStunting,
+    KdTema,
+    setKdTema,
+    KdPN,
+    setKdPN,
+    KdPP,
+    setKdPP,
+    KdMP,
+    setKdMP,
+    KdKegPP,
+    setKdKegPP,
+    Pangan,
+    setPangan,
+    Pemilu,
+    setPemilu,
     dept,
     setDept,
+    deptkondisi,
+    setDeptkondisi,
+    katadept,
+    setKatadept,
     kdunit,
     setKdunit,
+    unitkondisi,
+    setUnitkondisi,
+    kataunit,
+    setKataunit,
     dekon,
     setDekon,
+    dekonkondisi,
+    setDekonkondisi,
+    katadekon,
+    setKatadekon,
     prov,
     setProv,
+    lokasikondisi,
+    setLokasikondisi,
+    katalokasi,
+    setKatalokasi,
     kabkota,
     setKabkota,
+    kabkotakondisi,
+    setKabkotakondisi,
+    katakabkota,
+    setKatakabkota,
     kanwil,
     setKanwil,
+    kanwilkondisi,
+    setKanwilkondisi,
+    katakanwil,
+    setKatakanwil,
     kppn,
     setKppn,
+    kppnkondisi,
+    setKppnkondisi,
+    katakppn,
+    setKatakppn,
     satker,
     setSatker,
+    satkerkondisi,
+    setSatkerkondisi,
+    katasatker,
+    setKatasatker,
     fungsi,
     setFungsi,
+    fungsikondisi,
+    setFungsikondisi,
+    katafungsi,
+    setKatafungsi,
     sfungsi,
     setSfungsi,
+    subfungsikondisi,
+    setSubfungsikondisi,
+    katasubfungsi,
+    setKatasubfungsi,
     program,
     setProgram,
+    programkondisi,
+    setProgramkondisi,
+    kataprogram,
+    setKataprogram,
     giat,
     setGiat,
+    giatkondisi,
+    setGiatkondisi,
+    katagiat,
+    setKatagiat,
     output,
     setOutput,
+    outputkondisi,
+    setOutputkondisi,
+    kataoutput,
+    setKataoutput,
     soutput,
     setsOutput,
+    soutputkondisi,
+    setSoutputkondisi,
+    katasoutput,
+    setKatasoutput,
+    komponen,
+    setKomponen,
+    komponenkondisi,
+    setKomponenkondisi,
+    katakomponen,
+    setKatakomponen,
+    skomponen,
+    setSkomponen,
+    skomponenkondisi,
+    setSkomponenkondisi,
+    kataskomponen,
+    setKataskomponen,
     akun,
     setAkun,
+    akunkondisi,
+    setAkunkondisi,
+    kataakun,
+    setKataakun,
     sdana,
     setSdana,
+    sdanakondisi,
+    setSdanakondisi,
+    katasdana,
+    setKatasdana,
     register,
     setRegister,
+    registerkondisi,
+    setRegisterkondisi,
+    kataregister,
+    setKataregister,
     PN,
     setPN,
     PP,
@@ -209,14 +318,16 @@ const InquiryMod = () => {
     setStunting,
     Miskin,
     setMiskin,
+    Ikn,
+    setIkn,
     deptradio,
     setDeptradio,
     unitradio,
     setUnitradio,
     dekonradio,
     setDekonradio,
-    provradio,
-    setProvradio,
+    locradio,
+    setLocradio,
     kabkotaradio,
     setKabkotaradio,
     kanwilradio,
@@ -237,12 +348,46 @@ const InquiryMod = () => {
     setOutputradio,
     soutputradio,
     setsOutputradio,
+    komponenradio,
+    setKomponenradio,
+    skomponenradio,
+    setSkomponenradio,
     akunradio,
     setAkunradio,
     sdanaradio,
     setSdanaradio,
     registerradio,
     setRegisterradio,
+    inflasiradio,
+    setInflasiradio,
+    iknradio,
+    setIknradio,
+    kemiskinanradio,
+    setKemiskinanradio,
+    pnradio,
+    setPnradio,
+    ppradio,
+    setPpradio,
+    kegppradio,
+    setKegppradio,
+    mpradio,
+    setMpradio,
+    temaradio,
+    setTemaradio,
+    panganradio,
+    setPanganradio,
+    stuntingradio,
+    setStuntingradio,
+    pemiluradio,
+    setPemiluradio,
+    priradio,
+    setPriradio,
+    opsiInflasi,
+    setOpsiInflasi,
+    opsiIkn,
+    setOpsiIkn,
+    opsiKemiskinan,
+    setOpsiKemiskinan,
     sql,
     setSql,
     from,
@@ -250,6 +395,13 @@ const InquiryMod = () => {
     select,
     setSelect,
   } = inquiry;
+
+  // Debug logging to track initial state
+  console.log("=== FormInquiryMod Debug ===");
+  console.log("kddept state:", kddept);
+  console.log("unit state:", unit);
+  console.log("kddekon state:", kddekon);
+  console.log("=== End FormInquiryMod Debug ===");
 
   // Modal handlers
   const openModalKedua = () => {
@@ -264,7 +416,7 @@ const InquiryMod = () => {
 
   // Replace generateSql with buildQuery in all handlers
   const handleGenerateExcel = () => {
-    buildQuery();
+    buildQuery(); // Call the function to build the query
     setloadingExcell(true);
   };
 
@@ -277,8 +429,53 @@ const InquiryMod = () => {
     setloadingExcell(false);
   };
 
-  const handlegetQuery = () => {
-    buildQuery();
+  // **UNIFIED QUERY GENERATION** - All functions now use the same query builder
+  const generateUnifiedQuery = () => {
+    // Debug: Log the current inquiry state before generating SQL
+    console.log("🔍 generateUnifiedQuery - Debug inquiry state:", {
+      jenlap: inquiry.jenlap,
+      akumulatif: inquiry.akumulatif,
+      dept: inquiry.dept,
+      kddept: inquiry.kddept,
+      unit: inquiry.unit,
+      kddekon: inquiry.kddekon,
+      dekon: inquiry.dekon,
+      thang: inquiry.thang,
+      cutoff: inquiry.cutoff,
+      type: typeof inquiry.akumulatif,
+      timestamp: new Date().toISOString(),
+    });
+
+    const sql = buildQuery(); // Use buildQuery() to get the complete SQL string
+
+    // Safety check to ensure sql is a valid string before using substring
+    if (typeof sql === "string" && sql.length > 0) {
+      console.log("🔄 Query Generated:", sql.substring(0, 200) + "..."); // Debug log (show more characters)
+    } else {
+      console.log("🔄 Query Generated: (empty or invalid)"); // Debug log for empty/invalid queries
+    }
+
+    return sql;
+  };
+
+  // **DEBUGGING HELPER** - Get current query for monitoring
+  const getCurrentQuery = () => {
+    return generateUnifiedQuery();
+  };
+
+  // Add state for storing query result data for export
+  const [dataToExport, setDataToExport] = React.useState([]);
+
+  // **UPDATED** - Execute query handler now uses unified query generation
+  const handlegetQuery = async () => {
+    const sql = generateUnifiedQuery(); // Generate consistent SQL
+    inquiry.setSql(sql); // Store for modal display
+
+    // TODO: Replace with actual API call using the generated SQL
+    // const fetchedData = await fetchDataFromAPI(sql);
+    // setDataToExport(fetchedData);
+
+    // Open appropriate modal based on report type
     if (jenlap === "1") {
       setShowModalApbn(true);
     } else if (jenlap === "2") {
@@ -300,9 +497,19 @@ const InquiryMod = () => {
     }
   };
 
+  // **UPDATED** - SQL preview handler now uses unified query generation
   const handlegetQuerySQL = () => {
-    buildQuery();
-    setShowModalsql(true);
+    // Debug: Log the current akumulatif state before generating SQL
+    console.log("🔍 handlegetQuerySQL - Debug inquiry state:", {
+      jenlap: inquiry.jenlap,
+      akumulatif: inquiry.akumulatif,
+      type: typeof inquiry.akumulatif,
+      timestamp: new Date().toISOString(),
+    });
+
+    const latestSql = generateUnifiedQuery(); // Same query as execute
+    inquiry.setSql(latestSql); // update global state
+    setShowModalsql(true); // open modal
   };
 
   // Modal close handlers
@@ -365,7 +572,7 @@ const InquiryMod = () => {
   };
 
   const handleSimpan = () => {
-    buildQuery();
+    buildQuery(); // Call the function to build the query
     setShowModalsimpan(true);
   };
 
@@ -385,18 +592,38 @@ const InquiryMod = () => {
   React.useEffect(() => {
     // Update SQL or other dependent values when these parameters change
     const updateDependentValues = () => {
-      // Your logic here
+      // Call buildQuery to rebuild when parameters change
+      buildQuery();
     };
 
     updateDependentValues();
-  }, [thang, cutoff, pembulatan]);
+  }, [thang, cutoff, pembulatan, akumulatif]); // Remove buildQuery from dependencies to prevent infinite loops
+
+  // Add ref to track if component has mounted (to avoid resetting on initial load)
+  const hasMountedRef = React.useRef(false);
+
+  // Add useEffect for handling fungsi-subfungsi parent-child relationship
+  React.useEffect(() => {
+    // Skip the reset on initial mount
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      return;
+    }
+
+    // Reset subfungsi to default when fungsi changes (after initial mount)
+    // This ensures when user selects a different fungsi, subfungsi goes back to "Semua Sub Fungsi"
+    // Also clear related advanced filtering states
+    setSfungsi("XX");
+    setSubfungsikondisi("");
+    setKatasubfungsi("");
+  }, [fungsi]);
 
   // Handler to turn all switches on/off
   const handlePilihSemua = (isOn) => {
     setTanggal(isOn);
     setKddept(isOn);
     setKddekon(isOn);
-    setKdprov(isOn);
+    setKdlokasi(isOn);
     setKdkabkota(isOn);
     setKdkanwil(isOn);
     setKdkppn(isOn);
@@ -407,6 +634,8 @@ const InquiryMod = () => {
     setKdgiat(isOn);
     setKdoutput(isOn);
     setKdsoutput(isOn);
+    setKdkomponen(isOn);
+    setKdskomponen(isOn);
     setKdakun(isOn);
     setKdsdana(isOn);
     setKdregister(isOn);
@@ -418,12 +647,12 @@ const InquiryMod = () => {
   // Handler to reset all filters and parameters to their initial state
   const handleReset = () => {
     setJenlap("2");
-    setThang(new Date().getFullYear());
+    setThang(new Date().getFullYear().toString());
     setTanggal(false);
     setKddept(true);
     setUnit(false);
     setKddekon(false);
-    setKdprov(false);
+    setKdlokasi(false);
     setKdkabkota(false);
     setKdkanwil(false);
     setKdkppn(false);
@@ -434,11 +663,25 @@ const InquiryMod = () => {
     setKdgiat(false);
     setKdoutput(false);
     setKdsoutput(false);
+    setKdkomponen(false);
+    setKdskomponen(false);
     setKdakun(false);
     setKdsdana(false);
     setKdregister(false);
-    setAkumulatif(false);
-    setCutoff("12");
+    setKdInflasi(false);
+    setKdIkn(false);
+    setKdKemiskinan(false);
+    setKdPRI(false);
+    setKdPangan(false);
+    setKdPemilu(false);
+    setKdStunting(false);
+    setKdTema(false);
+    setKdPN(false);
+    setKdPP(false);
+    setKdMP(false);
+    setAkumulatif("0");
+    setCutoff("0");
+    setShowCutoffSelector(false);
     setPN("XX");
     setPP("XX");
     setKegPP("XX");
@@ -456,15 +699,27 @@ const InquiryMod = () => {
     setDekon("XX");
     setProv("XX");
     setKabkota("XX");
+    setKabkotakondisi("");
+    setKatakabkota("");
     setKanwil("XX");
     setKppn("XX");
+    setKppnkondisi("");
+    setKatakppn("");
     setSatker("XX");
+    setSatkerkondisi("");
+    setKatasatker("");
     setFungsi("XX");
+    setFungsikondisi("");
+    setKatafungsi("");
     setSfungsi("XX");
+    setSubfungsikondisi("");
+    setKatasubfungsi("");
     setProgram("XX");
     setGiat("XX");
     setOutput("XX");
     setsOutput("XX");
+    setKomponen("XX");
+    setSkomponen("XX");
     setAkun("XX");
     setSdana("XX");
     setRegister("XX");
@@ -472,7 +727,7 @@ const InquiryMod = () => {
     setDeptradio("1");
     setUnitradio("1");
     setDekonradio("1");
-    setProvradio("1");
+    setLocradio("1");
     setKabkotaradio("1");
     setKanwilradio("1");
     setKppnradio("1");
@@ -483,9 +738,17 @@ const InquiryMod = () => {
     setKegiatanradio("1");
     setOutputradio("1");
     setsOutputradio("1");
+    setKomponenradio("1");
+    setSkomponenradio("1");
     setAkunradio("1");
     setSdanaradio("1");
     setRegisterradio("1");
+    setInflasiradio("1");
+    setIknradio("1");
+    setKemiskinanradio("1");
+    setOpsiInflasi("pilihInflasi");
+    setOpsiIkn("pilihikn");
+    setOpsiKemiskinan("pilihKemiskinan");
     setSql("");
     setFrom("");
     setSelect(
@@ -493,95 +756,18 @@ const InquiryMod = () => {
     );
   };
 
-  // Add IKN state if not present
-  const [Ikn, setIkn] = React.useState("XX");
-  const [iknradio, setIknradio] = React.useState("1");
-  const [opsiIkn, setOpsiIkn] = React.useState("pilihIkn");
+  // Add IKN state if not present (Note: Now handled in useInquiryState)
+  // const [Ikn, setIkn] = React.useState("XX");
+  // const [iknradio, setIknradio] = React.useState("1");
+  // const [opsiIkn, setOpsiIkn] = React.useState("pilihIkn");
 
-  // Handler for JenisIkn select
-  const handleIkn = (val) => setIkn(val);
-  // Handler for IknRadio
-  const handleRadioChangeIkn = (val) => setIknradio(val);
-
-  // Remove duplicate Inflasi state declaration
-  const [inflasiradio, setInflasiradio] = React.useState("1");
-  const [opsiInflasi, setOpsiInflasi] = React.useState("pilihInflasi");
-
-  // Handler for JenisInflasiInquiry select
-  const handleInflasi = (val) => setInflasi(val);
-  // Handler for InflasiRadio
-  const handleRadioChangeInflasi = (val) => setInflasiradio(val);
-
-  // Miskin state and handlers
-  const [miskinradio, setMiskinradio] = React.useState("1");
-  const [opsiMiskin, setOpsiMiskin] = React.useState("pilihMiskin");
-
-  const handleMiskin = (val) => setMiskin(val);
-  const handleRadioChangeMiskin = (val) => setMiskinradio(val);
+  // Note: IKN, Inflasi, and Miskin filters are now modularized and managed in useInquiryState
 
   // Add MP state if not present
-  const [mpradio, setMPradio] = React.useState("1");
   const [opsiMP, setOpsiMP] = React.useState("pilihmp");
 
   // Handler for MpRadio
   const handleRadioMP = (val) => setMPradio(val);
-
-  // Add PRI state and handlers
-  const [KdPRI, setKdPRI] = React.useState(false);
-  const [opsiPRI, setOpsiPRI] = React.useState("pilihPRI");
-  const [priradio, setPriradio] = React.useState("1");
-  const [priKondisi, setPriKondisi] = React.useState("");
-
-  const handleRadioChangePRI = (e) => {
-    setOpsiPRI(e.target.value);
-  };
-  const handleRadioPri = (val) => setPriradio(val);
-  const handlePRI = (val) => setPRI(val);
-  const handlePRIKondisi = (val) => setPriKondisi(val);
-
-  // Add Pangan state and handlers
-  const [KdPangan, setKdPangan] = React.useState(false);
-  const [opsiPangan, setOpsiPangan] = React.useState("pilihPangan");
-  const [panganradio, setPanganradio] = React.useState("1");
-  const [Pangan, setPangan] = React.useState("XX");
-
-  const handleRadioChangePangan = (e) => {
-    setOpsiPangan(e.target.value);
-    const isChecked = e.target.value;
-    const value = isChecked === "pilihPangan" ? 5 : 0;
-    value === 0 ? setPanganradio("2") : setPanganradio("1");
-  };
-  const handlePangan = (val) => setPangan(val);
-  const handlePanganRadio = (val) => setPanganradio(val);
-
-  // Add Pemilu state and handlers
-  const [KdPemilu, setKdPemilu] = React.useState(false);
-  const [opsiPemilu, setOpsiPemilu] = React.useState("pilihPemilu");
-  const [pemiluradio, setPemiluradio] = React.useState("1");
-  const [Pemilu, setPemilu] = React.useState("XX");
-
-  const handleRadioChangePemilu = (e) => {
-    setOpsiPemilu(e.target.value);
-    const isChecked = e.target.value;
-    const value = isChecked === "pilihPemilu" ? 5 : 0;
-    value === 0 ? setPemiluradio("2") : setPemiluradio("1");
-  };
-  const handlePemilu = (val) => setPemilu(val);
-  const handlePemiluRadio = (val) => setPemiluradio(val);
-
-  // Add Stunting state and handlers
-  const [KdStunting, setKdStunting] = React.useState(false);
-  const [opsiStunting, setOpsiStunting] = React.useState("pilihStunting");
-  const [stuntingradio, setStuntingradio] = React.useState("1");
-
-  const handleRadioChangeStunting = (e) => {
-    setOpsiStunting(e.target.value);
-    const isChecked = e.target.value;
-    const value = isChecked === "pilihStunting" ? 5 : 0;
-    value === 0 ? setStuntingradio("2") : setStuntingradio("1");
-  };
-  const handleStunting = (val) => setStunting(val);
-  const handleStuntingRadio = (val) => setStuntingradio(val);
 
   // Add handlePDF for Export PDF modal (matches old form)
   const handlePDF = () => {
@@ -592,6 +778,102 @@ const InquiryMod = () => {
   const [showCutoffSelector, setShowCutoffSelector] = React.useState(
     cutoff !== "0"
   );
+
+  // Add state for SaveQueryModal
+  const [showSaveQueryModal, setShowSaveQueryModal] = React.useState(false);
+
+  // Helper to fetch data from backend using current filters/query
+  // **UPDATED** - Export data fetcher now uses unified query generation
+  async function fetchExportData() {
+    // Use the same query builder as execute and show SQL
+    const sql = generateUnifiedQuery(); // Consistent with all other operations
+
+    // TODO: Replace with your real backend fetch logic
+    // Example: fetch from API using the generated SQL
+    // const response = await fetch('/api/query', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ sql, thang, jenlap })
+    // });
+    // const data = await response.json();
+    // return data;
+
+    // Placeholder - return empty array until API is implemented
+    console.log("Generated SQL for export:", sql);
+    return [];
+  }
+
+  // Robust Excel export handler (fetches fresh data)
+  const handleExportExcel = async () => {
+    setloadingExcell(true);
+    try {
+      const exportData = await fetchExportData();
+      if (!exportData || !exportData.length) {
+        Pesan("Tidak ada data untuk diexport");
+        setloadingExcell(false);
+        return;
+      }
+      await exportToExcel(exportData, "inquiry_data.xlsx");
+      Pesan("Data berhasil diexport ke Excel");
+    } catch (e) {
+      Pesan("Gagal export Excel");
+    }
+    setloadingExcell(false);
+  };
+
+  // Robust CSV export handler (fetches fresh data)
+  const handleExportCSV = async () => {
+    setloadingExcell(true);
+    try {
+      const exportData = await fetchExportData();
+      if (!exportData || !exportData.length) {
+        Pesan("Tidak ada data untuk diexport");
+        setloadingExcell(false);
+        return;
+      }
+      exportToCSV(exportData, "inquiry_data.csv");
+      Pesan("Data berhasil diexport ke CSV");
+    } catch (e) {
+      Pesan("Gagal export CSV");
+    }
+    setloadingExcell(false);
+  };
+
+  // Robust JSON export handler (fetches fresh data)
+  const handleExportJSON = async () => {
+    setloadingExcell(true);
+    try {
+      const exportData = await fetchExportData();
+      if (!exportData || !exportData.length) {
+        Pesan("Tidak ada data untuk diexport");
+        setloadingExcell(false);
+        return;
+      }
+      exportToJSON(exportData, "inquiry_data.json");
+      Pesan("Data berhasil diexport ke JSON");
+    } catch (e) {
+      Pesan("Gagal export JSON");
+    }
+    setloadingExcell(false);
+  };
+
+  // Robust Text export handler (fetches fresh data)
+  const handleExportText = async () => {
+    setloadingExcell(true);
+    try {
+      const exportData = await fetchExportData();
+      if (!exportData || !exportData.length) {
+        Pesan("Tidak ada data untuk diexport");
+        setloadingExcell(false);
+        return;
+      }
+      exportToText(exportData, "inquiry_data.txt");
+      Pesan("Data berhasil diexport ke Text");
+    } catch (e) {
+      Pesan("Gagal export Text");
+    }
+    setloadingExcell(false);
+  };
 
   return (
     <div className="w-full">
@@ -605,6 +887,8 @@ const InquiryMod = () => {
             setJenlap,
             pembulatan,
             setPembulatan,
+            akumulatif,
+            setAkumulatif,
             thang,
             setThang,
           }}
@@ -614,14 +898,26 @@ const InquiryMod = () => {
 
         <FilterSection
           inquiryState={{
+            // Report type for determining default switches
+            jenlap,
+            // Basic form states
+            tanggal,
+            setTanggal,
+            cutoff,
+            setCutoff,
+            showCutoffSelector,
+            setShowCutoffSelector,
+            akumulatif,
+            setAkumulatif,
+            // Filter visibility states
             kddept,
             setKddept,
             unit,
             setUnit,
             kddekon,
             setKddekon,
-            kdprov,
-            setKdprov,
+            kdlokasi,
+            setKdlokasi,
             kdkabkota,
             setKdkabkota,
             kdkanwil,
@@ -642,322 +938,286 @@ const InquiryMod = () => {
             setKdoutput,
             kdsoutput,
             setKdsoutput,
+            kdkomponen,
+            setKdkomponen,
+            kdskomponen,
+            setKdskomponen,
             kdakun,
             setKdakun,
             kdsdana,
             setKdsdana,
             kdregister,
             setKdregister,
+            // Department filter values
+            dept,
+            setDept,
+            deptkondisi,
+            setDeptkondisi,
+            katadept,
+            setKatadept,
+            deptradio,
+            setDeptradio,
+            // Unit filter values
+            kdunit,
+            setKdunit,
+            unitkondisi,
+            setUnitkondisi,
+            kataunit,
+            setKataunit,
+            unitradio,
+            setUnitradio,
+            // Location filter values
+            prov,
+            setProv,
+            lokasikondisi,
+            setLokasikondisi,
+            katalokasi,
+            setKatalokasi,
+            locradio,
+            setLocradio,
+            // Dekon filter values
+            dekon,
+            setDekon,
+            dekonkondisi,
+            setDekonkondisi,
+            katadekon,
+            setKatadekon,
+            dekonradio,
+            setDekonradio,
+            // Kabkota filter values
+            kabkota,
+            setKabkota,
+            kabkotakondisi,
+            setKabkotakondisi,
+            katakabkota,
+            setKatakabkota,
+            kabkotaradio,
+            setKabkotaradio,
+            // Kanwil filter values
+            kanwil,
+            setKanwil,
+            kanwilkondisi,
+            setKanwilkondisi,
+            katakanwil,
+            setKatakanwil,
+            kanwilradio,
+            setKanwilradio,
+            // KPPN filter values
+            kppn,
+            setKppn,
+            kppnkondisi,
+            setKppnkondisi,
+            katakppn,
+            setKatakppn,
+            kppnradio,
+            setKppnradio,
+            // Satker filter values
+            satker,
+            setSatker,
+            satkerkondisi,
+            setSatkerkondisi,
+            katasatker,
+            setKatasatker,
+            satkerradio,
+            setSatkerradio,
+            // Fungsi filter values
+            fungsi,
+            setFungsi,
+            fungsikondisi,
+            setFungsikondisi,
+            katafungsi,
+            setKatafungsi,
+            fungsiradio,
+            setFungsiradio,
+            // Sub-fungsi filter values
+            sfungsi,
+            setSfungsi,
+            subfungsikondisi,
+            setSubfungsikondisi,
+            katasubfungsi,
+            setKatasubfungsi,
+            subfungsiradio,
+            setSubfungsiradio,
+            // Special states needed by FilterSelector
+            KdPRI,
+            setKdPRI,
+            KdPangan,
+            setKdPangan,
+            KdPemilu,
+            setKdPemilu,
+            KdStunting,
+            setKdStunting,
+            KdTema,
+            setKdTema,
+            KdPN,
+            setKdPN,
+            KdPP,
+            setKdPP,
+            KdMP,
+            setKdMP,
+            KdKegPP,
+            setKdKegPP,
+            // Kegiatan Prioritas filter values
+            KegPP,
+            setKegPP,
+            kegppradio,
+            setKegppradio,
+            // Program filter values
+            program,
+            setProgram,
+            programkondisi,
+            setProgramkondisi,
+            kataprogram,
+            setKataprogram,
+            programradio,
+            setProgramradio,
+            // Kegiatan filter values
+            giat,
+            setGiat,
+            giatkondisi,
+            setGiatkondisi,
+            katagiat,
+            setKatagiat,
+            kegiatanradio,
+            setKegiatanradio,
+            // Output filter values
+            output,
+            setOutput,
+            outputkondisi,
+            setOutputkondisi,
+            kataoutput,
+            setKataoutput,
+            outputradio,
+            setOutputradio,
+            // Sub-output filter values
+            soutput,
+            setsOutput,
+            soutputkondisi,
+            setSoutputkondisi,
+            katasoutput,
+            setKatasoutput,
+            soutputradio,
+            setsOutputradio,
+            // Komponen filter values
+            komponen,
+            setKomponen,
+            komponenkondisi,
+            setKomponenkondisi,
+            katakomponen,
+            setKatakomponen,
+            komponenradio,
+            setKomponenradio,
+            // Subkomponen filter values
+            skomponen,
+            setSkomponen,
+            skomponenkondisi,
+            setSkomponenkondisi,
+            kataskomponen,
+            setKataskomponen,
+            skomponenradio,
+            setSkomponenradio,
+            // Akun filter values
+            akun,
+            setAkun,
+            akunkondisi,
+            setAkunkondisi,
+            kataakun,
+            setKataakun,
+            akunradio,
+            setAkunradio,
+            // Sumber Dana filter values
+            sdana,
+            setSdana,
+            sdanakondisi,
+            setSdanakondisi,
+            katasdana,
+            setKatasdana,
+            sdanaradio,
+            setSdanaradio,
+            // Register filter values
+            register,
+            setRegister,
+            registerkondisi,
+            setRegisterkondisi,
+            kataregister,
+            setKataregister,
+            registerradio,
+            setRegisterradio,
+            // New modularized filter states
+            kdInflasi,
+            setKdInflasi,
+            Inflasi,
+            setInflasi,
+            inflasiradio,
+            setInflasiradio,
+            opsiInflasi,
+            setOpsiInflasi,
+            kdIkn,
+            setKdIkn,
+            Ikn,
+            setIkn,
+            iknradio,
+            setIknradio,
+            opsiIkn,
+            setOpsiIkn,
+            kdKemiskinan,
+            setKdKemiskinan,
+            Miskin,
+            setMiskin,
+            kemiskinanradio,
+            setKemiskinanradio,
+            opsiKemiskinan,
+            setOpsiKemiskinan,
+            // Add new special filter states
+            Pangan,
+            setPangan,
+            panganradio,
+            setPanganradio,
+            Stunting,
+            setStunting,
+            stuntingradio,
+            setStuntingradio,
+            Pemilu,
+            setPemilu,
+            pemiluradio,
+            setPemiluradio,
+            PN,
+            setPN,
+            pnradio,
+            setPnradio,
+            PP,
+            setPP,
+            ppradio,
+            setPpradio,
+            MP,
+            setMP,
+            mpradio,
+            setMpradio,
+            Tema,
+            setTema,
+            temaradio,
+            setTemaradio,
+            PRI,
+            setPRI,
+            priradio,
+            setPriradio,
             // Add other state/handlers as needed
           }}
         />
 
-        {/* Cutoff Month Selector (moved out of Report Settings) */}
-        {showCutoffSelector && (
-          <CutoffMonthSelector cutoff={cutoff} setCutoff={setCutoff} />
-        )}
-
         {/* Add SwitchesGrid for parameter toggles */}
-        <div className="my-6">
-          <SwitchesGrid
-            handlers={{
-              handlePilihSemua: handlePilihSemua,
-              handleSwitchCutoff: (val) => {
-                setCutoff(val ? "12" : "0");
-                setShowCutoffSelector(val);
-              },
-              handleSwitchTanggal: (val) => setTanggal(val),
-              handleSwitchKddept: (val) => setKddept(val),
-              handleSwitchKdUnit: (val) => setUnit(val),
-              handleSwitchKddekon: (val) => setKddekon(val),
-              handleSwitchProvinsi: (val) => setKdprov(val),
-              handleSwitchKabkota: (val) => setKdkabkota(val),
-              handleSwitchKanwil: (val) => setKdkanwil(val),
-              handleSwitchKppn: (val) => setKdkppn(val),
-              handleSwitchSatker: (val) => setKdsatker(val),
-              handleSwitchFungsi: (val) => setKdfungsi(val),
-              handleSwitchSubfungsi: (val) => setKdsfungsi(val),
-              handleSwitchProgram: (val) => setKdprogram(val),
-              handleSwitchKegiatan: (val) => setKdgiat(val),
-              handleSwitchOutput: (val) => setKdoutput(val),
-              handleSwitchSuboutput: (val) => setKdsoutput(val),
-              handleSwitchAkun: (val) => setKdakun(val),
-              handleSwitchSdana: (val) => setKdsdana(val),
-              handleSwitchRegister: (val) => setKdregister(val),
-              // Add more handlers as needed
-            }}
-            jenlap={jenlap}
-            setters={{
-              setKdfungsi,
-              setFungsi,
-              setKdsfungsi,
-              setSfungsi,
-              setKdsoutput,
-              setsOutput,
-              setKdakun,
-              setAkun,
-              setKdsdana,
-              setSdana,
-              setKdregister,
-              setRegister,
-              // Add more setters as needed
-            }}
-          />
-        </div>
-
-        {/* Inflasi Selection UI (match old formInquiry) */}
-        <div className="my-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Jenis Inflasi
-            </label>
-            <JenisInflasiInquiry value={Inflasi} onChange={handleInflasi} />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Tampilan Inflasi
-            </label>
-            <InflasiRadio
-              inflasiRadio={handleRadioChangeInflasi}
-              selectedValue={inflasiradio}
-            />
-          </div>
-        </div>
-
-        {/* IKN Selection UI (match old formInquiry) */}
-        <div className="my-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Jenis IKN</label>
-            <JenisIkn value={Ikn} onChange={handleIkn} />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Tampilan IKN
-            </label>
-            <IknRadio
-              iknRadio={handleRadioChangeIkn}
-              selectedValue={iknradio}
-              status={opsiIkn}
-            />
-          </div>
-        </div>
-
-        {/* Miskin Selection UI (match old formInquiry) */}
-        <div className="my-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Jenis Kemiskinan Ekstrim
-            </label>
-            <JenisMiskin value={Miskin} onChange={handleMiskin} />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Tampilan Kemiskinan Ekstrim
-            </label>
-            <MiskinRadio
-              miskinRadio={handleRadioChangeMiskin}
-              selectedValue={miskinradio}
-            />
-          </div>
-        </div>
-
-        {/* MP Selection UI (match old formInquiry) */}
-        <div className="my-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Tampilan Mitra Pembangunan
-            </label>
-            <MpRadio
-              mpRadio={handleRadioMP}
-              selectedValue={mpradio}
-              status={opsiMP}
-            />
-          </div>
-        </div>
-
-        {/* PRI Selection UI (modularized, matches old formInquiry) */}
-        {KdPRI && (
-          <div className="my-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Proyek Prioritas
-              </label>
-              <div className="flex items-center space-x-4">
-                <label>
-                  <input
-                    type="radio"
-                    name="opsiPRI"
-                    value="pilihPRI"
-                    checked={opsiPRI === "pilihPRI"}
-                    onChange={handleRadioChangePRI}
-                  />
-                  <span className="ml-1">Pilih Proyek Prioritas</span>
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="opsiPRI"
-                    value="kondisiPRI"
-                    checked={opsiPRI === "kondisiPRI"}
-                    onChange={handleRadioChangePRI}
-                  />
-                  <span className="ml-1">Kondisi</span>
-                </label>
-              </div>
-            </div>
-            <div>
-              {opsiPRI === "pilihPRI" ? (
-                <>
-                  <KodePRI
-                    kdPN={PN}
-                    kdPP={PP}
-                    value={PRI}
-                    KegPP={KegPP}
-                    kdPRI={KdPRI}
-                    thang={thang}
-                    onChange={handlePRI}
-                    status={opsiPRI}
-                  />
-                  <PriRadio
-                    priRadio={handleRadioPri}
-                    selectedValue={priradio}
-                    status={opsiPRI}
-                  />
-                </>
-              ) : (
-                <InputPRI PRIkondisi={handlePRIKondisi} status={opsiPRI} />
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Pangan Selection UI (modularized, matches old formInquiry) */}
-        {KdPangan && (
-          <div className="my-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Belanja Ketahanan Pangan
-              </label>
-              <div className="flex items-center space-x-4">
-                <label>
-                  <input
-                    type="radio"
-                    name="opsiPangan"
-                    value="pilihPangan"
-                    checked={opsiPangan === "pilihPangan"}
-                    onChange={handleRadioChangePangan}
-                  />
-                  <span className="ml-1">Pilih Belanja Ketahanan Pangan</span>
-                </label>
-              </div>
-            </div>
-            <div>
-              {opsiPangan === "pilihPangan" && (
-                <>
-                  <JenisPangan
-                    value={Pangan}
-                    kdPangan={KdPangan}
-                    onChange={handlePangan}
-                    status={opsiPangan}
-                  />
-                  <PanganRadio
-                    panganRadio={handlePanganRadio}
-                    selectedValue={panganradio}
-                    status={opsiPangan}
-                  />
-                </>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Pemilu Selection UI (modularized, matches old formInquiry) */}
-        {KdPemilu && (
-          <div className="my-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Belanja Pemilu
-              </label>
-              <div className="flex items-center space-x-4">
-                <label>
-                  <input
-                    type="radio"
-                    name="opsiPemilu"
-                    value="pilihPemilu"
-                    checked={opsiPemilu === "pilihPemilu"}
-                    onChange={handleRadioChangePemilu}
-                  />
-                  <span className="ml-1">Pilih Belanja Pemilu</span>
-                </label>
-              </div>
-            </div>
-            <div>
-              {opsiPemilu === "pilihPemilu" && (
-                <>
-                  <JenisPemilu
-                    value={Pemilu}
-                    kdPemilu={KdPemilu}
-                    onChange={handlePemilu}
-                    status={opsiPemilu}
-                  />
-                  <PemiluRadio
-                    pemiluRadio={handlePemiluRadio}
-                    selectedValue={pemiluradio}
-                    status={opsiPemilu}
-                  />
-                </>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Stunting Selection UI (modularized, matches old formInquiry) */}
-        {KdStunting && (
-          <div className="my-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Belanja Penurunan Stunting
-              </label>
-              <div className="flex items-center space-x-4">
-                <label>
-                  <input
-                    type="radio"
-                    name="opsiStunting"
-                    value="pilihStunting"
-                    checked={opsiStunting === "pilihStunting"}
-                    onChange={handleRadioChangeStunting}
-                  />
-                  <span className="ml-1">Pilih Belanja Stunting</span>
-                </label>
-              </div>
-            </div>
-            <div>
-              {opsiStunting === "pilihStunting" && (
-                <>
-                  <JenisStuntingInquiry
-                    value={Stunting}
-                    kdStunting={KdStunting}
-                    onChange={handleStunting}
-                    status={opsiStunting}
-                  />
-                  <StuntingRadio
-                    stuntingRadio={handleStuntingRadio}
-                    selectedValue={stuntingradio}
-                    status={opsiStunting}
-                  />
-                </>
-              )}
-            </div>
-          </div>
-        )}
+        <div className="my-6"></div>
 
         {/* Action Buttons */}
         <QueryButtons
           onExecuteQuery={handlegetQuery}
-          onExportExcel={handleGenerateExcel}
+          onExportExcel={handleExportExcel}
+          onExportCSV={handleExportCSV}
           onExportPDF={handlePDF}
           onReset={handleReset}
           isLoading={loadingExcell}
+          onSaveQuery={() => setShowSaveQueryModal(true)}
+          onShowSQL={handlegetQuerySQL}
         />
       </div>
 
@@ -966,7 +1226,7 @@ const InquiryMod = () => {
         <SqlPreviewModal
           isOpen={showModalsql}
           onClose={closeModalsql}
-          sql={sql}
+          query={sql}
         />
       )}
 
@@ -1060,19 +1320,24 @@ const InquiryMod = () => {
 
       {showModalPDF && (
         <ExportModal
-          isOpen={showModalPDF}
-          onClose={() => setShowModalPDF(false)}
-          data={[]} // You'll need to pass your data here
+          showModalPDF={showModalPDF}
+          setShowModalPDF={setShowModalPDF}
+          selectedFormat={selectedFormat}
+          setSelectedFormat={setSelectedFormat}
+          fetchExportData={fetchExportData}
           filename="inquiry_data"
+          loading={loadingExcell}
         />
       )}
 
-      {/* Cutoff Month Selector (conditionally rendered) */}
-      {showCutoffSelector && (
-        <CutoffMonthSelector
-          cutoff={cutoff}
-          onCutoffChange={handleCutoff}
-          onClose={() => setShowCutoffSelector(false)}
+      {/* Save Query Modal */}
+      {showSaveQueryModal && (
+        <SaveQueryModal
+          isOpen={showSaveQueryModal}
+          onClose={() => setShowSaveQueryModal(false)}
+          query={sql}
+          thang={thang}
+          queryType={"INQUIRY"}
         />
       )}
     </div>
@@ -1080,3 +1345,14 @@ const InquiryMod = () => {
 };
 
 export default InquiryMod;
+
+// Example placeholder for data fetching (should be replaced with real API call)
+async function fetchDataFromAPI() {
+  // Simulate API delay
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  // Return mock data
+  return [
+    { id: 1, name: "Contoh Data 1", value: 100 },
+    { id: 2, name: "Contoh Data 2", value: 200 },
+  ];
+}
