@@ -231,6 +231,7 @@ export const Login = () => {
 
           setShowSuccessAnimation(true);
           localStorage.setItem("status", "true");
+          localStorage.setItem("token", data.tokenSetLogin); // Persist token for refresh
           await createAuthCookie("token", JSON.stringify(true));
         }
       } catch (error) {

@@ -223,7 +223,6 @@ export default function useQueryBuilder(inquiryState) {
 
   // Backward compatibility methods (matching original useQueryBuilder interface)
   const legacyMethods = {
-    buildQuery: () => buildQuery, // Return the memoized query
     generateSqlPreview,
     generateOptimizedSql: () => buildQuery, // Same as buildQuery in new version
     parseAdvancedConditions: (kondisiValue, fieldName) => {

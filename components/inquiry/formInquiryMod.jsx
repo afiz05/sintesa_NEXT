@@ -64,6 +64,9 @@ import {
 const InquiryMod = () => {
   // Use modular inquiry state hook
   const inquiry = useInquiryState();
+
+  const context = useContext(MyContext);
+  const { statusLogin, token, axiosJWT } = context;
   // Use modular query builder hook
   const { buildQuery } = useQueryBuilder(inquiry);
   // Destructure all needed state and setters from inquiry
@@ -450,7 +453,7 @@ const InquiryMod = () => {
 
     // Safety check to ensure sql is a valid string before using substring
     if (typeof sql === "string" && sql.length > 0) {
-      console.log("🔄 Query Generated:", sql.substring(0, 200) + "..."); // Debug log (show more characters)
+      console.log("🔄 Query Generated:", sql.substring(0, 600)); // Debug log (show more characters)
     } else {
       console.log("🔄 Query Generated: (empty or invalid)"); // Debug log for empty/invalid queries
     }
@@ -779,9 +782,53 @@ const InquiryMod = () => {
   // Helper to fetch data from backend using current filters/query
   // **UPDATED** - Export data fetcher now uses unified query generation
   async function fetchExportData() {
+    console.log("fetchExportData called"); // Debug log to confirm function call
     // Use the same query builder as execute and show SQL
     const sql = generateUnifiedQuery(); // Consistent with all other operations
+    if (!sql || typeof sql !== "string" || sql.trim() === "") {
+      Pesan("Query tidak valid, silakan cek filter dan parameter.");
+      console.error("Export aborted: SQL query is empty or invalid.", { sql });
+      return [];
+    }
+    // If not logged in, return empty array
+    if (!statusLogin) {
+      console.log("Not logged in, cannot export data.");
+      return [];
+    }
 
+    try {
+      // Use the same backend URL as in InquiryModal
+      const backendUrl = "http://localhost:88";
+      const response = await axiosJWT.post(
+        `${backendUrl}/next/inquiry`,
+        {
+          sql,
+          page: 1, // Export all data from first page (adjust if backend supports full export)
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      // Debug: Log the full backend response
+      console.log("[Export Debug] Backend response:", response.data);
+      // If backend supports returning all data for export, use that.
+      // Otherwise, you may need to adjust API/backend to support full export.
+      if (response.data && Array.isArray(response.data.data)) {
+        return response.data.data;
+      }
+      return [];
+    } catch (e) {
+      console.error("Export API error:", e);
+      if (e && e.response) {
+        console.error(
+          "[Export Debug] Backend error response:",
+          e.response.data
+        );
+      }
+      return [];
+    }
     // TODO: Replace with your real backend fetch logic
     // Example: fetch from API using the generated SQL
     // const response = await fetch('/api/query', {
