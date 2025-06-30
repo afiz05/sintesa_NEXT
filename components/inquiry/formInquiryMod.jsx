@@ -339,6 +339,9 @@ const InquiryMod = () => {
     setFrom,
     select,
     setSelect,
+    akunType,
+    akunValue,
+    akunSql,
   } = inquiry;
 
   // Debug logging to track initial state
@@ -755,6 +758,12 @@ const InquiryMod = () => {
     }
     setloadingExcell(false);
   };
+
+  // Add useEffect for handling Akun filter changes
+  React.useEffect(() => {
+    // Update SQL or other dependent values when Akun filter changes
+    buildQuery();
+  }, [akunType, akunValue, akunSql]);
 
   return (
     <div className="w-full">

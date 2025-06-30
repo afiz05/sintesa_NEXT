@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {Button, Input, Select, SelectItem} from "@heroui/react";
+import { Button, Input, Select, SelectItem } from "@heroui/react";
 import { Settings } from "lucide-react";
 import Kdprogram from "../../../referensi_belanja/referensi_inquiryMod/Kdprogram";
 import { getFilteredPrograms } from "../../utils/filterUtils";
@@ -87,6 +87,22 @@ const ProgramFilter = ({ inquiryState, type = "program" }) => {
     { value: "4", label: "Jangan Tampilkan" },
   ];
 
+  // Determine if any filter is active
+  const isFilterActive = () => {
+    return (
+      (kondisi && kondisi !== "") ||
+      (kata && kata !== "") ||
+      (radio && radio !== "1") // Assuming "1" is the default for no filter
+    );
+  };
+
+  // Disable states for each input based on filter logic
+  const isPilihDisabled = isFilterActive();
+  const isKondisiDisabled = isFilterActive() && !kondisi;
+  const isKataDisabled = isFilterActive() && !kata;
+  const hasKondisiFilter = kondisi && kondisi !== "";
+  const hasKataFilter = kata && kata !== "";
+
   return (
     <div className="w-full p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-blue-100 to-cyan-100 shadow-sm">
       {/* Mobile/Tablet: Stack vertically, Desktop: Row layout */}
@@ -114,19 +130,38 @@ const ProgramFilter = ({ inquiryState, type = "program" }) => {
                 size="sm"
                 placeholder={label}
                 status={type === "activity" ? "pilihgiat" : "pilihprogram"}
+                isDisabled={isPilihDisabled}
               />
             </div>
 
             {/* Kondisi */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
-              <label className="text-sm font-medium text-gray-700">
-                Masukkan Kondisi
-              </label>
+              <div className="flex items-center justify-between">
+                <label
+                  className={`text-sm font-medium ${
+                    isKondisiDisabled ? "text-gray-400" : "text-gray-700"
+                  }`}
+                >
+                  Masukkan Kondisi
+                </label>
+                {hasKondisiFilter && !isKondisiDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onPress={() => setKondisi && setKondisi("")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Input
                 placeholder="misalkan: 001,002,003, dst"
                 className="w-full min-w-0"
                 size="sm"
                 value={kondisi || ""}
+                isDisabled={isKondisiDisabled}
                 onChange={(e) => setKondisi && setKondisi(e.target.value)}
               />
               {/* Helper text - show immediately below on mobile */}
@@ -138,14 +173,32 @@ const ProgramFilter = ({ inquiryState, type = "program" }) => {
 
             {/* Kata */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
-              <label className="text-sm font-medium text-gray-700">
-                Mengandung Kata
-              </label>
+              <div className="flex items-center justify-between">
+                <label
+                  className={`text-sm font-medium ${
+                    isKataDisabled ? "text-gray-400" : "text-gray-700"
+                  }`}
+                >
+                  Mengandung Kata
+                </label>
+                {hasKataFilter && !isKataDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onPress={() => setKata && setKata("")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Input
                 placeholder="misalkan: pendidikan"
                 className="w-full min-w-0"
                 size="sm"
                 value={kata || ""}
+                isDisabled={isKataDisabled}
                 onChange={(e) => setKata && setKata(e.target.value)}
               />
             </div>

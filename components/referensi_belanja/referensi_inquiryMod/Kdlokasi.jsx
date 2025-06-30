@@ -33,7 +33,7 @@ const Kdlokasi = (props) => {
       isVirtualized
       selectedKeys={new Set([validSelectedValue])}
       onSelectionChange={handleSelectionChange}
-      isDisabled={props.status !== "pilihprov"}
+      isDisabled={props.isDisabled || props.status !== "pilihprov"}
       size={props.size || "sm"}
       placeholder={props.placeholder || "Pilih Provinsi"}
       className={props.className || "w-full min-w-0 max-w-full"}

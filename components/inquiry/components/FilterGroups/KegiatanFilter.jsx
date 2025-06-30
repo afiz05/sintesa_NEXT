@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {Button, Input, Select, SelectItem} from "@heroui/react";
+import { Button, Input, Select, SelectItem } from "@heroui/react";
 import { Activity } from "lucide-react";
 import Kdgiat from "../../../referensi_belanja/referensi_inquiryMod/Kdgiat";
 import { getFilteredKegiatan } from "../../utils/filterUtils";
@@ -22,7 +22,8 @@ const KegiatanFilter = ({ inquiryState }) => {
   // Determine which filter type is currently active (priority order)
   const hasKataFilter = katagiat && katagiat.trim() !== "";
   const hasKondisiFilter = giatkondisi && giatkondisi.trim() !== "";
-  const hasPilihFilter = giat && giat !== "XXX" && giat !== "XX" && giat !== "XXX";
+  const hasPilihFilter =
+    giat && giat !== "XXX" && giat !== "XX" && giat !== "XXX";
 
   // Disable other inputs based on active filter
   const isPilihDisabled = hasKataFilter || hasKondisiFilter;
@@ -81,19 +82,38 @@ const KegiatanFilter = ({ inquiryState }) => {
                 size="sm"
                 placeholder="Pilih Kegiatan"
                 status="pilihgiat"
+                isDisabled={isPilihDisabled}
               />
             </div>
 
             {/* Kondisi */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
-              <label className="text-sm font-medium text-gray-700">
-                Masukkan Kondisi
-              </label>
+              <div className="flex items-center justify-between">
+                <label
+                  className={`text-sm font-medium ${
+                    isKondisiDisabled ? "text-gray-400" : "text-gray-700"
+                  }`}
+                >
+                  Masukkan Kondisi
+                </label>
+                {hasKondisiFilter && !isKondisiDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onPress={() => setGiatkondisi && setGiatkondisi("")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Input
                 placeholder="misalkan: 1001,1002,1003, dst"
                 className="w-full min-w-0"
                 size="sm"
                 value={giatkondisi || ""}
+                isDisabled={isKondisiDisabled}
                 onChange={(e) =>
                   setGiatkondisi && setGiatkondisi(e.target.value)
                 }
@@ -107,14 +127,32 @@ const KegiatanFilter = ({ inquiryState }) => {
 
             {/* Kata */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
-              <label className="text-sm font-medium text-gray-700">
-                Mengandung Kata
-              </label>
+              <div className="flex items-center justify-between">
+                <label
+                  className={`text-sm font-medium ${
+                    isKataDisabled ? "text-gray-400" : "text-gray-700"
+                  }`}
+                >
+                  Mengandung Kata
+                </label>
+                {hasKataFilter && !isKataDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onPress={() => setKatagiat && setKatagiat("")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Input
                 placeholder="misalkan: layanan"
                 className="w-full min-w-0"
                 size="sm"
                 value={katagiat || ""}
+                isDisabled={isKataDisabled}
                 onChange={(e) => setKatagiat && setKatagiat(e.target.value)}
               />
             </div>

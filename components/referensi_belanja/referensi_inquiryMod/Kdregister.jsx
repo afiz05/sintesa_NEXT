@@ -9,7 +9,7 @@ const Kdregister = (props) => {
         const selected = Array.from(keys)[0];
         props.onChange && props.onChange(selected);
       }}
-      isDisabled={props.status !== "pilihregister"}
+      isDisabled={props.isDisabled || props.status !== "pilihregister"}
       placeholder={props.placeholder || "Pilih Register"}
       className={props.className}
       size={props.size || "sm"}

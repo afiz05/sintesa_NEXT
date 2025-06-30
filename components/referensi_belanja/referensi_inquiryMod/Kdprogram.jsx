@@ -7,18 +7,30 @@ const Kdprogram = (props) => {
     (item) => item.kddept === props.kddept && item.kdunit === props.kdunit
   );
 
+  const selectedValue = props.value ? [props.value] : ["XX"];
+
+  const handleSelectionChange = (keys) => {
+    const selected = Array.from(keys)[0];
+    props.onChange && props.onChange(selected);
+  };
+
   return (
     <Select
-      selectedKeys={props.value ? [props.value] : ["XX"]}
-      onSelectionChange={(keys) => {
-        const selected = Array.from(keys)[0];
-        props.onChange && props.onChange(selected);
-      }}
-      isDisabled={props.status !== "pilihprogram"}
-      placeholder={props.placeholder || "Pilih Program"}
-      className={props.className}
+      selectedKeys={selectedValue}
+      onSelectionChange={handleSelectionChange}
+      isDisabled={props.isDisabled || props.status !== "pilihprogram"}
       size={props.size || "sm"}
+      placeholder="Pilih Program"
+      className={props.className || "max-w-xs mb-2"}
       disallowEmptySelection
+      aria-label="Pilih Program"
+      classNames={{
+        trigger: "w-full max-w-full",
+        value: "truncate pr-8 max-w-full overflow-hidden",
+        mainWrapper: "w-full max-w-full",
+        innerWrapper: "w-full max-w-full overflow-hidden",
+        base: "w-full max-w-full",
+      }}
     >
       <SelectItem key="XX" textValue="Semua Program">
         Semua Program

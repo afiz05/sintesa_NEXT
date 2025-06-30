@@ -17,7 +17,7 @@ const Kdgiat = (props) => {
         const selected = Array.from(keys)[0];
         props.onChange && props.onChange(selected);
       }}
-      isDisabled={props.status !== "pilihgiat"}
+      isDisabled={props.isDisabled || props.status !== "pilihgiat"}
       placeholder={props.placeholder || "Pilih Kegiatan"}
       className={props.className}
       size={props.size || "sm"}
