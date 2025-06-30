@@ -25,22 +25,22 @@ export const Layout = ({ children }: Props) => {
         setCollapsed: handleToggleSidebar,
       }}
     >
-      <div className="flex">
-        {/* Hamburger Sidebar for all screens except XL */}
-        <div className="xl:hidden">
-          <SidebarWrapper />
+      <div className="flex flex-col min-h-screen">
+        {/* Navbar always at the top */}
+        <NavbarWrapper />
+        {/* Sidebar below navbar */}
+        <div>
+          {/* Hamburger Sidebar for all screens except XL */}
+          <div className="xl:hidden">
+            <SidebarWrapper />
+          </div>
+          {/* Desktop Sidebar - positioned below navbar (XL screens only) */}
+          <div className="hidden xl:block pt-16">
+            <SidebarWrapper />
+          </div>
         </div>
-
-        {/* Main content area with navbar and desktop sidebar */}
-        <div className="flex-1 bg-slate-100 dark:bg-black">
-          <NavbarWrapper>
-            {/* Desktop Horizontal Sidebar - positioned below navbar (XL screens only) */}
-            <div className="hidden xl:block">
-              <SidebarWrapper />
-            </div>
-            {children}
-          </NavbarWrapper>
-        </div>
+        {/* Main content area */}
+        <div className="flex-1 bg-slate-100 dark:bg-black">{children}</div>
       </div>
     </SidebarContext.Provider>
   );
