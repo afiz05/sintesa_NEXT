@@ -7,7 +7,7 @@ import { SidebarWrapper } from "../sidebar/sidebar";
 import { SidebarContext } from "./layout-context";
 import { MyContextProvider } from "@/utils/Context";
 
-export const Layout = ({ children }) => {
+export const LayoutJSX = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [_, setLocked] = useLockedBody(false);
   const handleToggleSidebar = () => {

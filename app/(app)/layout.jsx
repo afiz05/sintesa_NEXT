@@ -1,6 +1,6 @@
-import { Layout } from "@/components/layout/layout";
 import "@/styles/globals.css";
+import { LayoutJSX } from "../../components/layout/layoutJSX";
 
 export default function RootLayout({ children }) {
-  return <Layout>{children}</Layout>;
+  return <LayoutJSX>{children}</LayoutJSX>;
 }

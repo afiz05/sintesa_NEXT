@@ -22,7 +22,7 @@ export const NavbarWrapper = ({ children }: Props) => {
   const [searchValue, setSearchValue] = useState("");
 
   return (
-    <div className="w-full fixed flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+    <div className="w-full relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
       <Navbar
         isBordered
         className="w-full"
@@ -54,7 +54,7 @@ export const NavbarWrapper = ({ children }: Props) => {
           </div>
           <NotificationBell />
           <DarkModeSwitch />
-          <UserDropdown />
+          <UserDropdownjsx />
         </NavbarContent>
         <NavbarContent className="w-full max-xl:hidden">
           {/* <CompaniesDropdown /> */}

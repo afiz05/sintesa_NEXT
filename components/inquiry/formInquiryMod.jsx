@@ -471,29 +471,9 @@ const InquiryMod = () => {
 
   const handlegetQuery = async () => {
     const sql = generateUnifiedQuery();
-    inquiry.setSql(sql); // Set the SQL for the modal to use
-
-    // The modal is now responsible for fetching its own data.
-    // This function just needs to open the correct modal based on the report type.
-    if (jenlap === "1") {
-      setShowModalApbn(true);
-    } else if (jenlap === "2") {
-      setShowModal(true);
-    } else if (jenlap === "3") {
-      setShowModalAkumulasi(true);
-    } else if (jenlap === "4") {
-      setShowModalBulanan(true);
-    } else if (jenlap === "5") {
-      setShowModalBlokir(true);
-    } else if (jenlap === "6" && thang > "2020") {
-      setShowModalPN(true);
-    } else if (jenlap === "6" && thang < "2021") {
-      setShowModalPN2(true);
-    } else if (jenlap === "7" && thang >= "2024") {
-      setShowModalJnsblokir(true);
-    }
+    inquiry.setSql(sql);
+    setShowModal(true); // Always open InquiryModal
   };
-
   // **UPDATED** - SQL preview handler now uses unified query generation
   const handlegetQuerySQL = () => {
     // Debug: Log the current akumulatif state before generating SQL

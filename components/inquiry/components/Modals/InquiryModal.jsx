@@ -23,6 +23,7 @@ import {
   TableCell,
 } from "@heroui/react";
 import DataExport from "../../../CSV/formatCSV";
+import Encrypt from "../../../../utils/Random";
 
 const InquiryModal = ({ isOpen, onClose, sql, from, thang }) => {
   const { axiosJWT, token, statusLogin } = useContext(MyContext);
@@ -65,6 +66,8 @@ const InquiryModal = ({ isOpen, onClose, sql, from, thang }) => {
     const isChecked = event.target.checked;
     setFullscreen(isChecked);
   };
+  const encodedQuery = encodeURIComponent(sql);
+  const encryptedQuery = Encrypt(encodedQuery);
 
   const fetchData = async () => {
     setLoading(true);
@@ -75,18 +78,12 @@ const InquiryModal = ({ isOpen, onClose, sql, from, thang }) => {
 
       // !!! IMPORTANT !!!
       // Please confirm or change this URL to your actual backend server address.
-      const backendUrl = "http://localhost:88";
 
       const response = await axiosJWT.post(
-        `${backendUrl}/next/inquiry`, // Use the new backend route
+        `${process.env.NEXT_PUBLIC_LOCAL_NEXT_INQUIRY}`, // Use the new backend route
         {
-          sql,
+          sql: encryptedQuery,
           page: currentPage + 1, // Backend expects a 1-based page index
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
         }
       );
       const endTime = performance.now();
@@ -103,8 +100,12 @@ const InquiryModal = ({ isOpen, onClose, sql, from, thang }) => {
         setPageCount(0);
       }
     } catch (error) {
-      handleHttpError(error);
-      // Clear data on error to prevent showing stale results
+      const { status, data } = error.response || {};
+      handleHttpError(
+        status,
+        (data && data.error) ||
+          "Terjadi Permasalahan Koneksi atau Server Backend"
+      );
       setData([]);
       setTotalData(0);
       setPageCount(0);

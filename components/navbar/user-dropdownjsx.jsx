@@ -36,19 +36,31 @@ export const UserDropdownjsx = () => {
           />
         </DropdownTrigger>
       </NavbarItem>
-      <DropdownMenu aria-label="User menu actions">
-        <DropdownItem className="flex flex-col items-start">
-          <p className="text-xs text-gray-500">Signed in as</p>
-          <p className="font-medium">{name}</p>
+      <DropdownMenu
+        disabledKeys={["username"]}
+        aria-label="User menu actions"
+        onAction={(actionKey) => console.log({ actionKey })}
+      >
+        <DropdownItem
+          key="username"
+          className="flex flex-col justify-start w-full items-start"
+        >
+          <p>Signed in as</p>
+          <p>{name}</p>
         </DropdownItem>
-        <DropdownItem key="settings">My Settings</DropdownItem>
-        <DropdownItem key="team_settings">Team Settings</DropdownItem>
-        <DropdownItem key="analytics">Analytics</DropdownItem>
-        <DropdownItem key="system">System</DropdownItem>
-        <DropdownItem key="configurations">Configurations</DropdownItem>
-        <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
+        <DropdownItem key="profil-user">
+          <Link href="/profil-user" className="dropdown-item">
+            Profil User
+          </Link>
+        </DropdownItem>
+        <DropdownItem key="settings">Settings</DropdownItem>
+
+        {/* <DropdownItem key="analytics">Analytics</DropdownItem> */}
+        {/* <DropdownItem key="system">System</DropdownItem> */}
+
+        {/* <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem> */}
         <DropdownItem key="user-manage">
-          <Link href="/accounts" className="w-full block text-left">
+          <Link href="/accounts" className="dropdown-item">
             User Management
           </Link>
         </DropdownItem>
