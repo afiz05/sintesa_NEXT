@@ -2,26 +2,23 @@ import React from "react";
 import { Sidebar } from "./sidebar.styles";
 import { Avatar, Tooltip } from "@heroui/react";
 import { CompaniesDropdown } from "./companies-dropdown";
-import { HomeIcon } from "../icons/sidebar/home-icon";
-import { PaymentsIcon } from "../icons/sidebar/payments-icon";
-import { BalanceIcon } from "../icons/sidebar/balance-icon";
-import { AccountsIcon } from "../icons/sidebar/accounts-icon";
-import { CustomersIcon } from "../icons/sidebar/customers-icon";
-import { ProductsIcon } from "../icons/sidebar/products-icon";
-import { ReportsIcon } from "../icons/sidebar/reports-icon";
-import { DevIcon } from "../icons/sidebar/dev-icon";
-import { ViewIcon } from "../icons/sidebar/view-icon";
-import { SettingsIcon } from "../icons/sidebar/settings-icon";
+import {
+  Home,
+  Users,
+  Settings,
+  ChevronDown,
+  CandlestickChart,
+  Info,
+  TestTube2,
+  Database,
+} from "lucide-react";
 import { InqVertikalDD } from "./inquiry-vrtkl-dropdown";
 import { InqHorizontalDD } from "./inquiry-hrzntl-dropdown";
 import { MbgHorizontalDD } from "./mbg-hrzntl-dropdown";
 import { MbgVertikalDD } from "./mbg-vrtkl-dropdown";
 import { SidebarItem } from "./sidebar-item";
 import { SidebarMenu } from "./sidebar-menu";
-import { FilterIcon } from "../icons/sidebar/filter-icon";
 import { useSidebarContext } from "../layout/layout-context";
-import { ChangeLogIcon } from "../icons/sidebar/changelog-icon";
-import { ChevronDown, ChevronUp, ChartCandlestick } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { EpaHorizontalDD } from "./epa-hrzntl-dropdown";
 import { EpaVertikalDD } from "./epa-vrtkl-dropdown";
@@ -49,14 +46,14 @@ export const SidebarWrapper = () => {
             <div className={Sidebar.Body()}>
               <SidebarItem
                 title="Dashboard"
-                icon={<HomeIcon />}
+                icon={<Home />}
                 isActive={pathname === "/"}
                 href="/"
               />
 
               <SidebarMenu title="Main Menu">
                 <MbgVertikalDD
-                  icon={<ChartCandlestick className="text-default-500" />}
+                  icon={<CandlestickChart className="text-default-500" />}
                   items={["Dashboard", "Kertas Kerja", "Data"]}
                   title="Makan Bergizi"
                   isActive={pathname.startsWith("/mbg")}
@@ -64,17 +61,17 @@ export const SidebarWrapper = () => {
                 <SidebarItem
                   isActive={pathname === "/profilkl"}
                   title="Profil K/L"
-                  icon={<CustomersIcon />}
+                  icon={<Users />}
                   href="/profilkl"
                 />
                 <EpaVertikalDD
-                  icon={<ChartCandlestick className="text-default-500" />}
+                  icon={<CandlestickChart className="text-default-500" />}
                   items={["Summary", "Analisa"]}
                   title="EPA"
                   isActive={pathname.startsWith("/epa")}
                 ></EpaVertikalDD>
                 <InqVertikalDD
-                  icon={<ChartCandlestick className="text-default-500" />}
+                  icon={<CandlestickChart className="text-default-500" />}
                   items={[
                     "Belanja",
                     "Belanja2",
@@ -94,22 +91,22 @@ export const SidebarWrapper = () => {
                 <SidebarItem
                   isActive={pathname === "/settings"}
                   title="Settings"
-                  icon={<SettingsIcon />}
+                  icon={<Settings />}
                   href="/settings"
                 />
               </SidebarMenu>
 
               <SidebarMenu title="Updates">
                 <SidebarItem
-                  isActive={pathname === "/test-loading"}
-                  title="Test Loading"
-                  icon={<DevIcon />}
-                  href="/test-loading"
+                  isActive={pathname === "/tentang-kami"}
+                  title="Tentang Kami"
+                  icon={<Info />}
+                  href="/tentang-kami"
                 />
                 <SidebarItem
                   isActive={pathname === "/test-belanja"}
                   title="Belanja Test"
-                  icon={<ChartCandlestick className="text-default-500" />}
+                  icon={<TestTube2 className="text-default-500" />}
                   href="/test-belanja"
                 />
               </SidebarMenu>
@@ -117,7 +114,7 @@ export const SidebarWrapper = () => {
             <div className={Sidebar.Footer()}>
               <Tooltip content={"Settings"} color="primary">
                 <div className="max-w-fit">
-                  <SettingsIcon />
+                  <Settings />
                 </div>
               </Tooltip>
             </div>
@@ -128,41 +125,41 @@ export const SidebarWrapper = () => {
       {/* Desktop Horizontal Navbar - Only for XL screens */}
       <nav className="hidden xl:block w-full z-[50] bg-white dark:bg-black border-b border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="px-6 py-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between font-medium">
             {/* Center - Navigation Items */}
-            <div className="flex items-center space-x-1 overflow-x-auto overflow-y-visible">
+            <div className="flex items-center space-x-4 overflow-x-auto overflow-y-visible">
               <SidebarItem
                 title="Dashboard"
-                icon={<HomeIcon />}
+                icon={<Home />}
                 isActive={pathname === "/"}
                 href="/"
               />
 
               <MbgHorizontalDD
-                icon={<ChartCandlestick className="text-default-500" />}
+                icon={<CandlestickChart />}
                 items={["Dashboard", "Kertas Kerja", "Data"]}
                 title="Makan Bergizi"
                 isActive={pathname.startsWith("/mbg")}
               >
-                <ChevronDown size={16} className="text-default-500" />
+                <ChevronDown size={16} />
               </MbgHorizontalDD>
 
               <SidebarItem
                 isActive={pathname === "/profilkl"}
                 title="Profil K/L"
-                icon={<CustomersIcon />}
+                icon={<Users />}
                 href="/profilkl"
               />
               <EpaHorizontalDD
-                icon={<ChartCandlestick className="text-default-500" />}
+                icon={<CandlestickChart />}
                 items={["Summary", "Analisa"]}
                 title="EPA"
                 isActive={pathname.startsWith("/epa")}
               >
-                <ChevronDown size={16} className="text-default-500" />
+                <ChevronDown size={16} />
               </EpaHorizontalDD>
               <InqHorizontalDD
-                icon={<ChartCandlestick className="text-default-500" />}
+                icon={<Database />}
                 items={[
                   "Belanja",
                   "Belanja2",
@@ -176,20 +173,20 @@ export const SidebarWrapper = () => {
                 title="Inquiry Data"
                 isActive={pathname.startsWith("/inquiry-data")}
               >
-                <ChevronDown size={16} className="text-default-500" />
+                <ChevronDown size={16} />
               </InqHorizontalDD>
 
               <SidebarItem
-                isActive={pathname === "/test-loading"}
-                title="Test Loading"
-                icon={<DevIcon />}
-                href="/test-loading"
+                isActive={pathname === "/tentang-kami"}
+                title="Tentang Kami"
+                icon={<Info />}
+                href="/tentang-kami"
               />
 
               <SidebarItem
                 isActive={pathname === "/test-belanja"}
                 title="Belanja Test"
-                icon={<ChartCandlestick className="text-default-500" />}
+                icon={<TestTube2 />}
                 href="/test-belanja"
               />
             </div>
@@ -198,7 +195,7 @@ export const SidebarWrapper = () => {
             <div className="flex items-center space-x-3">
               <Tooltip content={"Settings"} color="primary">
                 <div className="max-w-fit cursor-pointer">
-                  <SettingsIcon />
+                  <Settings />
                 </div>
               </Tooltip>
             </div>

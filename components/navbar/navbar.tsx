@@ -14,14 +14,14 @@ import SintesaLogoOnlyDark from "../icons/logo/snext_logoonly_dark.svg";
 import SintesaLogoOnlyLight from "../icons/logo/snext_logoonly_light.svg";
 
 interface Props {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export const NavbarWrapper = ({ children }: Props) => {
   const [searchValue, setSearchValue] = useState("");
 
   return (
-    <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+    <div className="w-full fixed flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
       <Navbar
         isBordered
         className="w-full"
@@ -36,10 +36,24 @@ export const NavbarWrapper = ({ children }: Props) => {
           </span>
           <BurguerButton />
         </NavbarContent>
-        <NavbarContent className="xl:hidden" justify="end">
+        <NavbarContent className="xl:hidden" justify="center">
+          <div className="flex-1">
+            <Input
+              startContent={<SearchIcon />}
+              isClearable
+              value={searchValue}
+              onValueChange={setSearchValue}
+              className="w-full"
+              classNames={{
+                input: "w-full",
+                mainWrapper: "w-full",
+              }}
+              placeholder="Search..."
+            />
+          </div>
           <NotificationBell />
-          <NotificationTester />
           <DarkModeSwitch />
+          <UserDropdown />
         </NavbarContent>
         <NavbarContent className="w-full max-xl:hidden">
           {/* <CompaniesDropdown /> */}
@@ -65,14 +79,14 @@ export const NavbarWrapper = ({ children }: Props) => {
           justify="end"
           className="w-fit data-[justify=end]:flex-grow-0 max-xl:hidden"
         >
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <FeedbackIcon />
             <span>Feedback?</span>
-          </div>
+          </div> */}
 
           <NotificationBell />
 
-          <NotificationTester />
+          {/* <NotificationTester /> */}
 
           <Link href="https://spanint.kemenkeu.go.id/" target={"_blank"}>
             <GithubIcon />
