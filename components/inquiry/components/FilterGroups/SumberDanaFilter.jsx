@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import {Button, Input, Select, SelectItem} from "@heroui/react";
+import { Button, Input, Select, SelectItem } from "@heroui/react";
 import { Settings } from "lucide-react";
 import Kdsdana from "../../../referensi_belanja/referensi_inquiryMod/Kdsdana";
 
@@ -19,12 +19,13 @@ const SumberdanaFilter = ({ inquiryState }) => {
   // Determine which filter type is currently active (priority order)
   const hasKataFilter = katasdana && katasdana.trim() !== "";
   const hasKondisiFilter = sdanakondisi && sdanakondisi.trim() !== "";
-  const hasPilihFilter = sdana && sdana !== "XXX" && sdana !== "XX" && sdana !== "XXX";
+  const hasPilihFilter =
+    sdana && sdana !== "XXX" && sdana !== "XX" && sdana !== "XXX";
 
   // Disable other inputs based on active filter
   const isPilihDisabled = hasKataFilter || hasKondisiFilter;
   const isKondisiDisabled = hasKataFilter || hasPilihFilter;
-  const isKataDisabled = hasKondisiFilter || hasPilihFilter;;
+  const isKataDisabled = hasKondisiFilter || hasPilihFilter;
 
   const SdanaOptions = [
     { value: "1", label: "Kode" },
@@ -49,9 +50,22 @@ const SumberdanaFilter = ({ inquiryState }) => {
           <div className="flex flex-col xl:flex xl:flex-row xl:items-end gap-3 xl:gap-4 w-full">
             {/* Selection Component */}
             <div className="flex flex-col gap-1 w-full xl:flex-1 min-w-0 max-w-full overflow-hidden">
-              <label className="text-sm font-medium text-gray-700">
-                Pilih Sumber Dana
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-gray-700">
+                  Pilih Sumber Dana
+                </label>
+                {hasPilihFilter && !isPilihDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onClick={() => setSdana && setSdana("")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Kdsdana
                 value={sdana}
                 onChange={setSdana}
@@ -59,14 +73,28 @@ const SumberdanaFilter = ({ inquiryState }) => {
                 size="sm"
                 placeholder="Pilih Sumber Dana"
                 status="pilihsdana"
+                isDisabled={isPilihDisabled}
               />
             </div>
 
             {/* Kondisi */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
-              <label className="text-sm font-medium text-gray-700">
-                Masukkan Kondisi
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-gray-700">
+                  Masukkan Kondisi
+                </label>
+                {hasKondisiFilter && !isKondisiDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onClick={() => setSdanakondisi && setSdanakondisi("")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Input
                 placeholder="misalkan: 001,002,003, dst"
                 className="w-full min-w-0"
@@ -75,6 +103,7 @@ const SumberdanaFilter = ({ inquiryState }) => {
                 onChange={(e) =>
                   setSdanakondisi && setSdanakondisi(e.target.value)
                 }
+                isDisabled={isKondisiDisabled}
               />
               {/* Helper text - show immediately below on mobile */}
               <p className="text-xs text-gray-500 xl:hidden">
@@ -85,15 +114,29 @@ const SumberdanaFilter = ({ inquiryState }) => {
 
             {/* Kata */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
-              <label className="text-sm font-medium text-gray-700">
-                Mengandung Kata
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-gray-700">
+                  Mengandung Kata
+                </label>
+                {hasKataFilter && !isKataDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onClick={() => setKatasdana && setKatasdana("")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Input
                 placeholder="misalkan: rupiah"
                 className="w-full min-w-0"
                 size="sm"
                 value={katasdana || ""}
                 onChange={(e) => setKatasdana && setKatasdana(e.target.value)}
+                isDisabled={isKataDisabled}
               />
             </div>
 

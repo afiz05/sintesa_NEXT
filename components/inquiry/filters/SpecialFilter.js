@@ -17,6 +17,7 @@ export class InflasiFilter extends BaseFilter {
   buildFromState(inquiryState) {
     const { jenlap, Inflasi, inflasiradio, opsiInflasi } = inquiryState;
 
+    // Only activate this filter for jenlap 7, never for jenlap 6
     if (jenlap !== "7") {
       return this.getEmptyResult();
     }
@@ -78,6 +79,7 @@ export class StuntingFilter extends BaseFilter {
   buildFromState(inquiryState) {
     const { jenlap, Stunting, stuntingradio, opsiStunting } = inquiryState;
 
+    // Only activate this filter for jenlap 7, never for jenlap 6
     if (jenlap !== "7") {
       return this.getEmptyResult();
     }
@@ -130,6 +132,7 @@ export class KemiskinanFilter extends BaseFilter {
   buildFromState(inquiryState) {
     const { jenlap, Miskin, miskinradio, opsiMiskin } = inquiryState;
 
+    // Only activate this filter for jenlap 7, never for jenlap 6
     if (jenlap !== "7") {
       return this.getEmptyResult();
     }
@@ -183,6 +186,7 @@ export class PemiluFilter extends BaseFilter {
   buildFromState(inquiryState) {
     const { jenlap, Pemilu, pemiluradio, opsiPemilu } = inquiryState;
 
+    // Only activate this filter for jenlap 7, never for jenlap 6
     if (jenlap !== "7") {
       return this.getEmptyResult();
     }
@@ -236,6 +240,7 @@ export class IknFilter extends BaseFilter {
   buildFromState(inquiryState) {
     const { jenlap, Ikn, iknradio, opsiIkn } = inquiryState;
 
+    // Only activate this filter for jenlap 7, never for jenlap 6
     if (jenlap !== "7") {
       return this.getEmptyResult();
     }
@@ -289,6 +294,7 @@ export class PanganFilter extends BaseFilter {
   buildFromState(inquiryState) {
     const { jenlap, Pangan, panganradio, opsiPangan } = inquiryState;
 
+    // Only activate this filter for jenlap 7, never for jenlap 6
     if (jenlap !== "7") {
       return this.getEmptyResult();
     }
