@@ -22,7 +22,6 @@ import {
   TableRow,
   TableCell,
 } from "@heroui/react";
-import DataExport from "../../../CSV/formatCSV";
 import Encrypt from "../../../../utils/Random";
 
 const InquiryModal = ({ isOpen, onClose, sql, from, thang }) => {
@@ -202,9 +201,6 @@ const InquiryModal = ({ isOpen, onClose, sql, from, thang }) => {
                 size="sm"
                 className="w-64"
               />
-              {data.length > 0 && (
-                <DataExport data={data} filename="inquiry_data.csv" />
-              )}
             </div>
           </div>
 

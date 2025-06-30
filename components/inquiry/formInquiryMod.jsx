@@ -4,62 +4,18 @@ import MyContext from "../../utils/Context";
 import SqlPreviewModal from "./components/Modals/SqlPreviewModal";
 import SaveQueryModal from "./components/Modals/SaveQueryModal";
 import ExportModal from "./components/Modals/ExportModal";
-import BlokirModal from "./components/Modals/BlokirModal";
-import PNModal from "./components/Modals/PNModal";
 import InquiryModal from "./components/Modals/InquiryModal";
-import ApbnModal from "./components/Modals/ApbnModal";
-import AkumulasiModal from "./components/Modals/AkumulasiModal";
-import BulananModal from "./components/Modals/BulananModal";
-import JnsBlokirModal from "./components/Modals/JnsBlokirModal";
-import PN2Modal from "./components/Modals/PN2Modal";
-import Thang from "../referensi_belanja/Thang";
-import Kddept from "../referensi_belanja/referensi_inquiryMod/Kddept";
-import Kdunit from "../referensi_belanja/referensi_inquiryMod/Kdunit";
-import Kddekon from "../referensi_belanja/referensi_inquiryMod/Kddekon";
-import Kdlokasi from "../referensi_belanja/referensi_inquiryMod/Kdlokasi";
-import Kdkabkota from "../referensi_belanja/referensi_inquiryMod/Kdkabkota";
-import Kdkanwil from "../referensi_belanja/referensi_inquiryMod/Kdkanwil";
-import Kdkppn from "../referensi_belanja/referensi_inquiryMod/Kdkppn";
-import Kdsatker from "../referensi_belanja/referensi_inquiryMod/Kdsatker";
-import Kdfungsi from "../referensi_belanja/referensi_inquiryMod/Kdfungsi";
-import Kdsfungsi from "../referensi_belanja/referensi_inquiryMod/Kdsfungsi";
-import Kdprogram from "../referensi_belanja/referensi_inquiryMod/Kdprogram";
-import Kdgiat from "../referensi_belanja/referensi_inquiryMod/Kdgiat";
-import Kdoutput from "../referensi_belanja/referensi_inquiryMod/Kdoutput";
-import Kdakun from "../referensi_belanja/referensi_inquiryMod/Kdakun";
-import Kdsdana from "../referensi_belanja/referensi_inquiryMod/Kdsdana";
-import Kdregister from "../referensi_belanja/referensi_inquiryMod/Kdregister";
-import AccountFilter from "./components/FilterGroups/AkunFilter";
-import KementerianFilter from "./components/FilterGroups/KementerianFilter";
-import FungsiFilter from "./components/FilterGroups/FungsiFilter";
-import FundingFilter from "./components/FilterGroups/SumberDanaFilter";
-import LokasiFilter from "./components/FilterGroups/LokasiFilter";
-import OutputFilter from "./components/FilterGroups/ProgramFilter";
-import UnitFilter from "./components/FilterGroups/UnitFilter";
-import ProgramFilter from "./components/FilterGroups/ProgramFilter";
-import DekonFilter from "./components/FilterGroups/DekonFilter";
-
 import FilterSection from "./components/FilterSelector";
 import QueryButtons from "./components/QueryButtons";
 import ReportTypeSelector from "./components/LaporanSelector";
-
 import useInquiryState from "./hooks/useInquiryState";
 import useQueryBuilder from "./hooks/useQueryBuilderModular";
-// Note: IKN, Inflasi, and Kemiskinan filter components moved to FilterGroups
-// import IknRadio from "../inquiry/radio/IknRadio";
-// import JenisIkn from "../referensi_belanja/JenisIkn";
-// import InflasiRadio from "../inquiry/radio/InflasiRadio";
-// import JenisInflasiInquiry from "../referensi_belanja/JenisInflasiInquiry";
-// import MiskinRadio from "../inquiry/radio/MiskinRadio";
-// import JenisMiskin from "../referensi_belanja/JenisMiskin";
-import MpRadio from "../inquiry/radio/MpRadio";
-import CutoffMonthSelector from "./CutoffMonthSelector";
 import {
   exportToCSV,
   exportToExcel,
   exportToJSON,
   exportToText,
-} from "./exportUtils";
+} from "./utils/exportUtils";
 
 const InquiryMod = () => {
   // Use modular inquiry state hook
@@ -85,20 +41,6 @@ const InquiryMod = () => {
     setShowModalKedua,
     showModalsql,
     setShowModalsql,
-    showModalApbn,
-    setShowModalApbn,
-    showModalAkumulasi,
-    setShowModalAkumulasi,
-    showModalBulanan,
-    setShowModalBulanan,
-    showModalBlokir,
-    setShowModalBlokir,
-    showModalPN,
-    setShowModalPN,
-    showModalPN2,
-    setShowModalPN2,
-    showModalJnsblokir,
-    setShowModalJnsblokir,
     showModalPDF,
     setShowModalPDF,
     showModalsimpan,
@@ -466,9 +408,6 @@ const InquiryMod = () => {
     return generateUnifiedQuery();
   };
 
-  // This state is no longer needed here as the modal fetches its own data.
-  // const [inquiryData, setInquiryData] = React.useState([]);
-
   const handlegetQuery = async () => {
     const sql = generateUnifiedQuery();
     inquiry.setSql(sql);
@@ -501,68 +440,9 @@ const InquiryMod = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const closeModalApbn = () => {
-    setShowModalApbn(false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const closeModalAkumulasi = () => {
-    setShowModalAkumulasi(false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const closeModalBulanan = () => {
-    setShowModalBulanan(false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const closeModalBlokir = () => {
-    setShowModalBlokir(false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const closeModalPN = () => {
-    setShowModalPN(false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const closeModalPN2 = () => {
-    setShowModalPN2(false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const closeModalJnsblokir = () => {
-    setShowModalJnsblokir(false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
   const closeModalsimpan = () => {
     setShowModalsimpan(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  // Add these handlers before the return statement
-  const handleJenlap = (jenlapopt) => {
-    const { akumulatif, selectedValue } = jenlapopt;
-    setAkumulatif(akumulatif);
-    setJenlap(selectedValue);
-  };
-
-  const handleSimpan = () => {
-    buildQuery(); // Call the function to build the query
-    setShowModalsimpan(true);
-  };
-
-  const handleThang = (thang) => {
-    setThang(thang);
-  };
-
-  const handleCutoff = (cutoff) => {
-    setCutoff(cutoff);
-  };
-
-  const handlePembulatan = (pembulatan) => {
-    setPembulatan(pembulatan);
   };
 
   // Add useEffect for handling cutoff changes
@@ -733,13 +613,6 @@ const InquiryMod = () => {
     );
   };
 
-  // Add IKN state if not present (Note: Now handled in useInquiryState)
-  // const [Ikn, setIkn] = React.useState("XX");
-  // const [iknradio, setIknradio] = React.useState("1");
-  // const [opsiIkn, setOpsiIkn] = React.useState("pilihIkn");
-
-  // Note: IKN, Inflasi, and Miskin filters are now modularized and managed in useInquiryState
-
   // Add MP state if not present
   const [opsiMP, setOpsiMP] = React.useState("pilihmp");
 
@@ -809,19 +682,6 @@ const InquiryMod = () => {
       }
       return [];
     }
-    // TODO: Replace with your real backend fetch logic
-    // Example: fetch from API using the generated SQL
-    // const response = await fetch('/api/query', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ sql, thang, jenlap })
-    // });
-    // const data = await response.json();
-    // return data;
-
-    // Placeholder - return empty array until API is implemented
-    console.log("Generated SQL for export:", sql);
-    return [];
   }
 
   // Robust Excel export handler (fetches fresh data)
@@ -1255,76 +1115,6 @@ const InquiryMod = () => {
         <InquiryModal
           isOpen={showModal}
           onClose={closeModal}
-          sql={sql}
-          from={from}
-          thang={thang}
-        />
-      )}
-
-      {showModalApbn && (
-        <ApbnModal
-          isOpen={showModalApbn}
-          onClose={closeModalApbn}
-          sql={sql}
-          from={from}
-          thang={thang}
-        />
-      )}
-
-      {showModalAkumulasi && (
-        <AkumulasiModal
-          isOpen={showModalAkumulasi}
-          onClose={closeModalAkumulasi}
-          sql={sql}
-          from={from}
-          thang={thang}
-        />
-      )}
-
-      {showModalBulanan && (
-        <BulananModal
-          isOpen={showModalBulanan}
-          onClose={closeModalBulanan}
-          sql={sql}
-          from={from}
-          thang={thang}
-        />
-      )}
-
-      {showModalBlokir && (
-        <BlokirModal
-          isOpen={showModalBlokir}
-          onClose={closeModalBlokir}
-          sql={sql}
-          from={from}
-          thang={thang}
-        />
-      )}
-
-      {showModalPN && (
-        <PNModal
-          isOpen={showModalPN}
-          onClose={closeModalPN}
-          sql={sql}
-          from={from}
-          thang={thang}
-        />
-      )}
-
-      {showModalPN2 && (
-        <PN2Modal
-          isOpen={showModalPN2}
-          onClose={closeModalPN2}
-          sql={sql}
-          from={from}
-          thang={thang}
-        />
-      )}
-
-      {showModalJnsblokir && (
-        <JnsBlokirModal
-          isOpen={showModalJnsblokir}
-          onClose={closeModalJnsblokir}
           sql={sql}
           from={from}
           thang={thang}
