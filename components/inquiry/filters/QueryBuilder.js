@@ -95,11 +95,11 @@ class QueryBuilder {
     const blokircaput = `, ROUND(SUM(a.blokir)/${pembulatan},0) AS BLOKIR`;
     const jnsblokirBulanan = `, a.kdblokir, ROUND(SUM(a.blokir)/${pembulatan},0) AS BLOKIR`;
 
-    // jenlap = 6: Complete monthly breakdown with volume, pagu, realization, percentage, and physical realization
-    const outputDetailSelect = `, a.sat as satuan, SUM(vol) AS vol, sum(a.pagu) as pagu, sum(real1) as rjan, sum(persen1) as pjan, sum(realfisik1) as rpjan, sum(real2) as rfeb, sum(persen2) as pfeb, sum(realfisik2) as rpfeb, sum(real3) as rmar, sum(persen3) as pmar, sum(realfisik3) as rpmar, sum(real4) as rapr, sum(persen4) as papr, sum(realfisik4) as rpapr, sum(real5) as rmei, sum(persen5) as pmei, sum(realfisik5) as rpmei, sum(real6) as rjun, sum(persen6) as pjun, sum(realfisik6) as rpjun, sum(real7) as rjul, sum(persen7) as pjul, sum(realfisik7) as rpjul, sum(real8) as rags, sum(persen8) as pags, sum(realfisik8) as rpags, sum(real9) as rsep, sum(persen9) as psep, sum(realfisik9) as rpsep, sum(real10) as rokt, sum(persen10) as pokt, sum(realfisik10) as rpokt, sum(real11) as rnov, sum(persen11) as pnov, sum(realfisik11) as rpnov, sum(real12) as rdes, sum(persen12) as pdes, sum(realfisik12) as rpdes, os, a.ket`;
+    // jenlap = 6: Volume Output Kegiatan (PN) - Data Caput (uses pagu_output table)
+    const jenlap6Select = `, a.sat as satuan, SUM(vol) AS vol, sum(a.pagu) as pagu, sum(real1) as rjan, sum(persen1) as pjan, sum(realfisik1) as rpjan, sum(real2) as rfeb, sum(persen2) as pfeb, sum(realfisik2) as rpfeb, sum(real3) as rmar, sum(persen3) as pmar, sum(realfisik3) as rpmar, sum(real4) as rapr, sum(persen4) as papr, sum(realfisik4) as rpapr, sum(real5) as rmei, sum(persen5) as pmei, sum(realfisik5) as rpmei, sum(real6) as rjun, sum(persen6) as pjun, sum(realfisik6) as rpjun, sum(real7) as rjul, sum(persen7) as pjul, sum(realfisik7) as rpjul, sum(real8) as rags, sum(persen8) as pags, sum(realfisik8) as rpags, sum(real9) as rsep, sum(persen9) as psep, sum(realfisik9) as rpsep, sum(real10) as rokt, sum(persen10) as pokt, sum(realfisik10) as rpokt, sum(real11) as rnov, sum(persen11) as pnov, sum(realfisik11) as rpnov, sum(real12) as rdes, sum(persen12) as pdes, sum(realfisik12) as rpdes, os, a.ket`;
 
-    // jenlap = 7: Use pa_pagu_blokir_akun table but with blokirBulanan + kdblokir + nmblokir
-    const blokirWithKdblokir = `, a.kdblokir, a.nmblokir${blokirBulanan}`;
+    // jenlap = 7: Pergerakan Blokir Bulanan per Jenis (kdblokir, nmblokir + monthly blokir breakdown)
+    const blokirBulananSelect = `, a.kdblokir, a.nmblokir${blokirBulanan}`;
 
     // Historical tables
     const monthNames = [
@@ -126,16 +126,25 @@ class QueryBuilder {
     let dynamicFrom = "";
     let dynamicSelect = "";
 
+    // Debug logging to check jenlap value
+    console.log("🔍 QueryBuilder Debug:", {
+      jenlap,
+      jenlapType: typeof jenlap,
+    });
+
     switch (jenlap) {
       case "1":
+        console.log("📊 Using jenlap 1 (DIPA APBN)");
         dynamicFrom = fromapbn;
         dynamicSelect = paguapbn + realapbn + blokir;
         break;
       case "2":
+        console.log("📊 Using jenlap 2 (Pagu Realisasi Blokir)");
         dynamicFrom = tanggal ? historicalTable : currentTable;
         dynamicSelect = pagu + selectClause + blokir;
         break;
       case "3":
+        console.log("📊 Using jenlap 3 (Realisasi Bulanan)");
         dynamicFrom = tanggal ? historicalTable : currentTable;
         dynamicSelect =
           jenlap === "3" && akumulatif === "1"
@@ -143,22 +152,27 @@ class QueryBuilder {
             : pagu + realbulanan + blokir;
         break;
       case "4":
+        console.log("📊 Using jenlap 4 (Pagu Bulanan)");
         dynamicFrom = fromBulanan;
         dynamicSelect = realBulanan;
         break;
       case "5":
+        console.log("📊 Using jenlap 5 (Blokir Bulanan)");
         dynamicFrom = fromBulanan;
         dynamicSelect = blokirBulanan;
         break;
       case "6":
+        console.log("📊 Using jenlap 6 (Volume Output Kegiatan - Data Caput)");
         dynamicFrom = fromcaput;
-        dynamicSelect = outputDetailSelect;
+        dynamicSelect = jenlap6Select;
         break;
       case "7":
+        console.log("📊 Using jenlap 7 (Pergerakan Blokir Bulanan per Jenis)");
         dynamicFrom = fromJnsblokir;
-        dynamicSelect = blokirWithKdblokir;
+        dynamicSelect = blokirBulananSelect;
         break;
       default:
+        console.log("📊 Using default jenlap");
         dynamicFrom = currentTable;
         dynamicSelect = pagu + blokir;
         break;
@@ -195,15 +209,21 @@ class QueryBuilder {
     let groupByClause = "";
     const groupByFields = [...filterResult.groupBy];
 
-    // Special handling for jenlap = 6: Add sat, os, ket to GROUP BY for output detail
+    console.log("🔍 Initial groupByFields:", groupByFields);
+
+    // Special handling for jenlap = 6: Add sat, os, ket to GROUP BY (Volume Output Kegiatan - Data Caput)
     if (inquiryState.jenlap === "6") {
+      console.log("📊 Adding sat, os, ket to GROUP BY for jenlap 6");
       groupByFields.push("a.sat", "a.os", "a.ket");
     }
 
-    // Special handling for jenlap = 7: Add kdblokir to GROUP BY
+    // Special handling for jenlap = 7: Add kdblokir to GROUP BY for blokir breakdown (Pergerakan Blokir Bulanan per Jenis)
     if (inquiryState.jenlap === "7") {
+      console.log("📊 Adding kdblokir to GROUP BY for jenlap 7");
       groupByFields.push("a.kdblokir");
     }
+
+    console.log("🔍 Final groupByFields:", groupByFields);
 
     if (groupByFields.length > 0) {
       groupByClause = `GROUP BY ${groupByFields.join(", ")}`;
