@@ -89,7 +89,7 @@ const Kdkppn = (props) => {
           }
           size={props.size || "sm"}
           aria-label="Pilih KPPN"
-          isDisabled={props.status !== "pilihkppn"}
+          isDisabled={props.isDisabled || props.status !== "pilihkppn"}
           disallowEmptySelection
           placeholder={props.placeholder || "Pilih KPPN"}
         >

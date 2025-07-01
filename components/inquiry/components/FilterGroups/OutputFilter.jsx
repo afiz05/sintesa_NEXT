@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {Button, Input, Select, SelectItem} from "@heroui/react";
+import { Button, Input, Select, SelectItem } from "@heroui/react";
 import { Target } from "lucide-react";
 import Kdoutput from "../../../referensi_belanja/referensi_inquiryMod/Kdoutput";
 import Kdsoutput from "../../../referensi_belanja/referensi_inquiryMod/Kdsoutput";
@@ -108,6 +108,16 @@ const OutputFilter = ({ inquiryState, type = "output" }) => {
     { value: "4", label: "Jangan Tampilkan" },
   ];
 
+  // Determine which filter type is currently active (priority order)
+  const hasKondisiFilter = kondisi && kondisi.trim() !== "";
+  const hasKataFilter = kata && kata.trim() !== "";
+  const hasPilihFilter = value && value !== "XX" && value !== "XXX";
+
+  // Disable other inputs based on active filter
+  const isPilihDisabled = hasKondisiFilter || hasKataFilter;
+  const isKondisiDisabled = hasKataFilter || hasPilihFilter;
+  const isKataDisabled = hasKondisiFilter || hasPilihFilter;
+
   return (
     <div className="w-full p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-purple-100 to-pink-100 shadow-sm">
       {/* Mobile/Tablet: Stack vertically, Desktop: Row layout */}
@@ -135,19 +145,38 @@ const OutputFilter = ({ inquiryState, type = "output" }) => {
                 size="sm"
                 placeholder={label}
                 status={type === "suboutput" ? "pilihsoutput" : "pilihoutput"}
+                isDisabled={isPilihDisabled}
               />
             </div>
 
             {/* Kondisi */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
-              <label className="text-sm font-medium text-gray-700">
-                Masukkan Kondisi
-              </label>
+              <div className="flex items-center justify-between">
+                <label
+                  className={`text-sm font-medium ${
+                    isKondisiDisabled ? "text-gray-400" : "text-gray-700"
+                  }`}
+                >
+                  Masukkan Kondisi
+                </label>
+                {hasKondisiFilter && !isKondisiDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onPress={() => setKondisi && setKondisi("")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Input
                 placeholder="misalkan: EAA,EAB,EAC, dst"
                 className="w-full min-w-0"
                 size="sm"
                 value={kondisi || ""}
+                isDisabled={isKondisiDisabled}
                 onChange={(e) => setKondisi && setKondisi(e.target.value)}
               />
               {/* Helper text - show immediately below on mobile */}
@@ -159,14 +188,32 @@ const OutputFilter = ({ inquiryState, type = "output" }) => {
 
             {/* Kata */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
-              <label className="text-sm font-medium text-gray-700">
-                Mengandung Kata
-              </label>
+              <div className="flex items-center justify-between">
+                <label
+                  className={`text-sm font-medium ${
+                    isKataDisabled ? "text-gray-400" : "text-gray-700"
+                  }`}
+                >
+                  Mengandung Kata
+                </label>
+                {hasKataFilter && !isKataDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onPress={() => setKata && setKata("")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Input
                 placeholder="misalkan: layanan"
                 className="w-full min-w-0"
                 size="sm"
                 value={kata || ""}
+                isDisabled={isKataDisabled}
                 onChange={(e) => setKata && setKata(e.target.value)}
               />
             </div>

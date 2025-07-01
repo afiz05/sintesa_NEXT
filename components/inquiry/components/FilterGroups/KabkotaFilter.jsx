@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, Input, Select, SelectItem} from "@heroui/react";
+import { Button, Input, Select, SelectItem } from "@heroui/react";
 import { Map } from "lucide-react";
 import Kdkabkota from "../../../referensi_belanja/referensi_inquiryMod/Kdkabkota";
 
@@ -19,12 +19,13 @@ const KabkotaFilter = ({ inquiryState }) => {
   // Determine which filter type is currently active (priority order)
   const hasKataFilter = katakabkota && katakabkota.trim() !== "";
   const hasKondisiFilter = kabkotakondisi && kabkotakondisi.trim() !== "";
-  const hasPilihFilter = kabkota && kabkota !== "XXX" && kabkota !== "XX" && kabkota !== "XX";
+  const hasPilihFilter =
+    kabkota && kabkota !== "XXX" && kabkota !== "XX" && kabkota !== "XX";
 
   // Disable other inputs based on active filter
   const isPilihDisabled = hasKataFilter || hasKondisiFilter;
   const isKondisiDisabled = hasKataFilter || hasPilihFilter;
-  const isKataDisabled = hasKondisiFilter || hasPilihFilter;; // When the province changes, reset the selected kabkota to "Semua Kabupaten/Kota"
+  const isKataDisabled = hasKondisiFilter || hasPilihFilter; // When the province changes, reset the selected kabkota to "Semua Kabupaten/Kota"
   React.useEffect(() => {
     if (setKabkota) {
       setKabkota("XX");
@@ -52,9 +53,26 @@ const KabkotaFilter = ({ inquiryState }) => {
           <div className="flex flex-col xl:flex xl:flex-row xl:items-end gap-3 xl:gap-4 w-full">
             {/* Kdkabkota */}
             <div className="flex flex-col gap-1 w-full xl:flex-1 min-w-0 max-w-full overflow-hidden">
-              <label className="text-sm font-medium text-gray-700">
-                Pilih Kabupaten/Kota
-              </label>{" "}
+              <div className="flex items-center justify-between">
+                <label
+                  className={`text-sm font-medium ${
+                    isPilihDisabled ? "text-gray-400" : "text-gray-700"
+                  }`}
+                >
+                  Pilih Kabupaten/Kota
+                </label>
+                {hasPilihFilter && !isPilihDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onPress={() => setKabkota && setKabkota("XX")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Kdkabkota
                 value={kabkota}
                 onChange={
@@ -65,18 +83,37 @@ const KabkotaFilter = ({ inquiryState }) => {
                 size="sm"
                 placeholder="Pilih Kabupaten/Kota"
                 status="pilihkdkabkota"
+                isDisabled={isPilihDisabled}
               />
             </div>
             {/* Kondisi */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
-              <label className="text-sm font-medium text-gray-700">
-                Masukkan Kondisi
-              </label>
+              <div className="flex items-center justify-between">
+                <label
+                  className={`text-sm font-medium ${
+                    isKondisiDisabled ? "text-gray-400" : "text-gray-700"
+                  }`}
+                >
+                  Masukkan Kondisi
+                </label>
+                {hasKondisiFilter && !isKondisiDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onPress={() => setKabkotakondisi && setKabkotakondisi("")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Input
                 placeholder="misalkan: 01,02,03, dst"
                 className="w-full min-w-0"
                 size="sm"
                 value={kabkotakondisi || ""}
+                isDisabled={isKondisiDisabled}
                 onChange={(e) =>
                   setKabkotakondisi && setKabkotakondisi(e.target.value)
                 }
@@ -89,14 +126,32 @@ const KabkotaFilter = ({ inquiryState }) => {
             </div>
             {/* Kata */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
-              <label className="text-sm font-medium text-gray-700">
-                Mengandung Kata
-              </label>
+              <div className="flex items-center justify-between">
+                <label
+                  className={`text-sm font-medium ${
+                    isKataDisabled ? "text-gray-400" : "text-gray-700"
+                  }`}
+                >
+                  Mengandung Kata
+                </label>
+                {hasKataFilter && !isKataDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onPress={() => setKatakabkota && setKatakabkota("")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Input
                 placeholder="misalkan: jakarta"
                 className="w-full min-w-0"
                 size="sm"
                 value={katakabkota || ""}
+                isDisabled={isKataDisabled}
                 onChange={(e) =>
                   setKatakabkota && setKatakabkota(e.target.value)
                 }

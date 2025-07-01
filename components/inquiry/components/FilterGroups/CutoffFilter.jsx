@@ -3,18 +3,18 @@ import { Select, SelectItem } from "@heroui/react";
 import { Calendar } from "lucide-react";
 
 const months = [
-  { value: "1", label: "January" },
-  { value: "2", label: "February" },
-  { value: "3", label: "March" },
+  { value: "1", label: "Januari" },
+  { value: "2", label: "Februari" },
+  { value: "3", label: "Maret" },
   { value: "4", label: "April" },
-  { value: "5", label: "May" },
-  { value: "6", label: "June" },
-  { value: "7", label: "July" },
-  { value: "8", label: "August" },
+  { value: "5", label: "Mei" },
+  { value: "6", label: "Juni" },
+  { value: "7", label: "Juli" },
+  { value: "8", label: "Agustus" },
   { value: "9", label: "September" },
-  { value: "10", label: "October" },
+  { value: "10", label: "Oktober" },
   { value: "11", label: "November" },
-  { value: "12", label: "December" },
+  { value: "12", label: "Desember" },
 ];
 
 const CutoffFilter = ({ inquiryState }) => {
@@ -32,7 +32,7 @@ const CutoffFilter = ({ inquiryState }) => {
   };
 
   return (
-    <div className="w-full p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-blue-100 to-cyan-100 shadow-sm">
+    <div className="w-full p-3 sm:p-4 rounded-2xl bg-sky-100 dark:bg-zinc-900 shadow-sm">
       {/* Mobile/Tablet: Stack vertically, Desktop: Row layout */}
       <div className="flex flex-col lg:flex-row lg:items-center gap-4 w-full">
         {/* Title - Full width on mobile, fixed width on desktop */}
@@ -50,34 +50,36 @@ const CutoffFilter = ({ inquiryState }) => {
               <label className="text-sm font-medium text-gray-700">
                 Pilih Bulan Cutoff
               </label>
-              <Select
-                aria-label="Select cutoff month"
-                className="w-full min-w-0 max-w-xs"
-                size="sm"
-                selectedKeys={
-                  isCutoffEnabled ? new Set([cutoff]) : new Set(["12"])
-                }
-                onSelectionChange={handleSelectionChange}
-                isDisabled={!isCutoffEnabled}
-                disallowEmptySelection
-                placeholder="Choose month"
-              >
-                {months.map((month) => (
-                  <SelectItem key={month.value} value={month.value}>
-                    {month.label}
-                  </SelectItem>
-                ))}
-              </Select>
-              {/* Helper text */}
-              {!isCutoffEnabled ? (
-                <p className="text-xs text-gray-500 mt-1">
-                  Aktifkan filter untuk memilih bulan cutoff
-                </p>
-              ) : (
-                <p className="text-xs text-gray-500 mt-1">
-                  Silahkan pilih cutoff bulan
-                </p>
-              )}
+              <div className="flex items-center">
+                <Select
+                  aria-label="Select cutoff month"
+                  className="w-full min-w-0 max-w-xs"
+                  size="sm"
+                  selectedKeys={
+                    isCutoffEnabled ? new Set([cutoff]) : new Set(["12"])
+                  }
+                  onSelectionChange={handleSelectionChange}
+                  isDisabled={!isCutoffEnabled}
+                  disallowEmptySelection
+                  placeholder="Choose month"
+                >
+                  {months.map((month) => (
+                    <SelectItem key={month.value} value={month.value}>
+                      {month.label}
+                    </SelectItem>
+                  ))}
+                </Select>
+                {/* Helper text */}
+                {!isCutoffEnabled ? (
+                  <p className="text-xs text-gray-500 ml-3">
+                    Aktifkan filter untuk memilih bulan cutoff
+                  </p>
+                ) : (
+                  <p className="text-xs text-gray-500 ml-3">
+                    Silahkan pilih cutoff bulan
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         </div>

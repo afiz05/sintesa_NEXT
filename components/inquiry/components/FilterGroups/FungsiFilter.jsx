@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, Input, Select, SelectItem} from "@heroui/react";
+import { Button, Input, Select, SelectItem } from "@heroui/react";
 import Kdfungsi from "../../../referensi_belanja/referensi_inquiryMod/Kdfungsi";
 import { BookText } from "lucide-react";
 
@@ -18,12 +18,13 @@ const FungsiFilter = ({ inquiryState }) => {
   // Determine which filter type is currently active (priority order)
   const hasKataFilter = katafungsi && katafungsi.trim() !== "";
   const hasKondisiFilter = fungsikondisi && fungsikondisi.trim() !== "";
-  const hasPilihFilter = fungsi && fungsi !== "XXX" && fungsi !== "XX" && fungsi !== "00";
+  const hasPilihFilter =
+    fungsi && fungsi !== "XXX" && fungsi !== "XX" && fungsi !== "00";
 
   // Disable other inputs based on active filter
   const isPilihDisabled = hasKataFilter || hasKondisiFilter;
   const isKondisiDisabled = hasKataFilter || hasPilihFilter;
-  const isKataDisabled = hasKondisiFilter || hasPilihFilter;;
+  const isKataDisabled = hasKondisiFilter || hasPilihFilter;
 
   const FungsiOptions = [
     { value: "1", label: "Kode" },
@@ -48,22 +49,57 @@ const FungsiFilter = ({ inquiryState }) => {
             {" "}
             {/* Kdfungsi */}
             <div className="flex flex-col gap-1 w-full xl:flex-1 min-w-0 max-w-full overflow-hidden">
-              <label className="text-sm font-medium text-gray-700">
-                Pilih Fungsi
-              </label>{" "}
+              <div className="flex items-center justify-between">
+                <label
+                  className={`text-sm font-medium ${
+                    isPilihDisabled ? "text-gray-400" : "text-gray-700"
+                  }`}
+                >
+                  Pilih Fungsi
+                </label>
+                {hasPilihFilter && !isPilihDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onPress={() => setFungsi && setFungsi("00")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Kdfungsi
                 kdfungsi={fungsi}
                 onChange={setFungsi}
                 className="w-full min-w-0 max-w-full"
                 size="sm"
                 status="pilihfungsi"
+                isDisabled={isPilihDisabled}
               />
             </div>
             {/* Kondisi */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
-              <label className="text-sm font-medium text-gray-700">
-                Kondisi Fungsi
-              </label>{" "}
+              <div className="flex items-center justify-between">
+                <label
+                  className={`text-sm font-medium ${
+                    isKondisiDisabled ? "text-gray-400" : "text-gray-700"
+                  }`}
+                >
+                  Kondisi Fungsi
+                </label>
+                {hasKondisiFilter && !isKondisiDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onPress={() => setFungsikondisi && setFungsikondisi("")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Input
                 type="text"
                 placeholder="Masukkan kode fungsi (contoh: 01,02 atau !03)"
@@ -71,13 +107,31 @@ const FungsiFilter = ({ inquiryState }) => {
                 onChange={(e) => setFungsikondisi(e.target.value)}
                 className="w-full"
                 size="sm"
+                isDisabled={isKondisiDisabled}
               />
             </div>
             {/* Kata */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
-              <label className="text-sm font-medium text-gray-700">
-                Kata Kunci
-              </label>{" "}
+              <div className="flex items-center justify-between">
+                <label
+                  className={`text-sm font-medium ${
+                    isKataDisabled ? "text-gray-400" : "text-gray-700"
+                  }`}
+                >
+                  Kata Kunci
+                </label>
+                {hasKataFilter && !isKataDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onPress={() => setKatafungsi && setKatafungsi("")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Input
                 type="text"
                 placeholder="Cari nama fungsi..."
@@ -85,6 +139,7 @@ const FungsiFilter = ({ inquiryState }) => {
                 onChange={(e) => setKatafungsi(e.target.value)}
                 className="w-full"
                 size="sm"
+                isDisabled={isKataDisabled}
               />
             </div>
             {/* Jenis Tampilan */}

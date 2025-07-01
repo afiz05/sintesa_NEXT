@@ -36,7 +36,7 @@ const Kdkabkota = (props) => {
       isVirtualized
       selectedKeys={[validSelectedValue]}
       onSelectionChange={handleSelectionChange}
-      isDisabled={props.status !== "pilihkdkabkota"}
+      isDisabled={props.isDisabled || props.status !== "pilihkdkabkota"}
       size={props.size || "sm"}
       placeholder={props.placeholder || "Pilih Kabupaten/Kota"}
       className={props.className || "min-w-0 flex-[2]"}

@@ -1,6 +1,6 @@
 import React from "react";
-import { Button, Input, Select, SelectItem } from "@heroui/react";
-import { Landmark } from "lucide-react";
+import { Button, Input, Select, SelectItem, Tooltip } from "@heroui/react";
+import { Landmark, Info } from "lucide-react";
 import Kddekon from "../../../referensi_belanja/referensi_inquiryMod/Kddekon";
 
 const DekonFilter = ({ inquiryState }) => {
@@ -39,7 +39,7 @@ const DekonFilter = ({ inquiryState }) => {
   ];
 
   return (
-    <div className="w-full p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-orange-100 to-lime-100 shadow-sm">
+    <div className="w-full p-3 sm:p-4 rounded-2xl bg-green-100 dark:bg-zinc-900 shadow-sm">
       {/* Mobile/Tablet: Stack vertically, Desktop: Row layout */}
       <div className="flex flex-col lg:flex-row lg:items-center gap-4 w-full">
         {/* Title - Full width on mobile, fixed width on desktop */}
@@ -61,6 +61,7 @@ const DekonFilter = ({ inquiryState }) => {
                 >
                   Pilih Kewenangan
                 </label>
+
                 {hasPilihFilter && !isKddekonDisabled && (
                   <Button
                     size="sm"
@@ -84,7 +85,7 @@ const DekonFilter = ({ inquiryState }) => {
             </div>{" "}
             {/* Kondisi */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-start gap-1">
                 <label
                   className={`text-sm font-medium ${
                     isKondisiDisabled ? "text-gray-400" : "text-gray-700"
@@ -92,6 +93,33 @@ const DekonFilter = ({ inquiryState }) => {
                 >
                   Masukkan Kondisi
                 </label>
+                <Tooltip
+                  content="Banyak kode pisahkan dengan koma, gunakan tanda ! di depan untuk exclude"
+                  showArrow={true}
+                  delay={1000}
+                  motionProps={{
+                    variants: {
+                      exit: {
+                        opacity: 0,
+                        transition: {
+                          duration: 0.1,
+                          ease: "easeIn",
+                        },
+                      },
+                      enter: {
+                        opacity: 1,
+                        transition: {
+                          duration: 0.15,
+                          ease: "easeOut",
+                        },
+                      },
+                    },
+                  }}
+                >
+                  <span className="ml-1 cursor-pointer text-gray-400 hover:text-gray-600">
+                    <Info size={15} />
+                  </span>
+                </Tooltip>
                 {hasKondisiFilter && !isKondisiDisabled && (
                   <Button
                     size="sm"
@@ -114,15 +142,6 @@ const DekonFilter = ({ inquiryState }) => {
                   setDekonkondisi && setDekonkondisi(e.target.value)
                 }
               />
-              {/* Helper text - show immediately below on mobile */}
-              <p
-                className={`text-xs xl:hidden ${
-                  isKondisiDisabled ? "text-gray-400" : "text-gray-500"
-                }`}
-              >
-                untuk banyak kode pisahkan dengan koma, gunakan tanda ! di depan
-                untuk exclude
-              </p>
             </div>
             {/* Kata */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
@@ -187,17 +206,6 @@ const DekonFilter = ({ inquiryState }) => {
           <div className="hidden xl:flex xl:flex-row gap-4 w-full">
             {/* Spacer for Kddekon */}
             <div className="flex-1"></div>
-            {/* Helper text under Kondisi */}
-            <div className="flex-1">
-              <p
-                className={`text-xs ${
-                  isKondisiDisabled ? "text-gray-400" : "text-gray-500"
-                }`}
-              >
-                untuk banyak kode pisahkan dengan koma, gunakan tanda ! di depan
-                untuk exclude
-              </p>
-            </div>
             {/* Spacer for Kata */}
             <div className="flex-1"></div>
             {/* Spacer for Jenis Tampilan */}

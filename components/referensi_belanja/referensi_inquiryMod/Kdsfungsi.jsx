@@ -16,7 +16,7 @@ const Kdsfungsi = (props) => {
     <Select
       selectedKeys={[selectedValue]}
       onSelectionChange={handleSelectionChange}
-      isDisabled={props.status !== "pilihsubfungsi"}
+      isDisabled={props.isDisabled || props.status !== "pilihsubfungsi"}
       size={props.size || "sm"}
       placeholder="Pilih Sub Fungsi"
       className={props.className || "max-w-xs mb-2"}

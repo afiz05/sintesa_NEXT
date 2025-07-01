@@ -16,18 +16,17 @@ const AkunFilter = ({ inquiryState }) => {
     setAkunradio,
     jenlap,
     jenis,
+    kdakun, // <-- get kdakun from inquiryState
+    setAkunType, // <-- add this to store type
+    setAkunValue, // <-- add this to store processed value
+    setAkunSql, // <-- add this to store SQL expr
   } = inquiryState;
 
-  // Determine which filter type is currently active (priority order)
-  const hasKataFilter = kataakun && kataakun.trim() !== "";
+  // Disable logic: kondisi disables kata, kata disables kondisi, pilih akun is never disabled
   const hasKondisiFilter = akunkondisi && akunkondisi.trim() !== "";
-  const hasPilihFilter =
-    akun && akun !== "XXX" && akun !== "XX" && akun !== "000";
-
-  // Disable other inputs based on active filter
-  const isKdakunDisabled = hasKataFilter || hasKondisiFilter;
-  const isKondisiDisabled = hasKataFilter || hasPilihFilter;
-  const isKataDisabled = hasKondisiFilter || hasPilihFilter;
+  const hasKataFilter = kataakun && kataakun.trim() !== "";
+  const isKondisiDisabled = hasKataFilter;
+  const isKataDisabled = hasKondisiFilter;
 
   const AkunOptions = [
     { value: "1", label: "Kode" },
@@ -53,49 +52,36 @@ const AkunFilter = ({ inquiryState }) => {
             {/* Selection Component */}
             <div className="flex flex-col gap-1 w-full xl:flex-1 min-w-0 max-w-full overflow-hidden">
               <div className="flex items-center justify-between">
-                <label
-                  className={`text-sm font-medium ${
-                    isKdakunDisabled ? "text-gray-400" : "text-gray-700"
-                  }`}
-                >
+                <label className="text-sm font-medium text-gray-700">
                   Pilih Akun
                 </label>
-                {hasPilihFilter && !isKdakunDisabled && (
-                  <Button
-                    size="sm"
-                    variant="light"
-                    color="warning"
-                    className="h-6 px-2 text-xs"
-                    onPress={() => setAkun && setAkun("000")}
-                  >
-                    Clear
-                  </Button>
-                )}
               </div>
               <Kdakun
-                value={akun}
-                onChange={setAkun}
+                value={akun && akun.type ? akun.type : akun}
+                onChange={(obj) => {
+                  setAkun(obj); // store the whole object for backward compatibility
+                  if (setAkunType) setAkunType(obj.type);
+                  if (setAkunValue) setAkunValue(obj.value);
+                  if (setAkunSql) setAkunSql(obj.sql);
+                }}
                 jenlap={jenlap}
                 jenis={jenis}
+                kdakun={kdakun}
                 className="w-full min-w-0 max-w-full"
                 size="sm"
                 placeholder="Pilih Akun"
                 status="pilihakun"
-                isDisabled={isKdakunDisabled}
+                isDisabled={false}
               />
             </div>
 
             {/* Kondisi */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
               <div className="flex items-center justify-between">
-                <label
-                  className={`text-sm font-medium ${
-                    isKondisiDisabled ? "text-gray-400" : "text-gray-700"
-                  }`}
-                >
+                <label className="text-sm font-medium text-gray-700">
                   Masukkan Kondisi
                 </label>
-                {hasKondisiFilter && !isKondisiDisabled && (
+                {hasKondisiFilter && (
                   <Button
                     size="sm"
                     variant="light"
@@ -118,11 +104,7 @@ const AkunFilter = ({ inquiryState }) => {
                 }
               />
               {/* Helper text - show immediately below on mobile */}
-              <p
-                className={`text-xs xl:hidden ${
-                  isKondisiDisabled ? "text-gray-400" : "text-gray-500"
-                }`}
-              >
+              <p className="text-xs xl:hidden text-gray-500">
                 untuk banyak kode pisahkan dengan koma, gunakan tanda ! di depan
                 untuk exclude
               </p>
@@ -131,14 +113,10 @@ const AkunFilter = ({ inquiryState }) => {
             {/* Kata */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
               <div className="flex items-center justify-between">
-                <label
-                  className={`text-sm font-medium ${
-                    isKataDisabled ? "text-gray-400" : "text-gray-700"
-                  }`}
-                >
+                <label className="text-sm font-medium text-gray-700">
                   Mengandung Kata
                 </label>
-                {hasKataFilter && !isKataDisabled && (
+                {hasKataFilter && (
                   <Button
                     size="sm"
                     variant="light"
@@ -190,11 +168,7 @@ const AkunFilter = ({ inquiryState }) => {
             <div className="flex-1"></div>
             {/* Helper text under Kondisi */}
             <div className="flex-1">
-              <p
-                className={`text-xs ${
-                  isKondisiDisabled ? "text-gray-400" : "text-gray-500"
-                }`}
-              >
+              <p className="text-xs text-gray-500">
                 untuk banyak kode pisahkan dengan koma, gunakan tanda ! di depan
                 untuk exclude
               </p>

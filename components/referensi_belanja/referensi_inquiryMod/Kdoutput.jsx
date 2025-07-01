@@ -11,18 +11,30 @@ const Kdoutput = (props) => {
       item.kdgiat === props.kdgiat
   );
 
+  const selectedValue = props.value ? [props.value] : ["XX"];
+
+  const handleSelectionChange = (keys) => {
+    const selected = Array.from(keys)[0];
+    props.onChange && props.onChange(selected);
+  };
+
   return (
     <Select
-      selectedKeys={props.value ? [props.value] : ["XX"]}
-      onSelectionChange={(keys) => {
-        const selected = Array.from(keys)[0];
-        props.onChange && props.onChange(selected);
-      }}
-      isDisabled={props.status !== "pilihoutput"}
-      placeholder={props.placeholder || "Pilih Output"}
-      className={props.className}
+      selectedKeys={selectedValue}
+      onSelectionChange={handleSelectionChange}
+      isDisabled={props.isDisabled || props.status !== "pilihoutput"}
       size={props.size || "sm"}
+      placeholder="Pilih Output"
+      className={props.className || "max-w-xs mb-2"}
       disallowEmptySelection
+      aria-label="Pilih Output"
+      classNames={{
+        trigger: "w-full max-w-full",
+        value: "truncate pr-8 max-w-full overflow-hidden",
+        mainWrapper: "w-full max-w-full",
+        innerWrapper: "w-full max-w-full overflow-hidden",
+        base: "w-full max-w-full",
+      }}
     >
       <SelectItem key="XX" textValue="Semua Output">
         Semua Output

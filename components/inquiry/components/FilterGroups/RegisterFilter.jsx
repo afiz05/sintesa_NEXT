@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import {Button, Input, Select, SelectItem} from "@heroui/react";
+import { Button, Input, Select, SelectItem } from "@heroui/react";
 import { Settings } from "lucide-react";
 import Kdregister from "../../../referensi_belanja/referensi_inquiryMod/Kdregister";
 
@@ -19,12 +19,13 @@ const RegisterFilter = ({ inquiryState }) => {
   // Determine which filter type is currently active (priority order)
   const hasKataFilter = kataregister && kataregister.trim() !== "";
   const hasKondisiFilter = registerkondisi && registerkondisi.trim() !== "";
-  const hasPilihFilter = register && register !== "XXX" && register !== "XX" && register !== "XXX";
+  const hasPilihFilter =
+    register && register !== "XXX" && register !== "XX" && register !== "XXX";
 
   // Disable other inputs based on active filter
   const isPilihDisabled = hasKataFilter || hasKondisiFilter;
   const isKondisiDisabled = hasKataFilter || hasPilihFilter;
-  const isKataDisabled = hasKondisiFilter || hasPilihFilter;;
+  const isKataDisabled = hasKondisiFilter || hasPilihFilter;
 
   const RegisterOptions = [
     { value: "1", label: "Kode" },
@@ -49,9 +50,22 @@ const RegisterFilter = ({ inquiryState }) => {
           <div className="flex flex-col xl:flex xl:flex-row xl:items-end gap-3 xl:gap-4 w-full">
             {/* Selection Component */}
             <div className="flex flex-col gap-1 w-full xl:flex-1 min-w-0 max-w-full overflow-hidden">
-              <label className="text-sm font-medium text-gray-700">
-                Pilih Register
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-gray-700">
+                  Pilih Register
+                </label>
+                {hasPilihFilter && !isPilihDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onClick={() => setRegister && setRegister("")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Kdregister
                 value={register}
                 onChange={setRegister}
@@ -59,14 +73,28 @@ const RegisterFilter = ({ inquiryState }) => {
                 size="sm"
                 placeholder="Pilih Register"
                 status="pilihregister"
+                isDisabled={isPilihDisabled}
               />
             </div>
 
             {/* Kondisi */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
-              <label className="text-sm font-medium text-gray-700">
-                Masukkan Kondisi
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-gray-700">
+                  Masukkan Kondisi
+                </label>
+                {hasKondisiFilter && !isKondisiDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onClick={() => setRegisterkondisi && setRegisterkondisi("")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Input
                 placeholder="misalkan: 001,002,003, dst"
                 className="w-full min-w-0"
@@ -75,6 +103,7 @@ const RegisterFilter = ({ inquiryState }) => {
                 onChange={(e) =>
                   setRegisterkondisi && setRegisterkondisi(e.target.value)
                 }
+                isDisabled={isKondisiDisabled}
               />
               {/* Helper text - show immediately below on mobile */}
               <p className="text-xs text-gray-500 xl:hidden">
@@ -85,9 +114,22 @@ const RegisterFilter = ({ inquiryState }) => {
 
             {/* Kata */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
-              <label className="text-sm font-medium text-gray-700">
-                Mengandung Kata
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-gray-700">
+                  Mengandung Kata
+                </label>
+                {hasKataFilter && !isKataDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onClick={() => setKataregister && setKataregister("")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Input
                 placeholder="misalkan: register"
                 className="w-full min-w-0"
@@ -96,6 +138,7 @@ const RegisterFilter = ({ inquiryState }) => {
                 onChange={(e) =>
                   setKataregister && setKataregister(e.target.value)
                 }
+                isDisabled={isKataDisabled}
               />
             </div>
 

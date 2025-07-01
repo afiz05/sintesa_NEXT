@@ -44,7 +44,7 @@ const Kdkanwil = (props) => {
       aria-label="Pilih Kanwil"
       selectedKeys={[validSelectedValue]}
       onSelectionChange={handleSelectionChange}
-      isDisabled={props.status !== "pilihkanwil"}
+      isDisabled={props.isDisabled || props.status !== "pilihkanwil"}
       size={props.size || "sm"}
       placeholder={props.placeholder || "Pilih Kanwil"}
       className={props.className || "min-w-0 flex-[2]"}

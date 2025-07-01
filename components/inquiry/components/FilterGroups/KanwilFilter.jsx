@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, Input, Select, SelectItem} from "@heroui/react";
+import { Button, Input, Select, SelectItem } from "@heroui/react";
 import { Landmark } from "lucide-react";
 import Kdkanwil from "../../../referensi_belanja/referensi_inquiryMod/Kdkanwil";
 
@@ -20,7 +20,8 @@ const KanwilFilter = ({ inquiryState, status }) => {
   // Determine which filter type is currently active (priority order)
   const hasKataFilter = katakanwil && katakanwil.trim() !== "";
   const hasKondisiFilter = kanwilkondisi && kanwilkondisi.trim() !== "";
-  const hasPilihFilter = kanwil && kanwil !== "XXX" && kanwil !== "XX" && kanwil !== "XX";
+  const hasPilihFilter =
+    kanwil && kanwil !== "XXX" && kanwil !== "XX" && kanwil !== "XX";
 
   // Disable other inputs based on active filter
   const isPilihDisabled = hasKataFilter || hasKondisiFilter;
@@ -56,9 +57,26 @@ const KanwilFilter = ({ inquiryState, status }) => {
           <div className="flex flex-col xl:flex xl:flex-row xl:items-end gap-3 xl:gap-4 w-full">
             {/* Kdkanwil */}
             <div className="flex flex-col gap-1 w-full xl:flex-1 min-w-0 max-w-full overflow-hidden">
-              <label className="text-sm font-medium text-gray-700">
-                Pilih Kanwil
-              </label>
+              <div className="flex items-center justify-between">
+                <label
+                  className={`text-sm font-medium ${
+                    isPilihDisabled ? "text-gray-400" : "text-gray-700"
+                  }`}
+                >
+                  Pilih Kanwil
+                </label>
+                {hasPilihFilter && !isPilihDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onPress={() => setKanwil && setKanwil("XX")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Kdkanwil
                 value={kanwil}
                 onChange={setKanwil}
@@ -66,18 +84,37 @@ const KanwilFilter = ({ inquiryState, status }) => {
                 className="w-full min-w-0 max-w-full"
                 size="sm"
                 status="pilihkanwil"
+                isDisabled={isPilihDisabled}
               />
             </div>
             {/* Kondisi */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
-              <label className="text-sm font-medium text-gray-700">
-                Masukkan Kondisi
-              </label>
+              <div className="flex items-center justify-between">
+                <label
+                  className={`text-sm font-medium ${
+                    isKondisiDisabled ? "text-gray-400" : "text-gray-700"
+                  }`}
+                >
+                  Masukkan Kondisi
+                </label>
+                {hasKondisiFilter && !isKondisiDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onPress={() => setKanwilkondisi && setKanwilkondisi("")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Input
                 placeholder="misalkan: 001,002,003, dst"
                 className="w-full min-w-0"
                 size="sm"
                 value={kanwilkondisi || ""}
+                isDisabled={isKondisiDisabled}
                 onChange={(e) =>
                   setKanwilkondisi && setKanwilkondisi(e.target.value)
                 }
@@ -90,14 +127,32 @@ const KanwilFilter = ({ inquiryState, status }) => {
             </div>
             {/* Kata */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
-              <label className="text-sm font-medium text-gray-700">
-                Mengandung Kata
-              </label>
+              <div className="flex items-center justify-between">
+                <label
+                  className={`text-sm font-medium ${
+                    isKataDisabled ? "text-gray-400" : "text-gray-700"
+                  }`}
+                >
+                  Mengandung Kata
+                </label>
+                {hasKataFilter && !isKataDisabled && (
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="warning"
+                    className="h-6 px-2 text-xs"
+                    onPress={() => setKatakanwil && setKatakanwil("")}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Input
                 placeholder="misalkan: jakarta"
                 className="w-full min-w-0"
                 size="sm"
                 value={katakanwil || ""}
+                isDisabled={isKataDisabled}
                 onChange={(e) => setKatakanwil && setKatakanwil(e.target.value)}
               />
             </div>

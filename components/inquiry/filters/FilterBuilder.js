@@ -106,23 +106,27 @@ class FilterBuilder {
       whereConditions: [],
     };
 
-    // Build each filter and aggregate results
+    // Only build filters that are enabled (except blokir and specialgrouping, which are jenlap-specific)
     Object.entries(this.filters).forEach(([key, filter]) => {
+      let enabled = false;
+      if (key === "blokir") {
+        // Only enable blokir for jenlap 6
+        enabled = inquiryState.jenlap === 6;
+      } else {
+        enabled = this.isFilterEnabled(key, inquiryState);
+      }
+      if (!enabled) return;
       try {
         const filterResult = filter.buildFromState(inquiryState);
-
         if (filterResult.columns.length > 0) {
           result.columns.push(...filterResult.columns);
         }
-
         if (filterResult.joinClause) {
           result.joinClauses.push(filterResult.joinClause);
         }
-
         if (filterResult.groupBy.length > 0) {
           result.groupBy.push(...filterResult.groupBy);
         }
-
         if (filterResult.whereConditions.length > 0) {
           result.whereConditions.push(...filterResult.whereConditions);
         }
