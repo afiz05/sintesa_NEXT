@@ -2,6 +2,12 @@ import React from "react";
 import { Select, SelectItem } from "@heroui/react";
 
 const Kdakun = (props) => {
+  // Always default to AKUN (Kode Akun)
+  const getDefaultSelection = () => {
+    if (props.value) return [props.value];
+    return ["AKUN"];
+  };
+
   // Add a handler to pass both value and type to parent
   const handleSelectionChange = (keys) => {
     const selected = Array.from(keys)[0];
@@ -16,39 +22,25 @@ const Kdakun = (props) => {
 
   return (
     <Select
-      selectedKeys={props.value ? [props.value] : ["AKUN"]}
+      selectedKeys={getDefaultSelection()}
       onSelectionChange={handleSelectionChange}
       isDisabled={props.status !== "pilihakun"}
-      placeholder={props.placeholder || "Pilih Akun"}
       className={props.className}
       size={props.size || "sm"}
       disallowEmptySelection
     >
-      {props.jenlap === "1" ? (
-        <SelectItem key="JENBEL" textValue="Jenis Belanja">
-          Jenis Belanja
-        </SelectItem>
-      ) : (
-        <>
-          {props.jenis === "tematik" ? (
-            <SelectItem key="BKPK" textValue="Kode BKPK">
-              Kode BKPK
-            </SelectItem>
-          ) : (
-            <>
-              <SelectItem key="AKUN" textValue="Kode Akun">
-                Kode Akun
-              </SelectItem>
-              <SelectItem key="BKPK" textValue="Kode BKPK">
-                Kode BKPK
-              </SelectItem>
-              <SelectItem key="JENBEL" textValue="Jenis Belanja">
-                Jenis Belanja
-              </SelectItem>
-            </>
-          )}
-        </>
-      )}
+      {/* Always show Kode Akun as the first option */}
+      <SelectItem key="AKUN" textValue="Kode Akun">
+        Kode Akun
+      </SelectItem>
+
+      {/* Show all other options */}
+      <SelectItem key="BKPK" textValue="Kode BKPK">
+        Kode BKPK
+      </SelectItem>
+      <SelectItem key="JENBEL" textValue="Jenis Belanja">
+        Jenis Belanja
+      </SelectItem>
     </Select>
   );
 };

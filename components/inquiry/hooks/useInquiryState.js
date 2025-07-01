@@ -135,7 +135,6 @@ export default function useInquiryState() {
   const [kataregister, setKataregister] = useState(""); // NEW: for advanced Register filter
   const [PN, setPN] = useState("XX");
   const [PP, setPP] = useState("XX");
-  const [KegPP, setKegPP] = useState("XX");
   const [PRI, setPRI] = useState("XX");
   const [MP, setMP] = useState("XX");
   const [Tema, setTema] = useState("XX");
@@ -175,7 +174,6 @@ export default function useInquiryState() {
   const [pemiluradio, setPemiluradio] = useState("1");
   const [pnradio, setPnradio] = useState("1");
   const [ppradio, setPpradio] = useState("1");
-  const [kegppradio, setKegppradio] = useState("1");
   const [mpradio, setMpradio] = useState("1");
   const [temaradio, setTemaradio] = useState("1");
 
@@ -191,6 +189,10 @@ export default function useInquiryState() {
   const [select, setSelect] = useState(
     ", round(sum(a.pagu),0) as PAGU, round(sum(a.real1),0) as REALISASI, round(sum(a.blokir) ,0) as BLOKIR"
   );
+
+  // Kegiatan Prioritas filter value and radio
+  const [kegiatanprioritas, setKegiatanPrioritas] = useState("XX");
+  const [kegiatanprioritasradio, setKegiatanPrioritasRadio] = useState("1");
 
   return {
     // Context values
@@ -434,8 +436,6 @@ export default function useInquiryState() {
     setPN,
     PP,
     setPP,
-    KegPP,
-    setKegPP,
     PRI,
     setPRI,
     MP,
@@ -512,8 +512,6 @@ export default function useInquiryState() {
     setPnradio,
     ppradio,
     setPpradio,
-    kegppradio,
-    setKegppradio,
     mpradio,
     setMpradio,
     temaradio,
@@ -536,5 +534,11 @@ export default function useInquiryState() {
     setFrom,
     select,
     setSelect,
+
+    // Kegiatan Prioritas filter value and radio
+    kegiatanprioritas,
+    setKegiatanPrioritas,
+    kegiatanprioritasradio,
+    setKegiatanPrioritasRadio,
   };
 }

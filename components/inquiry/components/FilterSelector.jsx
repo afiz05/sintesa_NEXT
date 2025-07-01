@@ -303,10 +303,10 @@ const FilterSection = ({ inquiryState }) => {
     setPP,
     ppradio,
     setPpradio,
-    KegPP,
-    setKegPP,
-    kegppradio,
-    setKegppradio,
+    kegiatanprioritas,
+    setKegiatanPrioritas,
+    kegiatanprioritasradio,
+    setKegiatanPrioritasRadio,
     MP,
     setMP,
     mpradio,
@@ -349,9 +349,14 @@ const FilterSection = ({ inquiryState }) => {
 
   // Determine which switches should be disabled based on report type
   const getDisabledSwitches = (reportType) => {
-    // For Volume Output Kegiatan (6), all switches are available
+    // For Volume Output Kegiatan (6), disable cutoff, akun, register, sumber dana
     if (reportType === "6") {
-      return [];
+      return [
+        "cutoff", // Cutoff
+        "kdakun", // Akun
+        "kdregister", // Register
+        "kdsdana", // Sumber Dana
+      ];
     }
 
     // Base disabled switches for most report types (same as Pagu Realisasi)
@@ -727,10 +732,10 @@ const FilterSection = ({ inquiryState }) => {
   React.useEffect(() => {
     if (!KdKegPP) {
       // Reset Kegiatanpri filter state
-      setKegPP && setKegPP("XX");
-      setKegppradio && setKegppradio("1");
+      setKegiatanPrioritas && setKegiatanPrioritas("XX");
+      setKegiatanPrioritasRadio && setKegiatanPrioritasRadio("1");
     }
-  }, [KdKegPP, setKegPP, setKegppradio]);
+  }, [KdKegPP, setKegiatanPrioritas, setKegiatanPrioritasRadio]);
 
   React.useEffect(() => {
     if (!KdMP) {
@@ -964,6 +969,7 @@ const FilterSection = ({ inquiryState }) => {
             checked={kdakun}
             onChange={setKdakun}
             label="Akun"
+            disabled={disabledSwitches.includes("kdakun")}
           />
           {/* <FilterSwitch
             id="kdkomponen-filter"
@@ -983,12 +989,14 @@ const FilterSection = ({ inquiryState }) => {
             checked={kdsdana}
             onChange={setKdsdana}
             label="Sumber Dana"
+            disabled={disabledSwitches.includes("kdsdana")}
           />
           <FilterSwitch
             id="kdregister-filter"
             checked={kdregister}
             onChange={setKdregister}
             label="Register"
+            disabled={disabledSwitches.includes("kdregister")}
           />
           <FilterSwitch
             id="prinas-filter"

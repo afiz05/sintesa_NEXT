@@ -1,6 +1,6 @@
 import React from "react";
-import { Button, Input, Select, SelectItem } from "@heroui/react";
-import { Target } from "lucide-react";
+import { Button, Input, Select, SelectItem, Tooltip } from "@heroui/react";
+import { Target, Info } from "lucide-react";
 import Kdsoutput from "../../../referensi_belanja/referensi_inquiryMod/Kdsoutput";
 
 const SuboutputFilter = ({ inquiryState }) => {
@@ -90,9 +90,42 @@ const SuboutputFilter = ({ inquiryState }) => {
             {/* Kondisi */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700">
-                  Masukkan Kondisi
-                </label>
+                <div className="flex items-center gap-2">
+                  <label
+                    className={`text-sm font-medium ${
+                      isKondisiDisabled ? "text-gray-400" : "text-gray-700"
+                    }`}
+                  >
+                    Masukkan Kondisi
+                  </label>
+                  <Tooltip
+                    content="Banyak kode pisahkan dengan koma, gunakan tanda ! di depan untuk exclude"
+                    showArrow={true}
+                    delay={1000}
+                    motionProps={{
+                      variants: {
+                        exit: {
+                          opacity: 0,
+                          transition: {
+                            duration: 0.1,
+                            ease: "easeIn",
+                          },
+                        },
+                        enter: {
+                          opacity: 1,
+                          transition: {
+                            duration: 0.15,
+                            ease: "easeOut",
+                          },
+                        },
+                      },
+                    }}
+                  >
+                    <span className="cursor-pointer text-gray-400 hover:text-gray-600">
+                      <Info size={15} />
+                    </span>
+                  </Tooltip>
+                </div>
                 {hasKondisiFilter && !isKondisiDisabled && (
                   <Button
                     size="sm"

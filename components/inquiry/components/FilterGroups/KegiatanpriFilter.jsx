@@ -5,10 +5,22 @@ import { Target } from "lucide-react";
 import KodeKegPP from "../../../referensi_belanja/referensi_inquiryMod/KdKegPP";
 
 const KegiatanpriFilter = ({ inquiryState }) => {
-  const { KegPP, setKegPP, kegppradio, setKegppradio, PP, PN, thang } =
-    inquiryState;
+  const {
+    kegiatanprioritas,
+    setKegiatanPrioritas,
+    kegiatanprioritasradio,
+    setKegiatanPrioritasRadio,
+    PP,
+    PN,
+    thang,
+  } = inquiryState;
 
-  const KegPPOptions = [
+  // Debug: log kegiatanprioritas to ensure it updates on selection
+  React.useEffect(() => {
+    console.log("[KegiatanpriFilter] kegiatanprioritas:", kegiatanprioritas);
+  }, [kegiatanprioritas]);
+
+  const KegiatanPrioritasOptions = [
     { value: "1", label: "Kode" },
     { value: "2", label: "Kode Uraian" },
     { value: "3", label: "Uraian" },
@@ -35,8 +47,15 @@ const KegiatanpriFilter = ({ inquiryState }) => {
                 Pilih Kegiatan Prioritas
               </label>
               <KodeKegPP
-                kdkp={KegPP}
-                onChange={setKegPP}
+                kdkp={kegiatanprioritas}
+                onChange={(val) => {
+                  setKegiatanPrioritas(val);
+                  // Debug: log value selected
+                  console.log(
+                    "[KegiatanpriFilter] setKegiatanPrioritas called with:",
+                    val
+                  );
+                }}
                 kdPN={PN}
                 kdPP={PP}
                 thang={thang}
@@ -77,18 +96,20 @@ const KegiatanpriFilter = ({ inquiryState }) => {
                 Jenis Tampilan
               </label>
               <Select
-                selectedKeys={kegppradio ? [kegppradio] : ["1"]}
+                selectedKeys={
+                  kegiatanprioritasradio ? [kegiatanprioritasradio] : ["1"]
+                }
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0];
-                  if (setKegppradio) {
-                    setKegppradio(selected);
+                  if (setKegiatanPrioritasRadio) {
+                    setKegiatanPrioritasRadio(selected);
                   }
                 }}
                 disallowEmptySelection
                 size="sm"
                 className="w-full min-w-0"
               >
-                {KegPPOptions.map((opt) => (
+                {KegiatanPrioritasOptions.map((opt) => (
                   <SelectItem key={opt.value} textValue={opt.label}>
                     {opt.label}
                   </SelectItem>

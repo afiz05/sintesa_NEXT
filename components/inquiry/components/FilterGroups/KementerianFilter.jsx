@@ -81,41 +81,44 @@ const KementerianFilter = ({ inquiryState, status }) => {
             </div>
             {/* Kondisi */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
-              <div className="flex items-center justify-start gap-1">
-                <label
-                  className={`text-sm font-medium ${
-                    isKondisiDisabled ? "text-gray-400" : "text-gray-700"
-                  }`}
-                >
-                  Masukkan Kondisi
-                </label>
-                <Tooltip
-                  content="Banyak kode pisahkan dengan koma, gunakan tanda ! di depan untuk exclude"
-                  showArrow={true}
-                  delay={1000}
-                  motionProps={{
-                    variants: {
-                      exit: {
-                        opacity: 0,
-                        transition: {
-                          duration: 0.1,
-                          ease: "easeIn",
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <label
+                    className={`text-sm font-medium ${
+                      isKondisiDisabled ? "text-gray-400" : "text-gray-700"
+                    }`}
+                  >
+                    Masukkan Kondisi
+                  </label>
+                  <Tooltip
+                    content="Banyak kode pisahkan dengan koma, gunakan tanda ! di depan untuk exclude"
+                    showArrow={true}
+                    delay={1000}
+                    motionProps={{
+                      variants: {
+                        exit: {
+                          opacity: 0,
+                          transition: {
+                            duration: 0.1,
+                            ease: "easeIn",
+                          },
+                        },
+                        enter: {
+                          opacity: 1,
+                          transition: {
+                            duration: 0.15,
+                            ease: "easeOut",
+                          },
                         },
                       },
-                      enter: {
-                        opacity: 1,
-                        transition: {
-                          duration: 0.15,
-                          ease: "easeOut",
-                        },
-                      },
-                    },
-                  }}
-                >
-                  <span className="ml-1 cursor-pointer text-gray-400 hover:text-gray-600">
-                    <Info size={15} />
-                  </span>
-                </Tooltip>
+                    }}
+                  >
+                    <span className="cursor-pointer text-gray-400 hover:text-gray-600">
+                      <Info size={15} />
+                    </span>
+                  </Tooltip>
+                </div>
+
                 {hasKondisiFilter && !isKondisiDisabled && (
                   <Button
                     size="sm"
