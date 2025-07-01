@@ -7,7 +7,7 @@ class PronasFilter extends BaseFilter {
   constructor() {
     super("kdpn", "pronas", {
       schema: "dbref",
-      table: "t_pn",
+      table: "t_prinas",
       alias: "pn",
       nameField: "nmpn",
       hasYear: true,
@@ -45,7 +45,7 @@ class PropresFilter extends BaseFilter {
   constructor() {
     super("kdpp", "propres", {
       schema: "dbref",
-      table: "t_pp",
+      table: "t_priprog",
       alias: "pp",
       nameField: "nmpp",
       hasYear: true,
@@ -77,31 +77,40 @@ class PropresFilter extends BaseFilter {
 }
 
 /**
- * Kegiatan Propres (KegPP) Filter Handler
+ * Kegiatan Prioritas (KP) Filter Handler
  */
-class KegiatanPropresFilter extends BaseFilter {
+class KegiatanPrioritasFilter extends BaseFilter {
   constructor() {
-    super("kdkegpp", "kegpropres", {
+    super("kdkp", "kegiatanprioritas", {
       schema: "dbref",
-      table: "t_kegpp",
-      alias: "kpp",
-      nameField: "nmkegpp",
+      table: "t_prigiat", // Base table name, year will be appended
+      alias: "pg",
+      nameField: "nmkp",
       hasYear: true,
-      joinCondition: "a.kdkegpp=kpp.kdkegpp",
+      joinCondition: "a.kdkp=pg.kdkp AND a.kdpp=pg.kdpp AND a.kdpn=pg.kdpn",
     });
   }
 
   buildFromState(inquiryState) {
     const {
       KdKegPP: isEnabled,
-      KegPP: pilihValue,
-      KegPPkondisi: kondisiValue,
-      opsikataKegPP: kataValue,
-      kegppradio: radio,
+      kegiatanprioritas: pilihValue,
+      kegiatanprioritasradio: radio,
       thang,
     } = inquiryState;
+    const kondisiValue = undefined;
+    const kataValue = undefined;
 
-    return this.build(
+    // DEBUG: Log the state values
+    console.log("🔍 KegiatanPrioritasFilter DEBUG:", {
+      isEnabled,
+      pilihValue,
+      radio,
+      thang,
+      timestamp: new Date().toISOString(),
+    });
+
+    const result = this.build(
       {
         isEnabled,
         radio,
@@ -111,6 +120,19 @@ class KegiatanPropresFilter extends BaseFilter {
       },
       thang
     );
+
+    // DEBUG: Log the result
+    console.log("🔍 KegiatanPrioritasFilter RESULT:", result);
+
+    // SPECIAL HANDLING: For Kegiatan Prioritas, we always need the JOIN clause when enabled,
+    // even if pilihValue is "00" (Semua) and radio is "4" (Jangan Tampilkan)
+    // This ensures the table is included in the query structure for proper filtering
+    if (isEnabled && !result.joinClause) {
+      result.joinClause = this.buildJoinClause(thang);
+      console.log("🔍 KegiatanPrioritasFilter FORCED JOIN:", result.joinClause);
+    }
+
+    return result;
   }
 }
 
@@ -119,13 +141,13 @@ class KegiatanPropresFilter extends BaseFilter {
  */
 class PrioritasFilter extends BaseFilter {
   constructor() {
-    super("kdpri", "prioritas", {
+    super("kdproy", "prioritas", {
       schema: "dbref",
-      table: "t_pri",
+      table: "t_priproy",
       alias: "pri",
-      nameField: "nmpri",
+      nameField: "nmproy",
       hasYear: true,
-      joinCondition: "a.kdpri=pri.kdpri",
+      joinCondition: "a.kdproy=pri.kdproy",
     });
   }
 
@@ -200,7 +222,7 @@ class MegaProjectFilter extends BaseFilter {
       table: "t_mp",
       alias: "mp",
       nameField: "nmmp",
-      hasYear: true,
+      hasYear: false, // Exception: t_mp table doesn't use year suffix
       joinCondition: "a.kdmp=mp.kdmp",
     });
   }
@@ -231,7 +253,7 @@ class MegaProjectFilter extends BaseFilter {
 export {
   PronasFilter,
   PropresFilter,
-  KegiatanPropresFilter,
+  KegiatanPrioritasFilter,
   PrioritasFilter,
   TemaFilter,
   MegaProjectFilter,

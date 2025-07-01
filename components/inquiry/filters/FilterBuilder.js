@@ -28,7 +28,7 @@ import { AkunFilter, SumberDanaFilter, RegisterFilter } from "./AccountFilter";
 import {
   PronasFilter,
   PropresFilter,
-  KegiatanPropresFilter,
+  KegiatanPrioritasFilter,
   PrioritasFilter,
   TemaFilter,
   MegaProjectFilter,
@@ -76,7 +76,7 @@ class FilterBuilder {
       // Priority Programs
       pronas: new PronasFilter(),
       propres: new PropresFilter(),
-      kegpropres: new KegiatanPropresFilter(),
+      kegiatanprioritas: new KegiatanPrioritasFilter(),
       prioritas: new PrioritasFilter(),
       tema: new TemaFilter(),
       megaproject: new MegaProjectFilter(),
@@ -115,9 +115,11 @@ class FilterBuilder {
       } else {
         enabled = this.isFilterEnabled(key, inquiryState);
       }
+
       if (!enabled) return;
       try {
         const filterResult = filter.buildFromState(inquiryState);
+
         if (filterResult.columns.length > 0) {
           result.columns.push(...filterResult.columns);
         }
@@ -196,7 +198,7 @@ class FilterBuilder {
       register: "kdregister",
       pronas: "KdPN",
       propres: "KdPP",
-      kegpropres: "KdKegPP",
+      kegiatanprioritas: "KdKegPP",
       prioritas: "KdPRI",
       tema: "KdTema",
       megaproject: "KdMP",

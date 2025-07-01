@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
-import { Button, Input, Select, SelectItem } from "@heroui/react";
-import { Settings } from "lucide-react";
+import { Button, Input, Select, SelectItem, Tooltip } from "@heroui/react";
+import { Settings, Info } from "lucide-react";
 import Kdakun from "../../../referensi_belanja/referensi_inquiryMod/Kdakun";
 
 const AkunFilter = ({ inquiryState }) => {
@@ -78,9 +78,42 @@ const AkunFilter = ({ inquiryState }) => {
             {/* Kondisi */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700">
-                  Masukkan Kondisi
-                </label>
+                <div className="flex items-center gap-2">
+                  <label
+                    className={`text-sm font-medium ${
+                      isKondisiDisabled ? "text-gray-400" : "text-gray-700"
+                    }`}
+                  >
+                    Masukkan Kondisi
+                  </label>
+                  <Tooltip
+                    content="Banyak kode pisahkan dengan koma, gunakan tanda ! di depan untuk exclude"
+                    showArrow={true}
+                    delay={1000}
+                    motionProps={{
+                      variants: {
+                        exit: {
+                          opacity: 0,
+                          transition: {
+                            duration: 0.1,
+                            ease: "easeIn",
+                          },
+                        },
+                        enter: {
+                          opacity: 1,
+                          transition: {
+                            duration: 0.15,
+                            ease: "easeOut",
+                          },
+                        },
+                      },
+                    }}
+                  >
+                    <span className="cursor-pointer text-gray-400 hover:text-gray-600">
+                      <Info size={15} />
+                    </span>
+                  </Tooltip>
+                </div>
                 {hasKondisiFilter && (
                   <Button
                     size="sm"
@@ -103,11 +136,6 @@ const AkunFilter = ({ inquiryState }) => {
                   setAkunkondisi && setAkunkondisi(e.target.value)
                 }
               />
-              {/* Helper text - show immediately below on mobile */}
-              <p className="text-xs xl:hidden text-gray-500">
-                untuk banyak kode pisahkan dengan koma, gunakan tanda ! di depan
-                untuk exclude
-              </p>
             </div>
 
             {/* Kata */}
@@ -166,13 +194,7 @@ const AkunFilter = ({ inquiryState }) => {
           <div className="hidden xl:flex xl:flex-row gap-4 w-full">
             {/* Spacer for Selection */}
             <div className="flex-1"></div>
-            {/* Helper text under Kondisi */}
-            <div className="flex-1">
-              <p className="text-xs text-gray-500">
-                untuk banyak kode pisahkan dengan koma, gunakan tanda ! di depan
-                untuk exclude
-              </p>
-            </div>
+
             {/* Spacer for Kata */}
             <div className="flex-1"></div>
             {/* Spacer for Jenis Tampilan */}

@@ -81,7 +81,7 @@ const LokasiFilter = ({ inquiryState }) => {
             {/* Kondisi */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-2">
                   <label
                     className={`text-sm font-medium ${
                       isKondisiDisabled ? "text-gray-400" : "text-gray-700"
@@ -112,7 +112,7 @@ const LokasiFilter = ({ inquiryState }) => {
                       },
                     }}
                   >
-                    <span className="ml-1 cursor-pointer text-gray-400 hover:text-gray-600">
+                    <span className="cursor-pointer text-gray-400 hover:text-gray-600">
                       <Info size={15} />
                     </span>
                   </Tooltip>

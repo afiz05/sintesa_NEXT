@@ -1,6 +1,6 @@
 import React from "react";
-import { Button, Input, Select, SelectItem } from "@heroui/react";
-import { Building2 } from "lucide-react";
+import { Button, Input, Select, SelectItem, Tooltip } from "@heroui/react";
+import { Building2, Info } from "lucide-react";
 import Kdsatker from "../../../referensi_belanja/referensi_inquiryMod/Kdsatker";
 
 const SatkerFilter = ({ inquiryState }) => {
@@ -97,13 +97,42 @@ const SatkerFilter = ({ inquiryState }) => {
             {/* Kondisi */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
               <div className="flex items-center justify-between">
-                <label
-                  className={`text-sm font-medium ${
-                    isKondisiDisabled ? "text-gray-400" : "text-gray-700"
-                  }`}
-                >
-                  Masukkan Kondisi
-                </label>
+                <div className="flex items-center gap-2">
+                  <label
+                    className={`text-sm font-medium ${
+                      isKondisiDisabled ? "text-gray-400" : "text-gray-700"
+                    }`}
+                  >
+                    Masukkan Kondisi
+                  </label>
+                  <Tooltip
+                    content="Banyak kode pisahkan dengan koma, gunakan tanda ! di depan untuk exclude"
+                    showArrow={true}
+                    delay={1000}
+                    motionProps={{
+                      variants: {
+                        exit: {
+                          opacity: 0,
+                          transition: {
+                            duration: 0.1,
+                            ease: "easeIn",
+                          },
+                        },
+                        enter: {
+                          opacity: 1,
+                          transition: {
+                            duration: 0.15,
+                            ease: "easeOut",
+                          },
+                        },
+                      },
+                    }}
+                  >
+                    <span className="cursor-pointer text-gray-400 hover:text-gray-600">
+                      <Info size={15} />
+                    </span>
+                  </Tooltip>
+                </div>
                 {hasKondisiFilter && !isKondisiDisabled && (
                   <Button
                     size="sm"
@@ -117,7 +146,7 @@ const SatkerFilter = ({ inquiryState }) => {
                 )}
               </div>
               <Input
-                placeholder="misalkan: 001001,001002,001003, dst"
+                placeholder="misalkan: 647321,647322, dst"
                 className="w-full min-w-0"
                 size="sm"
                 value={satkerkondisi || ""}
@@ -126,15 +155,6 @@ const SatkerFilter = ({ inquiryState }) => {
                   setSatkerkondisi && setSatkerkondisi(e.target.value)
                 }
               />
-              {/* Helper text - show immediately below on mobile */}
-              <p
-                className={`text-xs xl:hidden ${
-                  isKondisiDisabled ? "text-gray-400" : "text-gray-500"
-                }`}
-              >
-                untuk banyak kode pisahkan dengan koma, gunakan tanda ! di depan
-                untuk exclude
-              </p>
             </div>
             {/* Kata */}
             <div className="flex flex-col gap-1 w-full xl:flex-1">
@@ -214,17 +234,7 @@ const SatkerFilter = ({ inquiryState }) => {
           <div className="hidden xl:flex xl:flex-row gap-4 w-full">
             {/* Spacer for Kdsatker */}
             <div className="flex-1"></div>
-            {/* Helper text under Kondisi */}
-            <div className="flex-1">
-              <p
-                className={`text-xs ${
-                  isKondisiDisabled ? "text-gray-400" : "text-gray-500"
-                }`}
-              >
-                untuk banyak kode pisahkan dengan koma, gunakan tanda ! di depan
-                untuk exclude
-              </p>
-            </div>
+
             {/* Spacer for Kata */}
             <div className="flex-1"></div>
             {/* Spacer for Jenis Tampilan */}

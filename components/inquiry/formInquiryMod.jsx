@@ -249,8 +249,6 @@ const InquiryMod = () => {
     setPN,
     PP,
     setPP,
-    KegPP,
-    setKegPP,
     PRI,
     setPRI,
     MP,
@@ -313,8 +311,6 @@ const InquiryMod = () => {
     setPnradio,
     ppradio,
     setPpradio,
-    kegppradio,
-    setKegppradio,
     mpradio,
     setMpradio,
     temaradio,
@@ -333,6 +329,10 @@ const InquiryMod = () => {
     setOpsiIkn,
     opsiKemiskinan,
     setOpsiKemiskinan,
+    kegiatanprioritas,
+    setKegiatanPrioritas,
+    kegiatanprioritasradio,
+    setKegiatanPrioritasRadio,
     sql,
     setSql,
     from,
@@ -390,6 +390,10 @@ const InquiryMod = () => {
       dekon: inquiry.dekon,
       thang: inquiry.thang,
       cutoff: inquiry.cutoff,
+      // Add Kegiatan Prioritas debug
+      KdKegPP: inquiry.KdKegPP,
+      kegiatanprioritas: inquiry.kegiatanprioritas,
+      kegiatanprioritasradio: inquiry.kegiatanprioritasradio,
       type: typeof inquiry.akumulatif,
       timestamp: new Date().toISOString(),
     });
@@ -539,12 +543,12 @@ const InquiryMod = () => {
     setKdPN(false);
     setKdPP(false);
     setKdMP(false);
+    setKdKegPP(false);
     setAkumulatif("0");
     setCutoff("0");
     setShowCutoffSelector(false);
     setPN("XX");
     setPP("XX");
-    setKegPP("XX");
     setPRI("XX");
     setMP("XX");
     setTema("XX");
@@ -554,6 +558,7 @@ const InquiryMod = () => {
     setPemilu("XX");
     setIkn("XX");
     setPangan("XX");
+    setKegiatanPrioritas("XX");
     setDept("000");
     setKdunit("XX");
     setDekon("XX");
@@ -606,6 +611,15 @@ const InquiryMod = () => {
     setInflasiradio("1");
     setIknradio("1");
     setKemiskinanradio("1");
+    setPnradio("1");
+    setPpradio("1");
+    setMpradio("1");
+    setTemaradio("1");
+    setPanganradio("1");
+    setStuntingradio("1");
+    setPemiluradio("1");
+    setPriradio("1");
+    setKegiatanPrioritasRadio("1");
     setOpsiInflasi("pilihInflasi");
     setOpsiIkn("pilihikn");
     setOpsiKemiskinan("pilihKemiskinan");
@@ -948,10 +962,10 @@ const InquiryMod = () => {
             KdKegPP,
             setKdKegPP,
             // Kegiatan Prioritas filter values
-            KegPP,
-            setKegPP,
-            kegppradio,
-            setKegppradio,
+            kegiatanprioritas,
+            setKegiatanPrioritas,
+            kegiatanprioritasradio,
+            setKegiatanPrioritasRadio,
             // Program filter values
             program,
             setProgram,
