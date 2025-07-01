@@ -17,8 +17,8 @@ export class InflasiFilter extends BaseFilter {
   buildFromState(inquiryState) {
     const { jenlap, Inflasi, inflasiradio, opsiInflasi } = inquiryState;
 
-    // Only activate this filter for jenlap 7, never for jenlap 6
-    if (jenlap !== "7") {
+    // Only activate this filter for jenlap 6, never for jenlap 7
+    if (jenlap !== "6") {
       return this.getEmptyResult();
     }
 
@@ -77,10 +77,10 @@ export class StuntingFilter extends BaseFilter {
   }
 
   buildFromState(inquiryState) {
-    const { jenlap, Stunting, stuntingradio, opsiStunting } = inquiryState;
+    const { jenlap, Stunting, stuntingradio } = inquiryState;
 
-    // Only activate this filter for jenlap 7, never for jenlap 6
-    if (jenlap !== "7") {
+    // Only activate this filter for jenlap 6, never for jenlap 7
+    if (jenlap !== "6") {
       return this.getEmptyResult();
     }
 
@@ -110,12 +110,8 @@ export class StuntingFilter extends BaseFilter {
       result.columns = [];
     }
 
-    // Filter condition when opsiStunting is set
-    if (opsiStunting === "pilihStunting" && Stunting !== "XX") {
-      if (Stunting && Stunting !== "00") {
-        result.whereConditions.push(`a.stun_intervensi = '${Stunting}'`);
-      }
-    }
+    // Note: opsiStunting field doesn't exist in state, removing filter condition
+    // TODO: Add opsiStunting to state if needed for filtering by specific stunting intervention
 
     return result;
   }
@@ -130,22 +126,22 @@ export class KemiskinanFilter extends BaseFilter {
   }
 
   buildFromState(inquiryState) {
-    const { jenlap, Miskin, miskinradio, opsiMiskin } = inquiryState;
+    const { jenlap, Miskin, kemiskinanradio, opsiKemiskinan } = inquiryState;
 
-    // Only activate this filter for jenlap 7, never for jenlap 6
-    if (jenlap !== "7") {
+    // Only activate this filter for jenlap 6, never for jenlap 7
+    if (jenlap !== "6") {
       return this.getEmptyResult();
     }
 
     const result = this.getEmptyResult();
 
     // FUNGSI KEMISKINAN EKSTRIM - Based on original jenlap = 6 logic
-    if (miskinradio === "1" && Miskin !== "XX") {
+    if (kemiskinanradio === "1" && Miskin !== "XX") {
       result.columns.push("a.kemiskinan_ekstrim");
       result.groupBy.push("a.kemiskinan_ekstrim");
     }
 
-    if (miskinradio === "2" && Miskin !== "XX") {
+    if (kemiskinanradio === "2" && Miskin !== "XX") {
       result.columns.push(
         "a.kemiskinan_ekstrim",
         "(CASE WHEN a.kemiskinan_ekstrim = 'TRUE' THEN 'Belanja Kemiskinan Esktrim' WHEN a.kemiskinan_ekstrim <> 'TRUE' THEN 'Bukan Kemiskinan Ekstrim' END) AS ur_kemiskinan_ekstrim"
@@ -153,19 +149,19 @@ export class KemiskinanFilter extends BaseFilter {
       result.groupBy.push("a.kemiskinan_ekstrim");
     }
 
-    if (miskinradio === "3" && Miskin !== "XX") {
+    if (kemiskinanradio === "3" && Miskin !== "XX") {
       result.columns.push(
         "(CASE WHEN a.kemiskinan_ekstrim = 'TRUE' THEN 'Belanja Kemiskinan Esktrim' WHEN a.kemiskinan_ekstrim <> 'TRUE' THEN 'Bukan Kemiskinan Ekstrim' END) AS ur_kemiskinan_ekstrim"
       );
       result.groupBy.push("a.kemiskinan_ekstrim");
     }
 
-    if (miskinradio === "4") {
+    if (kemiskinanradio === "4") {
       result.columns = [];
     }
 
-    // Filter condition when opsiMiskin is set
-    if (opsiMiskin === "pilihMiskin" && Miskin !== "XX") {
+    // Filter condition when opsiKemiskinan is set
+    if (opsiKemiskinan === "pilihKemiskinan" && Miskin !== "XX") {
       if (Miskin && Miskin !== "00") {
         result.whereConditions.push(`a.kemiskinan_ekstrim = '${Miskin}'`);
       }
@@ -184,10 +180,10 @@ export class PemiluFilter extends BaseFilter {
   }
 
   buildFromState(inquiryState) {
-    const { jenlap, Pemilu, pemiluradio, opsiPemilu } = inquiryState;
+    const { jenlap, Pemilu, pemiluradio } = inquiryState;
 
-    // Only activate this filter for jenlap 7, never for jenlap 6
-    if (jenlap !== "7") {
+    // Only activate this filter for jenlap 6, never for jenlap 7
+    if (jenlap !== "6") {
       return this.getEmptyResult();
     }
 
@@ -218,12 +214,8 @@ export class PemiluFilter extends BaseFilter {
       result.columns = [];
     }
 
-    // Filter condition when opsiPemilu is set
-    if (opsiPemilu === "pilihPemilu" && Pemilu !== "XX") {
-      if (Pemilu && Pemilu !== "00") {
-        result.whereConditions.push(`a.pemilu = '${Pemilu}'`);
-      }
-    }
+    // Note: opsiPemilu field doesn't exist in state, removing filter condition
+    // TODO: Add opsiPemilu to state if needed for filtering by specific election type
 
     return result;
   }
@@ -240,8 +232,8 @@ export class IknFilter extends BaseFilter {
   buildFromState(inquiryState) {
     const { jenlap, Ikn, iknradio, opsiIkn } = inquiryState;
 
-    // Only activate this filter for jenlap 7, never for jenlap 6
-    if (jenlap !== "7") {
+    // Only activate this filter for jenlap 6, never for jenlap 7
+    if (jenlap !== "6") {
       return this.getEmptyResult();
     }
 
@@ -273,7 +265,7 @@ export class IknFilter extends BaseFilter {
     }
 
     // Filter condition when opsiIkn is set
-    if (opsiIkn === "pilihIkn" && Ikn !== "XX") {
+    if (opsiIkn === "pilihikn" && Ikn !== "XX") {
       if (Ikn && Ikn !== "00") {
         result.whereConditions.push(`a.ikn = '${Ikn}'`);
       }
@@ -292,10 +284,10 @@ export class PanganFilter extends BaseFilter {
   }
 
   buildFromState(inquiryState) {
-    const { jenlap, Pangan, panganradio, opsiPangan } = inquiryState;
+    const { jenlap, Pangan, panganradio } = inquiryState;
 
-    // Only activate this filter for jenlap 7, never for jenlap 6
-    if (jenlap !== "7") {
+    // Only activate this filter for jenlap 6, never for jenlap 7
+    if (jenlap !== "6") {
       return this.getEmptyResult();
     }
 
@@ -326,12 +318,8 @@ export class PanganFilter extends BaseFilter {
       result.columns = [];
     }
 
-    // Filter condition when opsiPangan is set
-    if (opsiPangan === "pilihPangan" && Pangan !== "XX") {
-      if (Pangan && Pangan !== "00") {
-        result.whereConditions.push(`a.pangan = '${Pangan}'`);
-      }
-    }
+    // Note: opsiPangan field doesn't exist in state, removing filter condition
+    // TODO: Add opsiPangan to state if needed for filtering by specific food security type
 
     return result;
   }

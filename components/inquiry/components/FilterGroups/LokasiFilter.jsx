@@ -35,7 +35,7 @@ const LokasiFilter = ({ inquiryState }) => {
   ];
 
   return (
-    <div className="w-full p-4 rounded-2xl bg-sky-100 dark:bg-zinc-900 shadow-sm">
+    <div className="w-full p-4 rounded-2xl bg-gradient-to-r from-sky-100 to-teal-100 dark:from-zinc-900 dark:to-zinc-900 shadow-sm">
       {/* Mobile/Tablet: Stack vertically, Desktop: Row layout */}
       <div className="flex flex-col lg:flex-row lg:items-center gap-4 w-full">
         {/* Title - Full width on mobile, fixed width on desktop */}

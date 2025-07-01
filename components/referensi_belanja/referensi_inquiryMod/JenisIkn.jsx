@@ -19,6 +19,7 @@ const JenisIkn = (props) => {
       size="sm"
       placeholder="Pilih Jenis IKN"
       className="max-w-xs mb-1"
+      aria-label="Pilih Jenis IKN"
     >
       <SelectItem key="00" value="00" textValue="Semua Belanja dan IKN">
         Semua Belanja dan IKN

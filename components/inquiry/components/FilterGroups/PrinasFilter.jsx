@@ -15,7 +15,7 @@ const PrinasFilter = ({ inquiryState }) => {
   ];
 
   return (
-    <div className="w-full p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-purple-100 to-indigo-100 shadow-sm">
+    <div className="w-full p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-pink-100 to-rose-100 dark:from-zinc-900 dark:to-zinc-900 shadow-sm">
       {/* Mobile/Tablet: Stack vertically, Desktop: Row layout */}
       <div className="flex flex-col lg:flex-row lg:items-center gap-4 w-full">
         {/* Title - Full width on mobile, fixed width on desktop */}

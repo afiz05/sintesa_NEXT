@@ -45,6 +45,7 @@ const CutOff = ({ onChange, thang, jenlap, pilihtanggal, value }) => {
       size="sm"
       placeholder="Pilih Cut Off"
       className="max-w-xs mb-2"
+      aria-label="Pilih Cut Off"
     >
       {cutoff.map((cutoffItem) => (
         <SelectItem key={cutoffItem.value} value={cutoffItem.value}>

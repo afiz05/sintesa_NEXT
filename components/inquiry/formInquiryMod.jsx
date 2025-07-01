@@ -781,7 +781,7 @@ const InquiryMod = () => {
 
   return (
     <div className="w-full">
-      <div className="p-6">
+      <div className="xl:px-24 p-6">
         <h2 className="text-2xl font-bold mb-6">Inquiry Data</h2>
 
         {/* Report Settings Card */}
