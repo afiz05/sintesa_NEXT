@@ -1,6 +1,13 @@
 import React from "react";
-import { Button, Card, CardBody } from "@heroui/react";
-import { Play, Download, RefreshCw, FileText, Save } from "lucide-react";
+import { Button, ButtonGroup, Card, CardBody } from "@heroui/react";
+import {
+  Play,
+  Download,
+  RefreshCw,
+  FileText,
+  Save,
+  MessageCircleHeart,
+} from "lucide-react";
 
 const QueryButtons = ({
   onExecuteQuery,
@@ -13,61 +20,61 @@ const QueryButtons = ({
   isLoading,
 }) => {
   return (
-    <Card className="mb-4">
+    <Card className="mb-4 shadow-none bg-transparent">
       <CardBody>
-        <div className="flex flex-wrap gap-3 justify-center md:justify-center">
+        <div className="flex flex-wrap gap-6 justify-center md:justify-center">
           <Button
             color="primary"
             startContent={<Play size={16} />}
             onClick={onExecuteQuery}
             isLoading={isLoading}
-            className="min-w-[120px]"
+            className="w-[160px] h-[50px]"
           >
-            Execute Query
+            Tayang Data
           </Button>
 
-          <Button
-            color="default"
-            variant="bordered"
+          {/* <Button
+            color="danger"
+            variant="light"
             startContent={<RefreshCw size={16} />}
             onClick={onReset}
             isDisabled={isLoading}
-            className="min-w-[120px]"
+            className="w-[160px] h-[50px]"
           >
-            Reset Filters
-          </Button>
+            Reset
+          </Button> */}
+          <ButtonGroup>
+            <Button
+              color="success"
+              variant="flat"
+              startContent={<Download size={16} />}
+              onClick={onExportExcel}
+              isDisabled={isLoading}
+              className="w-[120px] h-[50px]"
+            >
+              Excel
+            </Button>
 
+            <Button
+              color="secondary"
+              variant="flat"
+              startContent={<Download size={16} />}
+              onClick={onExportCSV}
+              isDisabled={isLoading}
+              className="w-[120px] h-[50px]"
+            >
+              CSV
+            </Button>
+          </ButtonGroup>
           <Button
             color="success"
             variant="flat"
-            startContent={<Download size={16} />}
-            onClick={onExportExcel}
-            isDisabled={isLoading}
-            className="min-w-[120px]"
-          >
-            Export Excel
-          </Button>
-
-          <Button
-            color="secondary"
-            variant="flat"
-            startContent={<Download size={16} />}
-            onClick={onExportCSV}
-            isDisabled={isLoading}
-            className="min-w-[120px]"
-          >
-            Export CSV
-          </Button>
-
-          <Button
-            color="danger"
-            variant="flat"
-            startContent={<FileText size={16} />}
+            startContent={<MessageCircleHeart size={16} />}
             onClick={onExportPDF}
             isDisabled={isLoading}
-            className="min-w-[120px]"
+            className="w-[160px] h-[50px]"
           >
-            Export PDF
+            Kirim WA
           </Button>
 
           <Button
@@ -76,20 +83,20 @@ const QueryButtons = ({
             startContent={<Save size={16} />}
             onClick={onSaveQuery}
             isDisabled={isLoading}
-            className="min-w-[120px]"
+            className="w-[160px] h-[50px]"
           >
             Simpan Query
           </Button>
 
           <Button
-            color="info"
+            color="default"
             variant="flat"
             startContent={<FileText size={16} />} // You can use a different icon if desired
             onClick={onShowSQL}
             isDisabled={isLoading}
-            className="min-w-[120px]"
+            className="w-[160px] h-[50px]"
           >
-            Show SQL
+            Tayang SQL
           </Button>
         </div>
       </CardBody>
