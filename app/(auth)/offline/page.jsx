@@ -63,13 +63,13 @@ export default function OfflinePage() {
   }, [setOffline, router]);
 
   return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="text-center">
+    <div className="flex items-center justify-center h-screen bg-white dark:bg-gray-900 transition-colors">
+      <div className="text-center max-w-md mx-auto px-8 py-10 bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-xl border border-gray-200 dark:border-gray-700">
         <div className="mb-8">
           {/* Animated Cloud Offline Icon */}
           <div className="relative mx-auto w-24 h-24">
             <svg
-              className="w-24 h-24 text-gray-400 animate-pulse"
+              className="w-24 h-24 text-gray-400 dark:text-gray-600 animate-pulse"
               fill="currentColor"
               viewBox="0 0 24 24"
             >
@@ -78,7 +78,7 @@ export default function OfflinePage() {
             {/* Animated disconnection lines */}
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
               <svg
-                className="w-8 h-8 text-red-500 animate-bounce"
+                className="w-8 h-8 text-red-500 dark:text-red-400 animate-bounce"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -94,19 +94,19 @@ export default function OfflinePage() {
             {/* WiFi signal lines */}
             <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
               <div className="flex space-x-1">
-                <div className="w-1 h-2 bg-gray-300 rounded-full opacity-30"></div>
-                <div className="w-1 h-3 bg-gray-300 rounded-full opacity-30"></div>
-                <div className="w-1 h-4 bg-gray-300 rounded-full opacity-30"></div>
-                <div className="w-1 h-2 bg-gray-300 rounded-full opacity-30"></div>
+                <div className="w-1 h-2 bg-gray-300 dark:bg-gray-600 rounded-full opacity-30"></div>
+                <div className="w-1 h-3 bg-gray-300 dark:bg-gray-600 rounded-full opacity-30"></div>
+                <div className="w-1 h-4 bg-gray-300 dark:bg-gray-600 rounded-full opacity-30"></div>
+                <div className="w-1 h-2 bg-gray-300 dark:bg-gray-600 rounded-full opacity-30"></div>
               </div>
             </div>
           </div>
         </div>
 
-        <h1 className="text-3xl font-bold mb-4 text-gray-900">
+        <h1 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
           Sintesa v3 sedang Offline
         </h1>
-        <p className="text-lg mb-6 text-gray-600">
+        <p className="text-lg mb-6 text-gray-600 dark:text-gray-300">
           Backend server sedang tidak tersedia.
           <br />
           Sistem akan otomatis kembali ketika server online.
@@ -117,14 +117,14 @@ export default function OfflinePage() {
           disabled={isChecking}
           className={`font-bold py-3 px-6 rounded-lg transition-colors ${
             isChecking
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700 text-white"
+              ? "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white"
           }`}
         >
           {isChecking ? "Mengecek..." : "Coba Lagi"}
         </button>
 
-        <p className="text-sm text-gray-500 mt-4">Auto-check setiap 30 detik</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">Auto-check setiap 30 detik</p>
       </div>
     </div>
   );

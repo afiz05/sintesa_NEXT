@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:88";
+const BACKEND_URL = process.env.NEXT_PUBLIC_LOCAL_SOCKET;
 
 export const useBackendStatusSocket = (options = {}) => {
   const {
