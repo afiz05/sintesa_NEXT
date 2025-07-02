@@ -125,25 +125,25 @@ export const Login = () => {
   };
 
   // Check captcha mode from backend
-  const cekMode = async () => {
-    try {
-      const response = await axios.get(
-        process.env.NEXT_PUBLIC_LOCAL_CEKMODE || ""
-      );
-      setChap(response.data.capcay);
-    } catch (error) {
-      console.log(error);
-      setError("Captcha mode check failed");
-      setChap("0");
-      setOffline(true);
-      window.location.href = "/v3/next/offline";
-      showToast("Mode Offline", "error");
-    }
-  };
+  // const cekMode = async () => {
+  //   try {
+  //     const response = await axios.get(
+  //       process.env.NEXT_PUBLIC_LOCAL_CEKMODE || ""
+  //     );
+  //     setChap(response.data.capcay);
+  //   } catch (error) {
+  //     console.log(error);
+  //     setError("Captcha mode check failed");
+  //     setChap("0");
+  //     setOffline(true);
+  //     window.location.href = "/v3/next/offline";
+  //     showToast("Mode Offline", "error");
+  //   }
+  // };
 
-  useEffect(() => {
-    cekMode();
-  }, []);
+  // useEffect(() => {
+  //   cekMode();
+  // }, []);
 
   useEffect(() => {
     if (chap === "0") {
