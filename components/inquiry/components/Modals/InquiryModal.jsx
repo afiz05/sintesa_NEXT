@@ -181,6 +181,8 @@ const InquiryModal = ({ isOpen, onClose, sql, from, thang }) => {
                 // Skip only the numeric amount columns that shouldn't be searched
                 if (
                   colName === "PAGU" ||
+                  colName === "PAGU_APBN" ||
+                  colName === "PAGU_DIPA" ||
                   colName === "REALISASI" ||
                   colName === "BLOKIR"
                 ) {
@@ -472,7 +474,13 @@ const InquiryModal = ({ isOpen, onClose, sql, from, thang }) => {
 
     return columns.reduce((acc, column) => {
       // Only allow PAGU, REALISASI, and BLOKIR columns to be treated as numeric
-      const allowedNumericColumns = ["PAGU", "REALISASI", "BLOKIR"];
+      const allowedNumericColumns = [
+        "PAGU",
+        "PAGU_APBN",
+        "PAGU_DIPA",
+        "REALISASI",
+        "BLOKIR",
+      ];
 
       if (!allowedNumericColumns.includes(column.toUpperCase())) {
         return acc; // Skip non-allowed columns
@@ -672,6 +680,8 @@ const InquiryModal = ({ isOpen, onClose, sql, from, thang }) => {
                     const isNumericColumn = numericColumns[column];
                     const allowSorting = [
                       "PAGU",
+                      "PAGU_APBN",
+                      "PAGU_DIPA",
                       "REALISASI",
                       "BLOKIR",
                     ].includes(column.toUpperCase());
@@ -680,9 +690,13 @@ const InquiryModal = ({ isOpen, onClose, sql, from, thang }) => {
                     let columnClass = "text-center uppercase";
                     let columnStyle = {};
                     if (
-                      ["PAGU", "REALISASI", "BLOKIR"].includes(
-                        column.toUpperCase()
-                      )
+                      [
+                        "PAGU",
+                        "PAGU_APBN",
+                        "PAGU_DIPA",
+                        "REALISASI",
+                        "BLOKIR",
+                      ].includes(column.toUpperCase())
                     ) {
                       columnStyle = {
                         width: "160px",
@@ -792,7 +806,13 @@ const InquiryModal = ({ isOpen, onClose, sql, from, thang }) => {
                         let grandTotal = 0;
                         if (
                           isNumericColumn &&
-                          ["PAGU", "REALISASI", "BLOKIR"].includes(columnName)
+                          [
+                            "PAGU",
+                            "PAGU_APBN",
+                            "PAGU_DIPA",
+                            "REALISASI",
+                            "BLOKIR",
+                          ].includes(columnName)
                         ) {
                           grandTotal = items.reduce((sum, item) => {
                             const value = Number(item[column]);
@@ -823,7 +843,13 @@ const InquiryModal = ({ isOpen, onClose, sql, from, thang }) => {
                             }`}
                           >
                             {isNumericColumn &&
-                            ["PAGU", "REALISASI", "BLOKIR"].includes(columnName)
+                            [
+                              "PAGU",
+                              "PAGU_APBN",
+                              "PAGU_DIPA",
+                              "REALISASI",
+                              "BLOKIR",
+                            ].includes(columnName)
                               ? formatNumber(grandTotal)
                               : shouldShowLabel
                               ? "GRAND TOTAL"

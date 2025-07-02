@@ -36,9 +36,11 @@ class QueryBuilder {
       if (i !== validCutoff) realColumns += "+ ";
     }
 
-    // Build SELECT clauses
-    const pagu = `, ROUND(SUM(a.pagu)/${pembulatan},0) AS PAGU`;
-    const paguapbn = `, ROUND(SUM(a.pagu)/${pembulatan},0) AS PAGU_DIPA`;
+    // Build SELECT clauses - use pagu_apbn for jenlap=1, pagu for others
+    const paguField = jenlap === "1" ? "a.pagu_apbn" : "a.pagu";
+    const pagu = `, ROUND(SUM(${paguField})/${pembulatan},0) AS PAGU`;
+    const paguapbn = `, ROUND(SUM(${paguField})/${pembulatan},0) AS PAGU_APBN`;
+    const pagudipa = `, ROUND(SUM(a.pagu_dipa)/${pembulatan},0) AS PAGU_DIPA`;
     const blokir = `, ROUND(SUM(a.blokir)/${pembulatan},0) AS BLOKIR`;
     const selectClause = `, ROUND(SUM(${realColumns})/${pembulatan},0) AS REALISASI`;
     const realapbn = `, ROUND(SUM(real1+real2+real3+real4+real5+real6+real7+real8+real9+real10+real11+real12)/${pembulatan},0) AS REALISASI`;
@@ -91,12 +93,12 @@ class QueryBuilder {
     }
 
     // Special cases
-    const selectcaput = `, ROUND(SUM(a.pagu)/${pembulatan},0) AS PAGU, ROUND(SUM(${realColumns})/${pembulatan},0) AS REALISASI`;
+    const selectcaput = `, ROUND(SUM(${paguField})/${pembulatan},0) AS PAGU, ROUND(SUM(${realColumns})/${pembulatan},0) AS REALISASI`;
     const blokircaput = `, ROUND(SUM(a.blokir)/${pembulatan},0) AS BLOKIR`;
     const jnsblokirBulanan = `, a.kdblokir, ROUND(SUM(a.blokir)/${pembulatan},0) AS BLOKIR`;
 
     // jenlap = 6: Volume Output Kegiatan (PN) - Data Caput (uses pagu_output table)
-    const jenlap6Select = `, a.sat as satuan, SUM(vol) AS vol, sum(a.pagu) as pagu, sum(real1) as rjan, sum(persen1) as pjan, sum(realfisik1) as rpjan, sum(real2) as rfeb, sum(persen2) as pfeb, sum(realfisik2) as rpfeb, sum(real3) as rmar, sum(persen3) as pmar, sum(realfisik3) as rpmar, sum(real4) as rapr, sum(persen4) as papr, sum(realfisik4) as rpapr, sum(real5) as rmei, sum(persen5) as pmei, sum(realfisik5) as rpmei, sum(real6) as rjun, sum(persen6) as pjun, sum(realfisik6) as rpjun, sum(real7) as rjul, sum(persen7) as pjul, sum(realfisik7) as rpjul, sum(real8) as rags, sum(persen8) as pags, sum(realfisik8) as rpags, sum(real9) as rsep, sum(persen9) as psep, sum(realfisik9) as rpsep, sum(real10) as rokt, sum(persen10) as pokt, sum(realfisik10) as rpokt, sum(real11) as rnov, sum(persen11) as pnov, sum(realfisik11) as rpnov, sum(real12) as rdes, sum(persen12) as pdes, sum(realfisik12) as rpdes, os, a.ket`;
+    const jenlap6Select = `, a.sat as satuan, SUM(vol) AS vol, sum(${paguField}) as pagu, sum(real1) as rjan, sum(persen1) as pjan, sum(realfisik1) as rpjan, sum(real2) as rfeb, sum(persen2) as pfeb, sum(realfisik2) as rpfeb, sum(real3) as rmar, sum(persen3) as pmar, sum(realfisik3) as rpmar, sum(real4) as rapr, sum(persen4) as papr, sum(realfisik4) as rpapr, sum(real5) as rmei, sum(persen5) as pmei, sum(realfisik5) as rpmei, sum(real6) as rjun, sum(persen6) as pjun, sum(realfisik6) as rpjun, sum(real7) as rjul, sum(persen7) as pjul, sum(realfisik7) as rpjul, sum(real8) as rags, sum(persen8) as pags, sum(realfisik8) as rpags, sum(real9) as rsep, sum(persen9) as psep, sum(realfisik9) as rpsep, sum(real10) as rokt, sum(persen10) as pokt, sum(realfisik10) as rpokt, sum(real11) as rnov, sum(persen11) as pnov, sum(realfisik11) as rpnov, sum(real12) as rdes, sum(persen12) as pdes, sum(realfisik12) as rpdes, os, a.ket`;
 
     // jenlap = 7: Pergerakan Blokir Bulanan per Jenis (kdblokir, nmblokir + monthly blokir breakdown)
     const blokirBulananSelect = `, a.kdblokir, a.nmblokir${blokirBulanan}`;
@@ -136,7 +138,7 @@ class QueryBuilder {
       case "1":
         console.log("📊 Using jenlap 1 (DIPA APBN)");
         dynamicFrom = fromapbn;
-        dynamicSelect = paguapbn + realapbn + blokir;
+        dynamicSelect = paguapbn + pagudipa + realapbn + blokir;
         break;
       case "2":
         console.log("📊 Using jenlap 2 (Pagu Realisasi Blokir)");
