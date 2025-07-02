@@ -17,8 +17,10 @@ import {
   FileSpreadsheet,
   FileText,
   Download,
+  Upload,
   FileType2,
   FileSignature,
+  MessageCircleHeart,
 } from "lucide-react";
 import {
   exportToJSON,
@@ -79,34 +81,42 @@ const ExportModal = ({
     <Modal
       isOpen={showModalPDF}
       onClose={() => setShowModalPDF(false)}
-      size="sm"
+      size="3xl"
       scrollBehavior="inside"
+      hideCloseButton
+      classNames={{
+        header:
+          "bg-gradient-to-r from-green-200 to-emerald-200 dark:from-zinc-800 dark:to-zinc-800 rounded-xl",
+      }}
     >
       <ModalContent>
-        <ModalHeader className="flex justify-between items-center">
+        <ModalHeader className="flex justify-between items-center m-6">
           <div className="text-lg font-semibold flex items-center">
-            <Download className="mr-2 text-blue-600" size={20} />
-            Ekspor Data
+            <MessageCircleHeart className="mr-2 text-success" size={20} />
+            Kirim Data ke WhatsApp
           </div>
         </ModalHeader>
         <ModalBody>
           <div className="space-y-4">
             <p className="text-sm text-gray-600">
-              Pilih format file untuk mengekspor data:
+              Pilih format file untuk dikirim:
             </p>
             <RadioGroup
               value={selectedFormat}
               onValueChange={setSelectedFormat}
-              orientation="vertical"
-              className="gap-3"
+              orientation="horizontal"
+              className="flex flex-row gap-8 justify-center h-16 items-center"
+              classNames={{
+                wrapper: "gap-8 justify-center h-16 items-center",
+              }}
             >
-              <Radio value="pdf">
+              <Radio value="pdf" color="danger">
                 <div className="flex items-center">
                   <FileSignature className="mr-2 text-red-600" size={18} />
                   <span>PDF</span>
                 </div>
               </Radio>
-              <Radio value="excel">
+              <Radio value="excel" color="success">
                 <div className="flex items-center">
                   <FileSpreadsheet className="mr-2 text-green-600" size={18} />
                   <span>Excel (.xlsx)</span>
@@ -118,7 +128,7 @@ const ExportModal = ({
                   <span>JSON</span>
                 </div>
               </Radio>
-              <Radio value="text">
+              <Radio value="text" color="default">
                 <div className="flex items-center">
                   <FileType2 className="mr-2 text-gray-600" size={18} />
                   <span>Text (.txt)</span>
@@ -144,14 +154,16 @@ const ExportModal = ({
             Batal
           </Button>
           <Button
-            color="primary"
+            color="success"
+            variant="ghost"
             onPress={handleExport}
             disabled={loading}
+            className="w-[160px]"
             startContent={
-              loading ? <Spinner size="sm" /> : <Download size={16} />
+              loading ? <Spinner size="sm" /> : <Upload size={16} />
             }
           >
-            {loading ? "Mengekspor..." : "Ekspor"}
+            {loading ? "Mengirim..." : "Kirim"}
           </Button>
         </ModalFooter>
       </ModalContent>

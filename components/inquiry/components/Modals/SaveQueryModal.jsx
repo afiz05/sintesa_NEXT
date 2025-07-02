@@ -76,9 +76,19 @@ const SaveQueryModal = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="md" scrollBehavior="inside">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="3xl"
+      scrollBehavior="inside"
+      hideCloseButton
+      classNames={{
+        header:
+          "bg-gradient-to-r from-yellow-200 to-amber-200 dark:from-zinc-800 dark:to-zinc-800 rounded-xl",
+      }}
+    >
       <ModalContent>
-        <ModalHeader className="flex justify-between items-center">
+        <ModalHeader className="flex justify-between items-center m-6">
           <div className="text-lg font-semibold flex items-center">
             <Database className="mr-2 text-blue-600" size={20} />
             Simpan Query
@@ -174,9 +184,11 @@ const SaveQueryModal = ({
                 </Button>
 
                 <Button
-                  color="primary"
+                  color="warning"
+                  variant="ghost"
                   type="submit"
                   disabled={loading}
+                  className="w-[160px]"
                   startContent={
                     loading ? <Spinner size="sm" /> : <Save size={16} />
                   }

@@ -26,33 +26,47 @@ const SqlPreviewModal = ({ isOpen, onClose, query, title }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="3xl" scrollBehavior="inside">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="3xl"
+      scrollBehavior="inside"
+      hideCloseButton
+      classNames={{
+        header:
+          "bg-gradient-to-r from-gray-200 to-zinc-200 dark:from-zinc-800 dark:to-zinc-800 rounded-xl",
+      }}
+    >
       <ModalContent>
-        <ModalHeader className="flex justify-between items-center">
+        <ModalHeader className="flex justify-between items-center m-6">
           <div className="text-lg font-semibold">{title || "SQL Preview"}</div>
         </ModalHeader>
 
         <ModalBody>
-          <div className="bg-gray-100 p-4 rounded-md overflow-auto max-h-[60vh]">
-            <pre className="whitespace-pre-wrap text-sm font-mono text-gray-800">
-              {query}
+          <div className="bg-gray-100 p-8 rounded-xl overflow-auto max-h-[60vh]">
+            <pre
+              className="whitespace-pre-wrap text-sm font-mono text-gray-800"
+              style={{ textAlign: "center" }}
+            >
+              {query && query.replace(/\s+/g, " ").trim()}
             </pre>
           </div>
         </ModalBody>
 
         <ModalFooter className="flex justify-between">
           <Button
-            color="primary"
-            variant="flat"
+            color="default"
+            variant="ghost"
             onPress={handleCopy}
             startContent={copied ? <Check size={16} /> : <Copy size={16} />}
           >
-            {copied ? "Copied!" : "Copy to Clipboard"}
+            {copied ? "Tersalin!" : "Salin ke Clipboard"}
           </Button>
 
           <Button
             color="danger"
-            variant="light"
+            variant="ghost"
+            className="w-[160px]"
             onPress={onClose}
             startContent={<X size={16} />}
           >
