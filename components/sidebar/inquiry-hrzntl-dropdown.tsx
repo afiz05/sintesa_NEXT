@@ -54,9 +54,7 @@ export const InqHorizontalDD = ({
             case "belanja":
               icon = <CreditCard size={16} />;
               break;
-            case "belanja2":
-              icon = <CreditCard size={16} />;
-              break;
+
             case "tematik":
               icon = <Building2 size={16} />;
               break;
