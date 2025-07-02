@@ -3,6 +3,7 @@ import { Providers } from "./providers";
 import { fontSans, fontMono } from "@/config/fonts";
 import { ToastContainer } from "@/components/ui/ToastContainer";
 import { ThemeScript } from "./theme-script";
+import BackendStatusMonitor from "@/components/BackendStatusMonitor";
 import clsx from "clsx";
 
 export const metadata = {
@@ -26,7 +27,7 @@ export default function RootLayout({ children }) {
         suppressHydrationWarning
       >
         <Providers>
-          {children}
+          <BackendStatusMonitor>{children}</BackendStatusMonitor>
           <ToastContainer />
         </Providers>
       </body>
