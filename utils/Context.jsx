@@ -123,11 +123,11 @@ export const MyContextProvider = ({ children }) => {
         }
       } catch (error) {
         console.error("Error in checkAndRefreshToken:", error);
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("token");
-        }
-        await deleteAuthCookie(); // Hapus cookie auth
-        setstatusLogin(false);
+        // if (typeof window !== "undefined") {
+        //   localStorage.removeItem("token");
+        // }
+        // await deleteAuthCookie(); // Hapus cookie auth
+        // setstatusLogin(false);
 
         // Hanya redirect jika tidak sedang di halaman auth
         if (!isOnAuthPage) {

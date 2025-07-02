@@ -173,7 +173,7 @@ export default function DetailSatkerPage({ params }) {
               Detail Satuan Kerja
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Informasi lengkap satuan kerja
+              Informasi lengkap Satuan Kerja
             </p>
           </div>
           <Button

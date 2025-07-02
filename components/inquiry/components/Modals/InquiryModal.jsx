@@ -830,6 +830,7 @@ const InquiryModal = ({ isOpen, onClose, sql, from, thang }) => {
                         return (
                           <TableCell
                             key={column}
+                            // colSpan={2}
                             className={`${
                               isNumericColumn ? "text-right" : "text-center"
                             } font-medium text-foreground-600 bg-default-100 uppercase ${

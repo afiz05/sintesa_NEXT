@@ -5,6 +5,13 @@ import { io } from "socket.io-client";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_LOCAL_SOCKET;
 
+// Global socket instance untuk memastikan hanya ada satu koneksi
+let globalSocket = null;
+let globalSocketListeners = new Set();
+let reconnectAttempts = 0;
+const MAX_RECONNECT_ATTEMPTS = 5;
+const RECONNECT_DELAY = 3000;
+
 export const useBackendStatusSocket = (options = {}) => {
   const {
     autoReconnect = true,
@@ -17,113 +24,197 @@ export const useBackendStatusSocket = (options = {}) => {
   const [isOnline, setIsOnline] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [lastCheck, setLastCheck] = useState(null);
-  const socketRef = useRef(null);
   const intervalRef = useRef(null);
   const reconnectTimeoutRef = useRef(null);
+  const listenerId = useRef(Math.random().toString(36).substr(2, 9));
 
   const connectSocket = () => {
-    if (socketRef.current?.connected) return;
+    // Jika sudah ada global socket yang connected, gunakan yang ada
+    if (globalSocket?.connected) {
+      setIsConnected(true);
+      setIsOnline(true);
+      setLastCheck(new Date());
+      registerListener();
+      return;
+    }
+
+    // Jika sedang mencoba reconnect dan sudah mencapai batas maksimum
+    if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+      console.warn("❌ Max reconnection attempts reached, stopping auto-reconnect");
+      setIsConnected(false);
+      setIsOnline(false);
+      return;
+    }
 
     try {
-      socketRef.current = io(BACKEND_URL, {
+      // Disconnect socket lama jika ada
+      if (globalSocket) {
+        globalSocket.disconnect();
+      }
+
+      globalSocket = io(BACKEND_URL, {
         transports: ["websocket", "polling"],
         timeout: 5000,
         forceNew: true,
       });
 
-      socketRef.current.on("connect", () => {
+      globalSocket.on("connect", () => {
         console.log("✅ Backend socket connected");
-        setIsConnected(true);
-        setIsOnline(true);
-        setLastCheck(new Date());
+        reconnectAttempts = 0; // Reset counter pada koneksi sukses
+        
+        // Update semua listeners
+        globalSocketListeners.forEach(listener => {
+          if (listener.setIsConnected) listener.setIsConnected(true);
+          if (listener.setIsOnline) listener.setIsOnline(true);
+          if (listener.setLastCheck) listener.setLastCheck(new Date());
+          if (listener.onStatusChange) listener.onStatusChange(true);
+        });
+      });
 
-        if (onStatusChange) {
-          onStatusChange(true);
+      globalSocket.on("disconnect", (reason) => {
+        console.log("❌ Backend socket disconnected:", reason);
+        
+        // Update semua listeners
+        globalSocketListeners.forEach(listener => {
+          if (listener.setIsConnected) listener.setIsConnected(false);
+          if (listener.setIsOnline) listener.setIsOnline(false);
+          if (listener.setLastCheck) listener.setLastCheck(new Date());
+          if (listener.onStatusChange) listener.onStatusChange(false);
+        });
+
+        // Hanya trigger onOffline jika disconnect karena masalah backend, bukan client
+        if (reason === 'io server disconnect' || reason === 'transport close' || reason === 'transport error') {
+          globalSocketListeners.forEach(listener => {
+            if (listener.onOffline) listener.onOffline();
+          });
+        }
+
+        // Auto reconnect dengan backoff
+        if (autoReconnect && reason !== 'io client disconnect') {
+          reconnectAttempts++;
+          const delay = RECONNECT_DELAY * Math.pow(2, Math.min(reconnectAttempts - 1, 3)); // Exponential backoff
+          console.log(`🔄 Attempting reconnect ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS} in ${delay}ms`);
+          
+          reconnectTimeoutRef.current = setTimeout(() => {
+            connectSocket();
+          }, delay);
         }
       });
 
-      socketRef.current.on("disconnect", () => {
-        console.log("❌ Backend socket disconnected");
-        setIsConnected(false);
-        setIsOnline(false);
-        setLastCheck(new Date());
-
-        if (onStatusChange) {
-          onStatusChange(false);
-        }
-
-        if (onOffline) {
-          onOffline();
-        }
-
-        // Auto reconnect if enabled
-        if (autoReconnect) {
-          reconnectTimeoutRef.current = setTimeout(connectSocket, 3000);
-        }
-      });
-
-      socketRef.current.on("connect_error", (error) => {
+      globalSocket.on("connect_error", (error) => {
         console.error("Socket connection error:", error);
-        setIsConnected(false);
-        setIsOnline(false);
-        setLastCheck(new Date());
+        reconnectAttempts++;
+        
+        // Update semua listeners
+        globalSocketListeners.forEach(listener => {
+          if (listener.setIsConnected) listener.setIsConnected(false);
+          if (listener.setIsOnline) listener.setIsOnline(false);
+          if (listener.setLastCheck) listener.setLastCheck(new Date());
+          if (listener.onStatusChange) listener.onStatusChange(false);
+        });
 
-        if (onStatusChange) {
-          onStatusChange(false);
+        // Hanya trigger onOffline jika ini bukan error sementara
+        if (reconnectAttempts >= 3) {
+          globalSocketListeners.forEach(listener => {
+            if (listener.onOffline) listener.onOffline();
+          });
         }
 
-        if (onOffline) {
-          onOffline();
+        // Auto reconnect dengan backoff
+        if (autoReconnect && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+          const delay = RECONNECT_DELAY * Math.pow(2, Math.min(reconnectAttempts - 1, 3));
+          reconnectTimeoutRef.current = setTimeout(() => {
+            connectSocket();
+          }, delay);
         }
       });
 
-      socketRef.current.on("backend-status", (data) => {
-        setIsOnline(data.status === "OK");
-        setLastCheck(new Date());
-
-        if (onStatusChange) {
-          onStatusChange(data.status === "OK");
-        }
+      globalSocket.on("backend-status", (data) => {
+        const status = data.status === "OK";
+        globalSocketListeners.forEach(listener => {
+          if (listener.setIsOnline) listener.setIsOnline(status);
+          if (listener.setLastCheck) listener.setLastCheck(new Date());
+          if (listener.onStatusChange) listener.onStatusChange(status);
+        });
       });
 
-      socketRef.current.on("pong", (data) => {
-        setIsOnline(data.status === "OK");
-        setLastCheck(new Date());
+      globalSocket.on("pong", (data) => {
+        const status = data.status === "OK";
+        globalSocketListeners.forEach(listener => {
+          if (listener.setIsOnline) listener.setIsOnline(status);
+          if (listener.setLastCheck) listener.setLastCheck(new Date());
+        });
       });
+
+      registerListener();
+      
     } catch (error) {
       console.error("Failed to create socket connection:", error);
-      setIsConnected(false);
-      setIsOnline(false);
+      reconnectAttempts++;
+      
+      globalSocketListeners.forEach(listener => {
+        if (listener.setIsConnected) listener.setIsConnected(false);
+        if (listener.setIsOnline) listener.setIsOnline(false);
+        if (listener.onStatusChange) listener.onStatusChange(false);
+      });
 
-      if (onStatusChange) {
-        onStatusChange(false);
-      }
-
-      if (onOffline) {
-        onOffline();
+      // Hanya trigger onOffline setelah beberapa kali gagal
+      if (reconnectAttempts >= 3) {
+        globalSocketListeners.forEach(listener => {
+          if (listener.onOffline) listener.onOffline();
+        });
       }
     }
   };
 
-  const checkStatus = () => {
-    if (socketRef.current?.connected) {
-      socketRef.current.emit("ping");
-    } else {
-      setIsOnline(false);
-      setIsConnected(false);
-      setLastCheck(new Date());
+  const registerListener = () => {
+    const listener = {
+      id: listenerId.current,
+      setIsConnected,
+      setIsOnline,
+      setLastCheck,
+      onStatusChange,
+      onOffline,
+    };
+    globalSocketListeners.add(listener);
+  };
 
-      if (onStatusChange) {
-        onStatusChange(false);
+  const unregisterListener = () => {
+    globalSocketListeners.forEach(listener => {
+      if (listener.id === listenerId.current) {
+        globalSocketListeners.delete(listener);
       }
+    });
+  };
 
-      if (onOffline) {
-        onOffline();
+  const checkStatus = () => {
+    if (globalSocket?.connected) {
+      globalSocket.emit("ping");
+    } else {
+      // Jangan langsung trigger offline, coba reconnect dulu
+      if (autoReconnect && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+        console.log("🔄 Socket not connected, attempting to reconnect...");
+        connectSocket();
+      } else {
+        // Hanya set offline jika sudah tidak bisa reconnect
+        setIsOnline(false);
+        setIsConnected(false);
+        setLastCheck(new Date());
+
+        if (onStatusChange) {
+          onStatusChange(false);
+        }
+
+        // Hanya trigger onOffline setelah semua usaha reconnect gagal
+        if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS && onOffline) {
+          onOffline();
+        }
       }
     }
   };
 
   const disconnect = () => {
+    // Cleanup interval dan timeout
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
@@ -132,8 +223,15 @@ export const useBackendStatusSocket = (options = {}) => {
       clearTimeout(reconnectTimeoutRef.current);
     }
 
-    if (socketRef.current) {
-      socketRef.current.disconnect();
+    // Unregister listener dari global socket
+    unregisterListener();
+
+    // Jangan disconnect global socket kecuali tidak ada listener lain
+    if (globalSocketListeners.size === 0 && globalSocket) {
+      console.log("🔌 No more listeners, disconnecting global socket");
+      globalSocket.disconnect();
+      globalSocket = null;
+      reconnectAttempts = 0;
     }
 
     setIsConnected(false);
@@ -146,7 +244,7 @@ export const useBackendStatusSocket = (options = {}) => {
       return;
     }
 
-    // Initial connection
+    // Initial connection dan register listener
     connectSocket();
 
     // Set up periodic status check
@@ -154,9 +252,19 @@ export const useBackendStatusSocket = (options = {}) => {
       intervalRef.current = setInterval(checkStatus, checkInterval);
     }
 
-    // Cleanup on unmount
+    // Cleanup hanya unregister listener, tidak disconnect global socket
     return () => {
-      disconnect();
+      // Cleanup interval dan timeout
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+
+      // Hanya unregister listener, biarkan socket tetap hidup untuk komponen lain
+      unregisterListener();
     };
   }, [disabled]); // Add disabled to dependency array
 
@@ -166,6 +274,11 @@ export const useBackendStatusSocket = (options = {}) => {
     lastCheck,
     checkStatus,
     disconnect,
-    reconnect: connectSocket,
+    reconnect: () => {
+      reconnectAttempts = 0; // Reset attempts
+      connectSocket();
+    },
+    reconnectAttempts,
+    maxReconnectAttempts: MAX_RECONNECT_ATTEMPTS,
   };
 };
