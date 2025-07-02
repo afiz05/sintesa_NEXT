@@ -31,6 +31,7 @@ const SqlPreviewModal = ({ isOpen, onClose, query, title }) => {
       onClose={onClose}
       size="3xl"
       scrollBehavior="inside"
+      backdrop="blur"
       hideCloseButton
       classNames={{
         header:
@@ -55,22 +56,20 @@ const SqlPreviewModal = ({ isOpen, onClose, query, title }) => {
 
         <ModalFooter className="flex justify-between">
           <Button
+            color="danger"
+            variant="light"
+            onPress={onClose}
+            startContent={<X size={16} />}
+          >
+            Tutup
+          </Button>
+          <Button
             color="default"
             variant="ghost"
             onPress={handleCopy}
             startContent={copied ? <Check size={16} /> : <Copy size={16} />}
           >
             {copied ? "Tersalin!" : "Salin ke Clipboard"}
-          </Button>
-
-          <Button
-            color="danger"
-            variant="ghost"
-            className="w-[160px]"
-            onPress={onClose}
-            startContent={<X size={16} />}
-          >
-            Tutup
           </Button>
         </ModalFooter>
       </ModalContent>

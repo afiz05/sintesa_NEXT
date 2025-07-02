@@ -3,6 +3,7 @@
 import MyContext from "@/utils/Context";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
+import { Card, Button } from "@heroui/react";
 
 export default function OfflinePage() {
   const context = useContext(MyContext);
@@ -63,8 +64,8 @@ export default function OfflinePage() {
   }, [setOffline, router]);
 
   return (
-    <div className="flex items-center justify-center h-screen bg-white dark:bg-gray-900 transition-colors">
-      <div className="text-center max-w-md mx-auto px-8 py-10 bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-xl border border-gray-200 dark:border-gray-700">
+    <div className="min-h-screen min-w-screen flex flex-col justify-center bg-slate-100 dark:bg-black pt-8">
+      <Card className="flex items-center text-center mx-auto w-[70vw] py-20 rounded-3xl shadow-none">
         <div className="mb-8">
           {/* Animated Cloud Offline Icon */}
           <div className="relative mx-auto w-24 h-24">
@@ -73,7 +74,7 @@ export default function OfflinePage() {
               fill="currentColor"
               viewBox="0 0 24 24"
             >
-              <path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
+              <path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z" />
             </svg>
             {/* Animated disconnection lines */}
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -104,28 +105,33 @@ export default function OfflinePage() {
         </div>
 
         <h1 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
-          Sintesa v3 sedang Offline
+          Sintesa v3 terputus!
         </h1>
         <p className="text-lg mb-6 text-gray-600 dark:text-gray-300">
-          Backend server sedang tidak tersedia.
+          Backend server sedang tidak terhubung.
           <br />
-          Sistem akan otomatis kembali ketika server online.
+          Sistem akan otomatis menghubungkan ketika server Online.
+          <br />
+          <br />
+          Klik tombol di bawah untuk mencoba hubungkan.
         </p>
 
-        <button
+        <Button
           onClick={handleTryAgain}
           disabled={isChecking}
-          className={`font-bold py-3 px-6 rounded-lg transition-colors ${
+          className={`font-bold py-3 px-6 rounded-lg w-96 transition-colors ${
             isChecking
               ? "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
               : "bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white"
           }`}
         >
-          {isChecking ? "Mengecek..." : "Coba Lagi"}
-        </button>
+          {isChecking ? "Mengecek..." : "Coba Hubungkan"}
+        </Button>
 
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">Auto-check setiap 30 detik</p>
-      </div>
+        <p className="text-sm text-gray-400 dark:text-gray-400 mt-4">
+          Mengecek otomatis setiap 30 detik
+        </p>
+      </Card>
     </div>
   );
 }

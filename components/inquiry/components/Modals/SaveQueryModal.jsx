@@ -81,6 +81,7 @@ const SaveQueryModal = ({
       onClose={onClose}
       size="3xl"
       scrollBehavior="inside"
+      backdrop="blur"
       hideCloseButton
       classNames={{
         header:
@@ -180,7 +181,7 @@ const SaveQueryModal = ({
                   disabled={loading}
                   startContent={<X size={16} />}
                 >
-                  Batal
+                  Tutup
                 </Button>
 
                 <Button
