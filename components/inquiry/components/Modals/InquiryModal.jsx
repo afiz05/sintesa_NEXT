@@ -20,6 +20,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  Card,
 } from "@heroui/react";
 import { useInfiniteScroll } from "@heroui/use-infinite-scroll";
 import Encrypt from "../../../../utils/Random";
@@ -181,6 +182,8 @@ const InquiryModal = ({ isOpen, onClose, sql, from, thang }) => {
                 // Skip only the numeric amount columns that shouldn't be searched
                 if (
                   colName === "PAGU" ||
+                  colName === "PAGU_APBN" ||
+                  colName === "PAGU_DIPA" ||
                   colName === "REALISASI" ||
                   colName === "BLOKIR"
                 ) {
@@ -472,7 +475,13 @@ const InquiryModal = ({ isOpen, onClose, sql, from, thang }) => {
 
     return columns.reduce((acc, column) => {
       // Only allow PAGU, REALISASI, and BLOKIR columns to be treated as numeric
-      const allowedNumericColumns = ["PAGU", "REALISASI", "BLOKIR"];
+      const allowedNumericColumns = [
+        "PAGU",
+        "PAGU_APBN",
+        "PAGU_DIPA",
+        "REALISASI",
+        "BLOKIR",
+      ];
 
       if (!allowedNumericColumns.includes(column.toUpperCase())) {
         return acc; // Skip non-allowed columns
@@ -648,194 +657,219 @@ const InquiryModal = ({ isOpen, onClose, sql, from, thang }) => {
             </div>
           ) : (
             <div className="h-full overflow-auto px-6 py-1" ref={scrollerRef}>
-              <Table
-                aria-label="Inquiry results table"
-                isHeaderSticky
-                sortDescriptor={sortDescriptor}
-                onSortChange={handleSortChange}
-                classNames={{
-                  base: "h-full ",
-                  table: "w-full ",
-                  wrapper: "min-h-full w-full overflow-auto",
-                }}
-              >
-                <TableHeader>
-                  {showNoColumn && (
-                    <TableColumn
-                      key="index"
-                      className="text-center w-12 uppercase"
-                    >
-                      No
-                    </TableColumn>
-                  )}
-                  {columns.map((column) => {
-                    const isNumericColumn = numericColumns[column];
-                    const allowSorting = [
-                      "PAGU",
-                      "REALISASI",
-                      "BLOKIR",
-                    ].includes(column.toUpperCase());
-
-                    // Always center and uppercase header text
-                    let columnClass = "text-center uppercase";
-                    let columnStyle = {};
-                    if (
-                      ["PAGU", "REALISASI", "BLOKIR"].includes(
-                        column.toUpperCase()
-                      )
-                    ) {
-                      columnStyle = {
-                        width: "160px",
-                        minWidth: "160px",
-                        maxWidth: "260px",
-                      };
-                    }
-
-                    return (
+              <Card className="h-full p-4 shadow-none border-2">
+                <Table
+                  aria-label="Inquiry results table"
+                  // isHeaderSticky
+                  removeWrapper
+                  sortDescriptor={sortDescriptor}
+                  onSortChange={handleSortChange}
+                  classNames={{
+                    base: "h-full overflow-auto",
+                    table: "h-full",
+                    th: "position: sticky top-0 z-20",
+                    wrapper: "h-full w-full ",
+                  }}
+                >
+                  <TableHeader>
+                    {showNoColumn && (
                       <TableColumn
-                        key={column}
-                        allowsSorting={allowSorting}
-                        className={columnClass}
-                        style={columnStyle}
+                        key="index"
+                        className="text-center w-12 uppercase"
                       >
-                        {column}
+                        No
                       </TableColumn>
-                    );
-                  })}
-                </TableHeader>
-                <TableBody isLoading={false} emptyContent="No data to display">
-                  {items.length === 0 ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={columns.length + (showNoColumn ? 1 : 0)}
-                        className="text-center"
-                      >
-                        {searchTerm
-                          ? `Tidak ada hasil untuk pencarian: "${searchTerm}"`
-                          : "No data available"}
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    items.map((item, index) => (
-                      <TableRow key={`${item.id || index}`}>
-                        {showNoColumn && (
-                          <TableCell className="text-center">
-                            {index + 1}
-                          </TableCell>
-                        )}
-                        {columns.map((column) => (
-                          <TableCell
-                            key={column}
-                            className={
-                              numericColumns[column]
-                                ? "text-right"
-                                : "text-center"
-                            }
-                          >
-                            {columnFormatters[column]
-                              ? columnFormatters[column](item[column])
-                              : numericColumns[column] &&
-                                !isNaN(Number(item[column]))
-                              ? formatNumber(item[column])
-                              : item[column]}
-                          </TableCell>
-                        ))}
+                    )}
+                    {columns.map((column) => {
+                      const isNumericColumn = numericColumns[column];
+                      const allowSorting = [
+                        "PAGU",
+                        "PAGU_APBN",
+                        "PAGU_DIPA",
+                        "REALISASI",
+                        "BLOKIR",
+                      ].includes(column.toUpperCase());
+
+                      // Always center and uppercase header text
+                      let columnClass = "text-center uppercase";
+                      let columnStyle = {};
+                      if (
+                        [
+                          "PAGU",
+                          "PAGU_APBN",
+                          "PAGU_DIPA",
+                          "REALISASI",
+                          "BLOKIR",
+                        ].includes(column.toUpperCase())
+                      ) {
+                        columnStyle = {
+                          width: "160px",
+                          minWidth: "160px",
+                          maxWidth: "260px",
+                        };
+                      }
+
+                      return (
+                        <TableColumn
+                          key={column}
+                          allowsSorting={allowSorting}
+                          className={columnClass}
+                          style={columnStyle}
+                        >
+                          {column}
+                        </TableColumn>
+                      );
+                    })}
+                  </TableHeader>
+                  <TableBody
+                    isLoading={false}
+                    emptyContent="No data to display"
+                  >
+                    {items.length === 0 ? (
+                      <TableRow>
+                        <TableCell
+                          colSpan={columns.length + (showNoColumn ? 1 : 0)}
+                          className="text-center"
+                        >
+                          {searchTerm
+                            ? `Tidak ada hasil untuk pencarian: "${searchTerm}"`
+                            : "No data available"}
+                        </TableCell>
                       </TableRow>
-                    ))
-                  )}
-                  {/* Always render the loader row for infinite scroll when there are items, regardless of loading state */}
-                  {items.length > 0 && (
-                    <TableRow>
-                      <TableCell
-                        colSpan={columns.length + (showNoColumn ? 1 : 0)}
-                        className={`text-center ${
-                          isLoadingMore ? "py-4 bg-gray-50" : "py-2"
-                        }`}
-                        style={{ minHeight: "40px" }}
-                      >
-                        <div ref={loaderRef} className="w-full">
-                          {isLoadingMore ? (
-                            <div className="flex items-center justify-center space-x-2">
-                              <Spinner
-                                color="primary"
-                                size="sm"
-                                variant="simple"
-                              />
-                              <span className="text-sm text-gray-600">
-                                Memuat data selanjutnya...
-                              </span>
-                            </div>
-                          ) : (
-                            <div className="h-1 w-full flex items-center justify-center">
-                              {process.env.NODE_ENV === "development" && (
-                                <div className="text-xs text-gray-300 opacity-0 px-1">
-                                  •
-                                </div>
-                              )}
-                            </div>
+                    ) : (
+                      items.map((item, index) => (
+                        <TableRow key={`${item.id || index}`}>
+                          {showNoColumn && (
+                            <TableCell className="text-center">
+                              {index + 1}
+                            </TableCell>
                           )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                  {/* Grand Total Row */}
-                  {items.length > 0 && (
-                    <TableRow className="sticky bottom-0 bg-default-100 z-20 rounded-lg">
-                      {showNoColumn && (
-                        <TableCell className="text-center font-medium text-foreground-600 bg-default-100 first:rounded-l-lg"></TableCell>
-                      )}
-                      {columns.map((column, columnIndex) => {
-                        const isNumericColumn = numericColumns[column];
-                        const columnName = column.toUpperCase();
+                          {columns.map((column) => (
+                            <TableCell
+                              key={column}
+                              className={
+                                numericColumns[column]
+                                  ? "text-right"
+                                  : "text-center"
+                              }
+                            >
+                              {columnFormatters[column]
+                                ? columnFormatters[column](item[column])
+                                : numericColumns[column] &&
+                                  !isNaN(Number(item[column]))
+                                ? formatNumber(item[column])
+                                : item[column]}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))
+                    )}
+                    {/* Always render the loader row for infinite scroll when there are items, regardless of loading state */}
+                    {items.length > 0 && (
+                      <TableRow>
+                        <TableCell
+                          colSpan={columns.length + (showNoColumn ? 1 : 0)}
+                          className={`text-center ${
+                            isLoadingMore ? "py-4" : "py-2"
+                          }`}
+                          style={{ minHeight: "40px" }}
+                        >
+                          <div ref={loaderRef} className="w-full">
+                            {isLoadingMore ? (
+                              <div className="flex items-center justify-center space-x-4">
+                                <Spinner
+                                  color="primary"
+                                  size="md"
+                                  variant="simple"
+                                />
+                                <span className="text-sm text-default-600">
+                                  Memuat data selanjutnya...
+                                </span>
+                              </div>
+                            ) : (
+                              <div className="h-1 w-full flex items-center justify-center">
+                                {process.env.NODE_ENV === "development" && (
+                                  <div className="text-xs text-gray-300 opacity-0 px-1">
+                                    •
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    {/* Grand Total Row */}
+                    {items.length > 0 && (
+                      <TableRow className="sticky bottom-0 bg-default-100 z-20 rounded-lg">
+                        {showNoColumn && (
+                          <TableCell className="text-center font-medium text-foreground-600 bg-default-100 first:rounded-l-lg"></TableCell>
+                        )}
+                        {columns.map((column, columnIndex) => {
+                          const isNumericColumn = numericColumns[column];
+                          const columnName = column.toUpperCase();
 
-                        // Calculate grand total for this column if it's numeric
-                        let grandTotal = 0;
-                        if (
-                          isNumericColumn &&
-                          ["PAGU", "REALISASI", "BLOKIR"].includes(columnName)
-                        ) {
-                          grandTotal = items.reduce((sum, item) => {
-                            const value = Number(item[column]);
-                            return !isNaN(value) ? sum + value : sum;
-                          }, 0);
-                        }
+                          // Calculate grand total for this column if it's numeric
+                          let grandTotal = 0;
+                          if (
+                            isNumericColumn &&
+                            [
+                              "PAGU",
+                              "PAGU_APBN",
+                              "PAGU_DIPA",
+                              "REALISASI",
+                              "BLOKIR",
+                            ].includes(columnName)
+                          ) {
+                            grandTotal = items.reduce((sum, item) => {
+                              const value = Number(item[column]);
+                              return !isNaN(value) ? sum + value : sum;
+                            }, 0);
+                          }
 
-                        // Find the last non-numeric column index to show "GRAND TOTAL" label
-                        const lastNonNumericIndex = columns.findLastIndex(
-                          (col) => !numericColumns[col]
-                        );
-                        const shouldShowLabel =
-                          columnIndex === lastNonNumericIndex;
+                          // Find the last non-numeric column index to show "GRAND TOTAL" label
+                          const lastNonNumericIndex = columns.findLastIndex(
+                            (col) => !numericColumns[col]
+                          );
+                          const shouldShowLabel =
+                            columnIndex === lastNonNumericIndex;
 
-                        return (
-                          <TableCell
-                            key={column}
-                            // colSpan={2}
-                            className={`${
-                              isNumericColumn ? "text-right" : "text-center"
-                            } font-medium text-foreground-600 bg-default-100 uppercase ${
-                              columnIndex === 0 && !showNoColumn
-                                ? "first:rounded-l-lg"
-                                : ""
-                            } ${
-                              columnIndex === columns.length - 1
-                                ? "last:rounded-r-lg"
-                                : ""
-                            }`}
-                          >
-                            {isNumericColumn &&
-                            ["PAGU", "REALISASI", "BLOKIR"].includes(columnName)
-                              ? formatNumber(grandTotal)
-                              : shouldShowLabel
-                              ? "GRAND TOTAL"
-                              : ""}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+                          return (
+                            <TableCell
+                              key={column}
+                              // colSpan={2}
+                              className={`${
+                                isNumericColumn ? "text-right" : "text-center"
+                              } font-medium text-foreground-600 bg-default-100 uppercase ${
+                                columnIndex === 0 && !showNoColumn
+                                  ? "first:rounded-l-lg"
+                                  : ""
+                              } ${
+                                columnIndex === columns.length - 1
+                                  ? "last:rounded-r-lg"
+                                  : ""
+                              }`}
+                            >
+                              {isNumericColumn &&
+                              [
+                                "PAGU",
+                                "PAGU_APBN",
+                                "PAGU_DIPA",
+                                "REALISASI",
+                                "BLOKIR",
+                              ].includes(columnName)
+                                ? formatNumber(grandTotal)
+                                : shouldShowLabel
+                                ? "GRAND TOTAL"
+                                : ""}
+                            </TableCell>
+                          );
+                        })}
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </Card>
             </div>
           )}
         </ModalBody>
@@ -858,7 +892,7 @@ const InquiryModal = ({ isOpen, onClose, sql, from, thang }) => {
             <Button
               color="danger"
               variant="ghost"
-              className="w-[160px]"
+              className="w-[120px]"
               onPress={onClose}
               startContent={<X size={16} />}
             >

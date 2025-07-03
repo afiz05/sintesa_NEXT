@@ -83,6 +83,7 @@ const ExportModal = ({
       onClose={() => setShowModalPDF(false)}
       size="3xl"
       scrollBehavior="inside"
+      backdrop="blur"
       hideCloseButton
       classNames={{
         header:
@@ -151,7 +152,7 @@ const ExportModal = ({
             disabled={loading}
             startContent={<X size={16} />}
           >
-            Batal
+            Tutup
           </Button>
           <Button
             color="success"

@@ -13,9 +13,10 @@ class BaseFilter {
    * Build column selection based on radio button value
    * @param {string} radio - Radio button value ("1" = code, "2" = code+text, "3" = text)
    * @param {string} thang - Year parameter
+   * @param {object} inquiryState - (optional) full inquiry state, used for jenlap-specific logic
    * @returns {object} - { columns: [], joinClause: string, groupBy: [] }
    */
-  buildColumns(radio, thang = "") {
+  buildColumns(radio, thang = "", inquiryState = {}) {
     const result = {
       columns: [],
       joinClause: "",
@@ -28,6 +29,10 @@ class BaseFilter {
     const textField = this.referenceTable
       ? `${this.referenceTable.alias}.${this.referenceTable.nameField}`
       : null;
+
+    // Determine pagu field name based on jenlap (for use in child filters)
+    const paguField =
+      inquiryState && inquiryState.jenlap === "1" ? "a.pagu_apbn" : "a.pagu";
 
     switch (radio) {
       case "1": // Code only
@@ -52,6 +57,9 @@ class BaseFilter {
         result.groupBy.push(codeField);
         break;
     }
+
+    // Optionally expose paguField for use in child filters
+    result.paguField = paguField;
 
     return result;
   }
