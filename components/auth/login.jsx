@@ -63,7 +63,7 @@ export const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isPinLoading, setIsPinLoading] = useState(false);
   const [pinValue, setPinValue] = useState("");
-  const [chap, setChap] = useState("");
+  const [chap, setChap] = useState("0");
   const [captcha, setCaptcha] = useState("");
   const [recaptchaValue, setRecaptchaValue] = useState("");
   const [error, setError] = useState("");
@@ -124,13 +124,14 @@ export const Login = () => {
     return output;
   };
 
-  // Check captcha mode from backend
+  // // Check captcha mode from backend
   // const cekMode = async () => {
   //   try {
   //     const response = await axios.get(
   //       process.env.NEXT_PUBLIC_LOCAL_CEKMODE || ""
   //     );
   //     setChap(response.data.capcay);
+  //     console.log(response.data.capcay);
   //   } catch (error) {
   //     console.log(error);
   //     setError("Captcha mode check failed");
