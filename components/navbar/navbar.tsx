@@ -23,7 +23,7 @@ export const NavbarWrapper = ({ children }: Props) => {
     <div className="w-full relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
       <Navbar
         isBordered
-        className="w-full"
+        className="w-full fixed top-0 z-50 bg-white dark:bg-black"
         classNames={{
           wrapper: "w-full max-w-full",
         }}
@@ -73,7 +73,7 @@ export const NavbarWrapper = ({ children }: Props) => {
           <UserDropdownjsx />
         </NavbarContent>
       </Navbar>
-      {children}
+      <div className="pt-16">{children}</div>
     </div>
   );
 };

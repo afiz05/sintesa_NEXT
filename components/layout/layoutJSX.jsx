@@ -35,7 +35,8 @@ export const LayoutJSX = ({ children }) => {
             <div className="hidden xl:block">
               <SidebarWrapper />
             </div>
-            {children}
+            {/* Content with proper padding for fixed navbar and sidebar */}
+            <div className="xl:pt-16">{children}</div>
           </NavbarWrapper>
         </div>
       </div>

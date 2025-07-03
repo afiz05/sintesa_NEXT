@@ -1,16 +1,16 @@
 import React from "react";
 import { Sidebar } from "./sidebar.styles";
-import { Avatar, Tooltip } from "@heroui/react";
-import { CompaniesDropdown } from "./companies-dropdown";
+import { Tooltip } from "@heroui/react";
 import {
   Home,
   Users,
   Settings,
   ChevronDown,
-  CandlestickChart,
   Info,
   TestTube2,
   Database,
+  Ham,
+  BookCheck,
 } from "lucide-react";
 import { InqVertikalDD } from "./inquiry-vrtkl-dropdown";
 import { InqHorizontalDD } from "./inquiry-hrzntl-dropdown";
@@ -46,32 +46,33 @@ export const SidebarWrapper = () => {
             <div className={Sidebar.Body()}>
               <SidebarItem
                 title="Dashboard"
-                icon={<Home />}
+                icon={<Home className="text-primary" />}
                 isActive={pathname === "/"}
                 href="/"
               />
 
-              <SidebarMenu title="Main Menu">
+              <SidebarMenu title="Menu Utama">
                 <MbgVertikalDD
-                  icon={<CandlestickChart className="text-default-500" />}
+                  icon={<Ham className="text-danger" />}
                   items={["Dashboard", "Kertas Kerja", "Data"]}
                   title="Makan Bergizi"
                   isActive={pathname.startsWith("/mbg")}
                 />
+
                 <SidebarItem
                   isActive={pathname === "/profilkl"}
                   title="Profil K/L"
-                  icon={<Users />}
+                  icon={<Users className="text-warning" />}
                   href="/profilkl"
                 />
                 <EpaVertikalDD
-                  icon={<CandlestickChart className="text-default-500" />}
+                  icon={<BookCheck className="text-success" />}
                   items={["Summary", "Analisa"]}
                   title="EPA"
                   isActive={pathname.startsWith("/epa")}
                 ></EpaVertikalDD>
                 <InqVertikalDD
-                  icon={<CandlestickChart className="text-default-500" />}
+                  icon={<Database className="text-secondary" />}
                   items={[
                     "Belanja",
                     "Tematik",
@@ -86,27 +87,18 @@ export const SidebarWrapper = () => {
                 />
               </SidebarMenu>
 
-              <SidebarMenu title="General">
+              <SidebarMenu title="Lainnya">
                 <SidebarItem
-                  isActive={pathname === "/settings"}
-                  title="Settings"
-                  icon={<Settings />}
-                  href="/settings"
+                  isActive={pathname === "/test-belanja"}
+                  title="Belanja Test"
+                  icon={<TestTube2 />}
+                  href="/test-belanja"
                 />
-              </SidebarMenu>
-
-              <SidebarMenu title="Updates">
                 <SidebarItem
                   isActive={pathname === "/tentang-kami"}
                   title="Tentang Kami"
                   icon={<Info />}
                   href="/tentang-kami"
-                />
-                <SidebarItem
-                  isActive={pathname === "/test-belanja"}
-                  title="Belanja Test"
-                  icon={<TestTube2 className="text-default-500" />}
-                  href="/test-belanja"
                 />
               </SidebarMenu>
             </div>
@@ -122,43 +114,61 @@ export const SidebarWrapper = () => {
       </aside>
 
       {/* Desktop Horizontal Navbar - Only for XL screens */}
-      <nav className="hidden xl:block w-full z-[50] bg-white dark:bg-black border-b border-gray-200 dark:border-gray-700 shadow-sm">
-        <div className="px-6 py-3">
-          <div className="flex items-center justify-between font-medium">
+      <nav className="hidden xl:block w-full z-[50] bg-white dark:bg-black border-b border-gray-200 dark:border-gray-700 shadow-md fixed top-16">
+        <div className="px-6 pt-1 pb-3">
+          <div className="flex items-center justify-center font-medium">
             {/* Center - Navigation Items */}
-            <div className="flex items-center space-x-4 overflow-x-auto overflow-y-visible">
+            <div className="flex items-center space-x-8 overflow-x-auto overflow-y-visible">
               <SidebarItem
                 title="Dashboard"
-                icon={<Home />}
+                icon={
+                  <Home className="text-primary" strokeWidth={2.5} size={26} />
+                }
                 isActive={pathname === "/"}
                 href="/"
               />
 
               <MbgHorizontalDD
-                icon={<CandlestickChart />}
+                icon={
+                  <Ham className="text-danger" strokeWidth={2.5} size={26} />
+                }
                 items={["Dashboard", "Kertas Kerja", "Data"]}
                 title="Makan Bergizi"
                 isActive={pathname.startsWith("/mbg")}
               >
-                <ChevronDown size={16} />
+                <ChevronDown size={20} strokeWidth={2.5} />
               </MbgHorizontalDD>
 
               <SidebarItem
                 isActive={pathname === "/profilkl"}
                 title="Profil K/L"
-                icon={<Users />}
+                icon={
+                  <Users className="text-warning" strokeWidth={2.5} size={26} />
+                }
                 href="/profilkl"
               />
               <EpaHorizontalDD
-                icon={<CandlestickChart />}
+                icon={
+                  <BookCheck
+                    className="text-success"
+                    strokeWidth={2.5}
+                    size={26}
+                  />
+                }
                 items={["Summary", "Analisa"]}
                 title="EPA"
                 isActive={pathname.startsWith("/epa")}
               >
-                <ChevronDown size={16} />
+                <ChevronDown size={20} strokeWidth={2.5} />
               </EpaHorizontalDD>
               <InqHorizontalDD
-                icon={<Database />}
+                icon={
+                  <Database
+                    className="text-secondary"
+                    strokeWidth={2.5}
+                    size={26}
+                  />
+                }
                 items={[
                   "Belanja",
                   "Tematik",
@@ -171,31 +181,29 @@ export const SidebarWrapper = () => {
                 title="Inquiry Data"
                 isActive={pathname.startsWith("/inquiry-data")}
               >
-                <ChevronDown size={16} />
+                <ChevronDown size={20} strokeWidth={2.5} />
               </InqHorizontalDD>
-
-              <SidebarItem
-                isActive={pathname === "/tentang-kami"}
-                title="Tentang Kami"
-                icon={<Info />}
-                href="/tentang-kami"
-              />
-
               <SidebarItem
                 isActive={pathname === "/test-belanja"}
                 title="Belanja Test"
-                icon={<TestTube2 />}
+                icon={<TestTube2 strokeWidth={2.5} size={26} />}
                 href="/test-belanja"
+              />
+              <SidebarItem
+                isActive={pathname === "/tentang-kami"}
+                title="Tentang Kami"
+                icon={<Info strokeWidth={2.5} size={26} />}
+                href="/tentang-kami"
               />
             </div>
 
             {/* Right side - User Actions */}
             <div className="flex items-center space-x-3">
-              <Tooltip content={"Settings"} color="primary">
+              {/* <Tooltip content={"Settings"} color="primary">
                 <div className="max-w-fit cursor-pointer">
                   <Settings />
                 </div>
-              </Tooltip>
+              </Tooltip> */}
             </div>
           </div>
         </div>

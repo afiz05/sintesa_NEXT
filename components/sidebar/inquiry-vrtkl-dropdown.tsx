@@ -156,7 +156,7 @@ export const InqVertikalDD = ({
                     itemActive
                       ? "bg-primary-100 text-primary [&_svg]:text-primary"
                       : "hover:text-primary hover:bg-default-100",
-                    "w-full flex py-2 pl-8 pr-2 rounded-lg transition-colors cursor-pointer min-h-[36px] items-center gap-2 group"
+                    "w-full flex py-2 pl-8 pr-2 rounded-xl transition-colors cursor-pointer min-h-[36px] items-center gap-2 group"
                   )}
                 >
                   <span

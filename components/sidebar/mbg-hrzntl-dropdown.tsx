@@ -8,14 +8,7 @@ import {
 } from "@heroui/react";
 import clsx from "clsx";
 import { useRouter, usePathname } from "next/navigation";
-import {
-  Building2,
-  CreditCard,
-  Banknote,
-  BarChart3,
-  FileText,
-  Database,
-} from "lucide-react";
+import { Building2, BarChart3, FileText, Database } from "lucide-react";
 
 interface DropdownItemType {
   label: string;
@@ -60,23 +53,23 @@ export const MbgHorizontalDD = ({
           // Assign icons based on menu item names
           switch (item.toLowerCase()) {
             case "dashboard":
-              icon = <BarChart3 size={16} />;
+              icon = <BarChart3 size={20} />;
               href = `/mbg/dashboard-mbg`;
               break;
             case "kertas kerja":
-              icon = <FileText size={16} />;
+              icon = <FileText size={20} />;
               href = `/mbg/kertas-kerja`;
               break;
             case "data":
-              icon = <Database size={16} />;
+              icon = <Database size={20} />;
               href = `/mbg/data-update`;
               break;
             default:
-              icon = <Building2 size={16} />;
+              icon = <Building2 size={20} />;
           }
         } else {
           // Default handling for other menu items
-          icon = <Building2 size={16} />;
+          icon = <Building2 size={20} />;
           href = `/${item.toLowerCase().replace(/\s+/g, "-")}`;
         }
 
@@ -105,13 +98,13 @@ export const MbgHorizontalDD = ({
             data-testid="hover-dropdown-button"
             className={clsx(
               isActive
-                ? "bg-primary-100 [&_svg]:stroke-primary-500"
-                : "hover:bg-default-100",
+                ? "bg-danger-100 [&_svg]:stroke-danger-500"
+                : "hover:bg-danger-100",
               "flex gap-2 w-full min-h-[44px] h-full items-center px-3.5 rounded-xl cursor-pointer transition-all duration-150 active:scale-[0.98]"
             )}
           >
             {icon}
-            <span className="text-default-900">{title}</span>
+            <span className="text-default-900 ">{title}</span>
             {children}
           </div>
         </DropdownTrigger>
@@ -132,9 +125,9 @@ export const MbgHorizontalDD = ({
                 key={index}
                 className={clsx(
                   itemActive
-                    ? "bg-primary-100 [&_*]:text-primary"
+                    ? "bg-danger-100 [&_*]:text-primary"
                     : "data-[hover=true]:bg-default-100",
-                  "font-sans text-sm py-3 px-4 min-h-[44px] group"
+                  "font-sans font-semibold text-sm py-3 px-4 min-h-[44px] group"
                 )}
               >
                 <div className="flex items-center gap-3">
@@ -142,18 +135,23 @@ export const MbgHorizontalDD = ({
                   <span
                     className={clsx(
                       itemActive
-                        ? "text-primary [&_svg]:stroke-primary"
-                        : "text-default-900 group-hover:text-primary [&_svg]:group-hover:stroke-primary",
+                        ? "text-default-900 [&_svg]:stroke-danger "
+                        : "text-default-900 group-hover:text-danger [&_svg]:group-hover:stroke-danger",
                       "flex-shrink-0 transition-colors"
                     )}
                   >
-                    {item.icon}
+                    {React.cloneElement(
+                      item.icon as React.ReactElement,
+                      {
+                        strokeWidth: 2.5,
+                      } as any
+                    )}
                   </span>
                   <span
                     className={clsx(
                       itemActive
-                        ? "text-primary"
-                        : "text-default-900 group-hover:text-primary",
+                        ? "!text-danger font-medium"
+                        : "text-default-900 group-hover:text-danger font-medium",
                       "text-base transition-colors"
                     )}
                   >
