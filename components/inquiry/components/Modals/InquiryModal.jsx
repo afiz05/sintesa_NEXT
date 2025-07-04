@@ -25,8 +25,20 @@ import {
 import { useInfiniteScroll } from "@heroui/use-infinite-scroll";
 import Encrypt from "../../../../utils/Random";
 
-const InquiryModal = ({ isOpen, onClose, sql, from, thang }) => {
+const InquiryModal = ({ isOpen, onClose, sql, from, thang, pembulatan }) => {
   const { axiosJWT, token, statusLogin } = useContext(MyContext);
+
+  // Debug pembulatan value
+  useEffect(() => {
+    if (process.env.NODE_ENV === "development") {
+      console.log(
+        "InquiryModal - pembulatan value:",
+        pembulatan,
+        typeof pembulatan
+      );
+    }
+  }, [pembulatan]);
+
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [executionTime, setExecutionTime] = useState(null);
@@ -268,6 +280,24 @@ const InquiryModal = ({ isOpen, onClose, sql, from, thang }) => {
         const totalPages = response.data.totalPages || 0;
         const grandTotalsData = response.data.grandTotals || null;
 
+        // Debug: Log the first few items to see raw data structure
+        if (process.env.NODE_ENV === "development" && newData.length > 0) {
+          console.log("Raw data from backend:", newData.slice(0, 2));
+          console.log("Sample numeric values:", {
+            PAGU: newData[0]?.PAGU,
+            REALISASI: newData[0]?.REALISASI,
+            BLOKIR: newData[0]?.BLOKIR,
+          });
+          console.log("Backend API Response Structure:", {
+            total,
+            totalPages,
+            pembulatan,
+            dataLength: newData.length,
+            firstItemKeys: Object.keys(newData[0] || {}),
+            isTrillionData: pembulatan === "1000000000000",
+          });
+        }
+
         setTotalData(total);
 
         // Only set grand totals on first page load to avoid overwriting
@@ -454,7 +484,44 @@ const InquiryModal = ({ isOpen, onClose, sql, from, thang }) => {
   };
 
   const formatNumber = (num) => {
-    return numeral(num).format("0,0");
+    // Convert to number
+    const numericValue = Number(num);
+
+    // Handle invalid numbers (but allow zero values)
+    if (isNaN(numericValue)) {
+      return "0";
+    }
+
+    // Check if pembulatan is Triliun (1000000000000)
+    const isTriliun = pembulatan === "1000000000000";
+
+    // Debug logging
+    if (process.env.NODE_ENV === "development") {
+      console.log("formatNumber debug:", {
+        backendValue: num,
+        numericValue,
+        pembulatan,
+        isTriliun,
+        finalValue: numericValue,
+      });
+    }
+
+    // Use European formatting: . for thousands, , for decimals
+    if (isTriliun) {
+      // For Triliun, the backend now sends decimal values, so we format them with up to 2 decimal places
+      // but only show decimals if they exist (remove trailing zeros)
+      const formatted = new Intl.NumberFormat("de-DE", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      }).format(numericValue);
+      return formatted;
+    } else {
+      // For other cases, show without decimal places
+      return new Intl.NumberFormat("de-DE", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(numericValue);
+    }
   };
 
   // Custom column formatters

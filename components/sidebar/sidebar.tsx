@@ -11,6 +11,8 @@ import {
   Database,
   Ham,
   BookCheck,
+  ScrollText,
+  FileSearch,
 } from "lucide-react";
 import { InqVertikalDD } from "./inquiry-vrtkl-dropdown";
 import { InqHorizontalDD } from "./inquiry-hrzntl-dropdown";
@@ -53,7 +55,7 @@ export const SidebarWrapper = () => {
 
               <SidebarMenu title="Menu Utama">
                 <MbgVertikalDD
-                  icon={<Ham className="text-danger" />}
+                  icon={<Ham className="text-amber-700" />}
                   items={["Dashboard", "Kertas Kerja", "Data"]}
                   title="Makan Bergizi"
                   isActive={pathname.startsWith("/mbg")}
@@ -85,15 +87,21 @@ export const SidebarWrapper = () => {
                   title="Inquiry Data"
                   isActive={pathname.startsWith("/inquiry-data")}
                 />
+                <SidebarItem
+                  isActive={pathname === "/test-belanja"}
+                  title="Spending Review"
+                  icon={<FileSearch />}
+                  href="/test-belanja"
+                />
+                {/* <SidebarItem
+                    isActive={pathname === "/test-belanja"}
+                    title="Laporan"
+                    icon={<ScrollText />}
+                    href="/test-belanja"
+                  /> */}
               </SidebarMenu>
 
               <SidebarMenu title="Lainnya">
-                <SidebarItem
-                  isActive={pathname === "/test-belanja"}
-                  title="Belanja Test"
-                  icon={<TestTube2 />}
-                  href="/test-belanja"
-                />
                 <SidebarItem
                   isActive={pathname === "/tentang-kami"}
                   title="Tentang Kami"
@@ -118,11 +126,11 @@ export const SidebarWrapper = () => {
         <div className="px-6 pt-1 pb-3">
           <div className="flex items-center justify-center font-medium">
             {/* Center - Navigation Items */}
-            <div className="flex items-center space-x-8 overflow-x-auto overflow-y-visible">
+            <div className="flex items-center space-x-4 overflow-x-auto overflow-y-visible">
               <SidebarItem
                 title="Dashboard"
                 icon={
-                  <Home className="text-primary" strokeWidth={2.5} size={26} />
+                  <Home className="text-primary" strokeWidth={2.5} size={25} />
                 }
                 isActive={pathname === "/"}
                 href="/"
@@ -130,7 +138,7 @@ export const SidebarWrapper = () => {
 
               <MbgHorizontalDD
                 icon={
-                  <Ham className="text-danger" strokeWidth={2.5} size={26} />
+                  <Ham className="text-amber-700" strokeWidth={2.5} size={25} />
                 }
                 items={["Dashboard", "Kertas Kerja", "Data"]}
                 title="Makan Bergizi"
@@ -143,9 +151,14 @@ export const SidebarWrapper = () => {
                 isActive={pathname === "/profilkl"}
                 title="Profil K/L"
                 icon={
-                  <Users className="text-warning" strokeWidth={2.5} size={26} />
+                  <Users className="text-warning" strokeWidth={2.5} size={25} />
                 }
                 href="/profilkl"
+                bgColor="bg-warning-100"
+                color="text-default-900"
+                activeBgColor="bg-warning-100"
+                activeColor="text-warning"
+                hoverColor="hover:bg-warning-100"
               />
               <EpaHorizontalDD
                 icon={
@@ -161,6 +174,22 @@ export const SidebarWrapper = () => {
               >
                 <ChevronDown size={20} strokeWidth={2.5} />
               </EpaHorizontalDD>
+              <SidebarItem
+                isActive={pathname === "/test-belanja"}
+                title="Spending Review"
+                icon={
+                  <FileSearch
+                    className="text-teal-500"
+                    strokeWidth={2.5}
+                    size={25}
+                  />
+                }
+                href="/test-belanja"
+                color="text-default-900"
+                activeBgColor="bg-teal-100"
+                activeColor="text-teal-500"
+                hoverColor="hover:bg-teal-100"
+              />
               <InqHorizontalDD
                 icon={
                   <Database
@@ -183,17 +212,28 @@ export const SidebarWrapper = () => {
               >
                 <ChevronDown size={20} strokeWidth={2.5} />
               </InqHorizontalDD>
-              <SidebarItem
+
+              {/* <SidebarItem
                 isActive={pathname === "/test-belanja"}
-                title="Belanja Test"
-                icon={<TestTube2 strokeWidth={2.5} size={26} />}
+                title="Laporan"
+                icon={<ScrollText strokeWidth={2.5} size={25} />}
                 href="/test-belanja"
-              />
+              /> */}
               <SidebarItem
                 isActive={pathname === "/tentang-kami"}
                 title="Tentang Kami"
-                icon={<Info strokeWidth={2.5} size={26} />}
+                icon={
+                  <Info
+                    className="text-default-500"
+                    strokeWidth={2.5}
+                    size={25}
+                  />
+                }
                 href="/tentang-kami"
+                color="text-default-900"
+                activeBgColor="bg-default-200"
+                activeColor="text-default-500"
+                hoverColor="hover:bg-default-200"
               />
             </div>
 

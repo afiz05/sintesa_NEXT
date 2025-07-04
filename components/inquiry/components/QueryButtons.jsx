@@ -32,17 +32,16 @@ const QueryButtons = ({
           >
             Tayang Data
           </Button>
-
-          {/* <Button
+          <Button
             color="danger"
-            variant="light"
+            variant="ghost"
             startContent={<RefreshCw size={16} />}
             onClick={onReset}
             isDisabled={isLoading}
             className="w-[160px] h-[50px]"
           >
-            Reset
-          </Button> */}
+            Reset Filter
+          </Button>
           <ButtonGroup>
             <Button
               color="success"
