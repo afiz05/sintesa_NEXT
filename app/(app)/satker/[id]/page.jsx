@@ -10,16 +10,26 @@ import {
   Chip,
   Breadcrumbs,
   BreadcrumbItem,
+  Input,
 } from "@heroui/react";
-import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import {
+  MagnifyingGlassIcon,
+  XMarkIcon,
+  ChevronDownIcon,
+} from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 import { useSatkerService } from "@/services/satkerService.js";
+import TayangAdk from "@/components/adk/TayangAdk";
 
 export default function DetailSatkerPage({ params }) {
   const unwrappedParams = use(params);
   const [satker, setSatker] = useState(null);
   const [sedangMemuat, setSedangMemuat] = useState(true);
   const [error, setError] = useState(null);
+  const currentYear = new Date().getFullYear();
+  const [tahunAdk, setTahunAdk] = useState(currentYear.toString());
+  const [searchTahun, setSearchTahun] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const router = useRouter();
 
   const { ambilDetailSatker } = useSatkerService();
@@ -438,93 +448,99 @@ export default function DetailSatkerPage({ params }) {
             style={{ minHeight: "100%", height: "100%" }}
           >
             <CardHeader className="pb-2 border-b border-blue-100 dark:border-gray-700 bg-transparent">
-              <h3 className="text-lg font-bold text-blue-700 dark:text-blue-200 tracking-tight">
+              <h4 className="text-lg font-normal text-blue-700 dark:text-blue-200 tracking-tight">
                 Download ADK DIPA
-              </h3>
+              </h4>
             </CardHeader>
             <CardBody className="flex flex-col gap-4 p-4 flex-1 overflow-hidden">
-              {/* Dropdown Tahun Modern */}
-              <div className="w-full flex items-center gap-3 mb-4">
-                <label htmlFor="tahun-adk" className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                  Pilih Tahun
-                </label>
-                <div className="relative flex-1">
-                  <select
-                    id="tahun-adk"
-                    className="block w-full appearance-none px-4 py-2 pr-10 rounded-xl border border-blue-300 dark:border-blue-700 bg-white dark:bg-gray-900 text-blue-800 dark:text-blue-100 font-semibold shadow focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
-                    defaultValue={2025}
+              {/* Select dengan pencarian tahun */}
+              <div className="w-full mb-4 relative">
+                <div className="border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 shadow-md relative">
+                  {/* Input tahun, readonly, klik untuk buka dropdown */}
+                  <div
+                    className="flex items-center px-4 py-3 cursor-pointer select-none"
+                    onClick={() => setDropdownOpen((v) => !v)}
                   >
-                    {Array.from({ length: 2025 - 2009 + 1 }, (_, i) => 2009 + i).map((tahun) => (
-                      <option key={tahun} value={tahun}>{tahun}</option>
-                    ))}
-                  </select>
-                  <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-blue-400 dark:text-blue-300">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
-                  </span>
+                    <span className="flex-1 text-gray-800 dark:text-gray-100">
+                      {tahunAdk}
+                    </span>
+                    <ChevronDownIcon
+                      className={`w-5 h-5 ml-2 transition-transform ${
+                        dropdownOpen ? "rotate-180" : ""
+                      } text-blue-400`}
+                    />
+                  </div>
+                  {/* Dropdown opsi tahun */}
+                  {dropdownOpen && (
+                    <div className="absolute left-0 top-full w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-b-xl shadow-md z-20">
+                      {/* Search input dalam dropdown */}
+                      <div className="p-3 border-b border-gray-200 dark:border-gray-600">
+                        <Input
+                          autoFocus
+                          placeholder="Cari tahun..."
+                          value={searchTahun}
+                          onChange={(e) => setSearchTahun(e.target.value)}
+                          startContent={
+                            <MagnifyingGlassIcon className="w-4 h-4 text-gray-400" />
+                          }
+                          size="sm"
+                          className="w-full"
+                        />
+                      </div>
+                      <div className="max-h-60 overflow-auto">
+                        {Array.from(
+                          { length: currentYear - 2009 + 1 },
+                          (_, i) => currentYear - i
+                        )
+                          .filter((tahun) =>
+                            tahun.toString().includes(searchTahun)
+                          )
+                          .map((tahun) => (
+                            <div
+                              key={tahun}
+                              onMouseDown={() => {
+                                setTahunAdk(tahun.toString());
+                                setDropdownOpen(false);
+                                setSearchTahun("");
+                              }}
+                              className={`px-4 py-3 cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 border-b border-gray-100 dark:border-gray-700 last:border-b-0 ${
+                                tahunAdk === tahun.toString()
+                                  ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium"
+                                  : "text-gray-800 dark:text-gray-200"
+                              }`}
+                            >
+                              {tahun}
+                            </div>
+                          ))}
+                        {searchTahun &&
+                          Array.from(
+                            { length: currentYear - 2009 + 1 },
+                            (_, i) => currentYear - i
+                          ).filter((tahun) =>
+                            tahun.toString().includes(searchTahun)
+                          ).length === 0 && (
+                            <div className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                              <MagnifyingGlassIcon className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                              <p className="text-sm">
+                                Tahun "{searchTahun}" tidak ditemukan
+                              </p>
+                              <p className="text-xs mt-1">
+                                Tersedia tahun 2009 - {currentYear}
+                              </p>
+                            </div>
+                          )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
               {/* Tabel File ADK DIPA */}
-              <div className="flex-1 w-full overflow-auto rounded-lg border border-blue-100 dark:border-gray-700 bg-white/60 dark:bg-gray-900/60 shadow-inner min-h-[220px] max-h-[340px]">
-                <table className="min-w-full text-sm text-left">
-                  <thead className="sticky top-0 z-10 bg-blue-100 dark:bg-gray-800/80 text-blue-800 dark:text-blue-200 font-semibold">
-                    <tr>
-                      <th className="px-3 py-2 text-center align-middle">
-                        Nama File
-                      </th>
-                      <th className="px-3 py-2 text-center align-middle">
-                        Revisi Ke
-                      </th>
-                      <th className="px-3 py-2 text-center align-middle">
-                        Folder
-                      </th>
-                      <th className="px-3 py-2 text-center align-middle">
-                        Tanggal
-                      </th>
-                      <th className="px-3 py-2 text-center align-middle">
-                        Download
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-blue-50 dark:divide-gray-800">
-                    {/* Dummy data, ganti dengan map data asli jika sudah ada */}
-                    <tr>
-                      <td className="px-3 py-2">DIPA_2025_v1.zip</td>
-                      <td className="px-3 py-2 text-center">1</td>
-                      <td className="px-3 py-2">/2025/</td>
-                      <td className="px-3 py-2">01-07-2025</td>
-                      <td className="px-3 py-2">
-                        <Button
-                          size="sm"
-                          color="primary"
-                          variant="flat"
-                          disabled
-                        >
-                          Download
-                        </Button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="px-3 py-2">DIPA_2024_v2.zip</td>
-                      <td className="px-3 py-2 text-center">2</td>
-                      <td className="px-3 py-2">/2024/</td>
-                      <td className="px-3 py-2">15-06-2024</td>
-                      <td className="px-3 py-2">
-                        <Button
-                          size="sm"
-                          color="primary"
-                          variant="flat"
-                          disabled
-                        >
-                          Download
-                        </Button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div className="flex-1 w-full">
+                <TayangAdk
+                  kdsatker={satker?.kdsatker || satker?.kode}
+                  tahun={tahunAdk}
+                />
               </div>
-              <p className="text-xs text-gray-400 text-center mt-2">
-                Fitur download ADK DIPA akan segera tersedia.
-              </p>
             </CardBody>
           </Card>
         </div>
