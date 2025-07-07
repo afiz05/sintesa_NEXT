@@ -1305,14 +1305,3 @@ const InquiryMod = () => {
 };
 
 export default InquiryMod;
-
-// Example placeholder for data fetching (should be replaced with real API call)
-async function fetchDataFromAPI() {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  // Return mock data
-  return [
-    { id: 1, name: "Contoh Data 1", value: 100 },
-    { id: 2, name: "Contoh Data 2", value: 200 },
-  ];
-}

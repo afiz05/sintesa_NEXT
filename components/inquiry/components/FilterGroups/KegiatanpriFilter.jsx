@@ -47,7 +47,7 @@ const KegiatanpriFilter = ({ inquiryState }) => {
                 Pilih Kegiatan Prioritas
               </label>
               <KodeKegPP
-                kdkp={kegiatanprioritas}
+                value={kegiatanprioritas}
                 onChange={(val) => {
                   setKegiatanPrioritas(val);
                   // Debug: log value selected

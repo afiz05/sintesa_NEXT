@@ -35,7 +35,7 @@ const PRIFilter = ({ inquiryState }) => {
                 Pilih Proyek Prioritas
               </label>
               <KodePRI
-                kdproy={PRI}
+                value={PRI}
                 onChange={setPRI}
                 kdPN={PN}
                 kdPP={PP}

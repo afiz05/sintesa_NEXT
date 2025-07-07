@@ -18,7 +18,7 @@ const JenisStuntingInquiry = (props) => {
       }}
       size="sm"
       placeholder="Pilih Tematik Stunting"
-      className="max-w-xs mb-1"
+      className="max-w-2xl"
     >
       <SelectItem
         key="00"
