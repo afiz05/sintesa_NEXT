@@ -17,7 +17,7 @@ const KodePN = (props) => {
       }}
       size="sm"
       placeholder="Pilih Prioritas Nasional"
-      className="max-w-xs mb-1"
+      className="max-w-2xl"
     >
       <SelectItem key="00" value="00" textValue="Semua Prioritas Nasional">
         Semua Prioritas Nasional

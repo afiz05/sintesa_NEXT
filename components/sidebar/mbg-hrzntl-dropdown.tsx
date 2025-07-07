@@ -98,8 +98,8 @@ export const MbgHorizontalDD = ({
             data-testid="hover-dropdown-button"
             className={clsx(
               isActive
-                ? "bg-danger-100 [&_svg]:stroke-danger-500"
-                : "hover:bg-danger-100",
+                ? "bg-amber-100 [&_svg]:stroke-amber-700"
+                : "hover:bg-amber-100",
               "flex gap-2 w-full min-h-[44px] h-full items-center px-3.5 rounded-xl cursor-pointer transition-all duration-150 active:scale-[0.98]"
             )}
           >
@@ -125,7 +125,7 @@ export const MbgHorizontalDD = ({
                 key={index}
                 className={clsx(
                   itemActive
-                    ? "bg-danger-100 [&_*]:text-primary"
+                    ? "bg-amber-100 [&_*]:text-primary"
                     : "data-[hover=true]:bg-default-100",
                   "font-sans font-semibold text-sm py-3 px-4 min-h-[44px] group"
                 )}
@@ -135,8 +135,8 @@ export const MbgHorizontalDD = ({
                   <span
                     className={clsx(
                       itemActive
-                        ? "text-default-900 [&_svg]:stroke-danger "
-                        : "text-default-900 group-hover:text-danger [&_svg]:group-hover:stroke-danger",
+                        ? "text-default-900 [&_svg]:stroke-amber-700 "
+                        : "text-default-900 group-hover:text-amber-700 [&_svg]:group-hover:stroke-amber-700",
                       "flex-shrink-0 transition-colors"
                     )}
                   >
@@ -150,8 +150,8 @@ export const MbgHorizontalDD = ({
                   <span
                     className={clsx(
                       itemActive
-                        ? "!text-danger font-medium"
-                        : "text-default-900 group-hover:text-danger font-medium",
+                        ? "!text-amber-700 font-medium"
+                        : "text-default-900 group-hover:text-amber-700 font-medium",
                       "text-base transition-colors"
                     )}
                   >

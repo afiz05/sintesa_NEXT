@@ -63,11 +63,20 @@ class PropresFilter extends BaseFilter {
       thang,
     } = inquiryState;
 
+    // Handle composite PP value (e.g., "01-01" should become "01")
+    let processedPilihValue = pilihValue;
+    if (pilihValue && pilihValue.includes("-")) {
+      processedPilihValue = pilihValue.split("-")[1]; // Get the part after the dash
+      console.log(
+        `PropresFilter (inquiry) - Extracted PP from composite value: "${pilihValue}" -> "${processedPilihValue}"`
+      );
+    }
+
     return this.build(
       {
         isEnabled,
         radio,
-        pilihValue,
+        pilihValue: processedPilihValue,
         kondisiValue,
         kataValue,
       },

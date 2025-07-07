@@ -16,12 +16,12 @@ const StuntingFilter = ({ inquiryState }) => {
   ];
 
   return (
-    <div className="w-full p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-pink-100 to-rose-100 dark:from-zinc-900 dark:to-zinc-900 shadow-sm">
+    <div className="p-3 sm:mx-16 rounded-2xl bg-gradient-to-r from-pink-100 to-rose-100 dark:from-zinc-900 dark:to-zinc-900 shadow-sm">
       {/* Mobile/Tablet: Stack vertically, Desktop: Row layout */}
       <div className="flex flex-col lg:flex-row lg:items-center gap-4 w-full">
         {/* Title - Full width on mobile, fixed width on desktop */}
         <h6 className="font-semibold flex items-center gap-2 lg:min-w-[100px] lg:flex-[2]">
-          <Baby size={18} className="text-primary" />
+          <Baby size={20} className="ml-4 text-secondary" />
           Tematik Stunting
         </h6>
 

@@ -781,8 +781,8 @@ const InquiryMod = () => {
 
   return (
     <div className="w-full">
-      <div className="xl:px-24 p-6">
-        <h2 className="text-2xl font-bold mb-6">Inquiry Data</h2>
+      <div className="xl:px-8 p-6">
+        <h2 className="text-2xl font-bold mb-6">Inquiry Data Belanja</h2>
 
         {/* Report Settings Card */}
         <ReportTypeSelector
@@ -1110,7 +1110,132 @@ const InquiryMod = () => {
         />
 
         {/* Add SwitchesGrid for parameter toggles */}
-        <div className="my-6"></div>
+        <div className="my-3 sm:px-16">
+          <div className="flex flex-col md:flex-row md:flex-wrap lg:flex-nowrap gap-2 border-2 dark:border-zinc-600 rounded-xl shadow-sm py-2 px-4 font-mono tracking-wide bg-zinc-100 dark:bg-black">
+            <div className="text-xs">
+              <span className="font-semibold text-blue-600 ml-4">
+                Tahun Anggaran:
+              </span>
+              <span className="ml-2">{thang}</span>
+            </div>
+            <div className="text-xs">
+              <span className="font-semibold text-green-600 ml-4">
+                Jenis Laporan:
+              </span>
+              <span className="ml-2">
+                {jenlap === "1"
+                  ? "Pagu APBN"
+                  : jenlap === "2"
+                  ? "Pagu Realisasi"
+                  : jenlap === "3"
+                  ? "Pagu Realisasi Bulanan"
+                  : jenlap === "4"
+                  ? "Pergerakan Pagu Bulanan"
+                  : jenlap === "5"
+                  ? "Pergerakan Blokir Bulanan"
+                  : jenlap === "7"
+                  ? "Pergerakan Blokir Bulanan per Jenis"
+                  : "Volume Output Kegiatan (PN) - Data Caput"}
+              </span>
+            </div>
+            <div className="text-xs">
+              <span className="font-semibold text-purple-600 ml-4">
+                Pembulatan:
+              </span>
+              <span className="ml-2">
+                {pembulatan === "1"
+                  ? "Rupiah"
+                  : pembulatan === "1000"
+                  ? "Ribuan"
+                  : pembulatan === "1000000"
+                  ? "Jutaan"
+                  : pembulatan === "1000000000"
+                  ? "Miliaran"
+                  : "Triliunan"}
+              </span>
+            </div>
+            <div className="text-xs">
+              <span className="font-semibold text-orange-600 ml-4">
+                Filter Aktif:
+              </span>
+              <span className="ml-2">
+                {
+                  [
+                    tanggal,
+                    kddept,
+                    unit,
+                    kddekon,
+                    kdlokasi,
+                    kdkabkota,
+                    kdkanwil,
+                    kdkppn,
+                    kdsatker,
+                    kdfungsi,
+                    kdsfungsi,
+                    kdprogram,
+                    kdgiat,
+                    kdoutput,
+                    kdsoutput,
+                    kdkomponen,
+                    kdskomponen,
+                    kdakun,
+                    kdsdana,
+                    kdregister,
+                    kdInflasi,
+                    kdIkn,
+                    kdKemiskinan,
+                    KdPRI,
+                    KdPangan,
+                    KdPemilu,
+                    KdStunting,
+                    KdTema,
+                    KdPN,
+                    KdPP,
+                    KdMP,
+                    KdKegPP,
+                  ].filter(Boolean).length
+                }{" "}
+                dari{" "}
+                {
+                  [
+                    tanggal,
+                    kddept,
+                    unit,
+                    kddekon,
+                    kdlokasi,
+                    kdkabkota,
+                    kdkanwil,
+                    kdkppn,
+                    kdsatker,
+                    kdfungsi,
+                    kdsfungsi,
+                    kdprogram,
+                    kdgiat,
+                    kdoutput,
+                    kdsoutput,
+                    kdkomponen,
+                    kdskomponen,
+                    kdakun,
+                    kdsdana,
+                    kdregister,
+                    kdInflasi,
+                    kdIkn,
+                    kdKemiskinan,
+                    KdPRI,
+                    KdPangan,
+                    KdPemilu,
+                    KdStunting,
+                    KdTema,
+                    KdPN,
+                    KdPP,
+                    KdMP,
+                    KdKegPP,
+                  ].length
+                }
+              </span>
+            </div>
+          </div>
+        </div>
 
         {/* Action Buttons */}
         <QueryButtons
@@ -1141,6 +1266,7 @@ const InquiryMod = () => {
           sql={sql}
           from={from}
           thang={thang}
+          pembulatan={pembulatan}
         />
       )}
 
@@ -1179,14 +1305,3 @@ const InquiryMod = () => {
 };
 
 export default InquiryMod;
-
-// Example placeholder for data fetching (should be replaced with real API call)
-async function fetchDataFromAPI() {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  // Return mock data
-  return [
-    { id: 1, name: "Contoh Data 1", value: 100 },
-    { id: 2, name: "Contoh Data 2", value: 200 },
-  ];
-}
