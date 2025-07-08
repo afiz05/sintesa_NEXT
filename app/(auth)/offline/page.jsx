@@ -18,7 +18,7 @@ export default function OfflinePage() {
   // Simple HTTP check for manual retry
   const checkBackendStatus = async () => {
     try {
-      const response = await fetch("http://localhost:88/next/status", {
+      const response = await fetch("http://localhost:8080/next/status", {
         method: "GET",
         signal: AbortSignal.timeout(5000),
       });

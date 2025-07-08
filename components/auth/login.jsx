@@ -204,11 +204,11 @@ export const Login = () => {
         } else {
           resetState();
 
-          const decrypted = decryptData(data.tokenSetLogin);
+          const decrypted = decryptData(data.data.token);
           const decoded = jwtDecode(decrypted);
 
           setTelp(decoded.telp);
-          setToken(data.tokenSetLogin);
+          setToken(data.token);
           setstatusLogin(true);
           setLoading(false);
           setName(decoded.name);
@@ -231,13 +231,13 @@ export const Login = () => {
 
           setShowSuccessAnimation(true);
           localStorage.setItem("status", "true");
-          localStorage.setItem("token", data.tokenSetLogin); // Persist token for refresh
-          await createAuthCookie("token", data.tokenSetLogin); // Gunakan token sebenarnya
+          localStorage.setItem("token", data.data.token); // Persist token for refresh
+          await createAuthCookie("token", data.data.token); // Gunakan token sebenarnya
         }
       } catch (error) {
         console.log(error);
 
-        showToast("Login failed. Please try again.", "error");
+        showToast("Login Gagal", "error");
       } finally {
         setIsLoading(false);
       }
