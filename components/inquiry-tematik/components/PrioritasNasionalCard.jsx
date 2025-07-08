@@ -11,7 +11,7 @@ import ProyekpriFilter from "./FilterGroups/ProyekpriFilter";
 
 const PrioritasNasionalCard = ({ inquiryState }) => {
   return (
-    <div className="w-full space-y-4 shadow-sm px-6 py-4 mb-4 rounded-xl">
+    <div className="w-full space-y-4 bg-gradient-to-r from-yellow-100 to-amber-100 dark:from-zinc-900 dark:to-zinc-900 shadow-none pl-2 pr-6 py-4 mb-4 rounded-2xl">
       {/* Header Card
       <Card className="shadow-lg border-0 bg-gradient-to-br from-slate-50 to-gray-100 dark:from-slate-900 dark:to-gray-900">
         <CardHeader className="pb-3">
