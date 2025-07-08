@@ -378,32 +378,11 @@ const InquiryModTematik = () => {
 
   // **UNIFIED QUERY GENERATION** - All functions now use the same query builder
   const generateUnifiedQuery = () => {
-    // Debug: Log the current inquiry state before generating SQL
-    console.log("🔍 generateUnifiedQuery - Debug inquiry state:", {
-      jenlap: inquiry.jenlap,
-      akumulatif: inquiry.akumulatif,
-      dept: inquiry.dept,
-      kddept: inquiry.kddept,
-      unit: inquiry.unit,
-      kddekon: inquiry.kddekon,
-      dekon: inquiry.dekon,
-      thang: inquiry.thang,
-      cutoff: inquiry.cutoff,
-      // Add Kegiatan Prioritas debug
-      KdKegPP: inquiry.KdKegPP,
-      kegiatanprioritas: inquiry.kegiatanprioritas,
-      kegiatanprioritasradio: inquiry.kegiatanprioritasradio,
-      type: typeof inquiry.akumulatif,
-      timestamp: new Date().toISOString(),
-    });
-
     const sql = buildQuery(); // Use buildQuery() to get the complete SQL string
 
     // Safety check to ensure sql is a valid string before using substring
     if (typeof sql === "string" && sql.length > 0) {
-      console.log("🔄 Query Generated:", sql.substring(0, 600)); // Debug log (show more characters)
     } else {
-      console.log("🔄 Query Generated: (empty or invalid)"); // Debug log for empty/invalid queries
     }
 
     return sql;
@@ -422,12 +401,6 @@ const InquiryModTematik = () => {
   // **UPDATED** - SQL preview handler now uses unified query generation
   const handlegetQuerySQL = () => {
     // Debug: Log the current akumulatif state before generating SQL
-    console.log("🔍 handlegetQuerySQL - Debug inquiry state:", {
-      jenlap: inquiry.jenlap,
-      akumulatif: inquiry.akumulatif,
-      type: typeof inquiry.akumulatif,
-      timestamp: new Date().toISOString(),
-    });
 
     const latestSql = generateUnifiedQuery(); // Same query as execute
     inquiry.setSql(latestSql); // update global state
@@ -509,7 +482,7 @@ const InquiryModTematik = () => {
 
   // Handler to reset all filters and parameters to their initial state
   const handleReset = () => {
-    setJenlap("2");
+    setJenlap("1");
     setThang(new Date().getFullYear().toString());
     setTanggal(false);
     setKddept(true);
@@ -651,7 +624,6 @@ const InquiryModTematik = () => {
   // Helper to fetch data from backend using current filters/query
   // **UPDATED** - Export data fetcher now uses unified query generation
   async function fetchExportData() {
-    console.log("fetchExportData called"); // Debug log to confirm function call
     // Use the same query builder as execute and show SQL
     const sql = generateUnifiedQuery(); // Consistent with all other operations
     if (!sql || typeof sql !== "string" || sql.trim() === "") {
@@ -661,7 +633,6 @@ const InquiryModTematik = () => {
     }
     // If not logged in, return empty array
     if (!statusLogin) {
-      console.log("Not logged in, cannot export data.");
       return [];
     }
 
@@ -680,8 +651,7 @@ const InquiryModTematik = () => {
           },
         }
       );
-      // Debug: Log the full backend response
-      console.log("[Export Debug] Backend response:", response.data);
+
       // If backend supports returning all data for export, use that.
       // Otherwise, you may need to adjust API/backend to support full export.
       if (response.data && Array.isArray(response.data.data)) {
@@ -781,7 +751,7 @@ const InquiryModTematik = () => {
   return (
     <div className="w-full">
       <div className="xl:px-8 p-6">
-        <h2 className="text-2xl font-bold mb-6">Inquiry Data Tematik</h2>
+        <h2 className="text-2xl font-bold mb-6">Inquiry Data Tematik APBN</h2>
 
         {/* Report Settings Card */}
         <ReportTypeSelector

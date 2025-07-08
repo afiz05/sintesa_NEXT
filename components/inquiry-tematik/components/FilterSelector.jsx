@@ -357,7 +357,6 @@ const FilterSection = ({ inquiryState }) => {
   const getDisabledSwitches = (reportType) => {
     // Base disabled switches for most report types
     const baseDisabledSwitches = [
-      "kdsoutput", // Sub-output
       "KdPP", // Program Prioritas
       "KdKegPP", // Kegiatan Prioritas
       "KdPRI", // Proyek Prioritas
@@ -422,8 +421,9 @@ const FilterSection = ({ inquiryState }) => {
     }
 
     // For Special Akun Filter (10), disable other switches but keep Akun available (controlled separately)
+    // Also disable sub-output for Bantuan Pemerintah
     if (reportType === "10") {
-      return baseDisabledSwitches;
+      return baseDisabledSwitches.concat(["kdsoutput"]);
     }
 
     // For MBG (11), enable MBG filter but disable others
@@ -647,6 +647,23 @@ const FilterSection = ({ inquiryState }) => {
       setKdPemilu && setKdPemilu(false);
       setKdIkn && setKdIkn(false);
       setKdPangan && setKdPangan(false);
+    } else if (jenlap === "12") {
+      // jenlap 12 (Swasembada Pangan) - No special filter switches needed
+      // This uses a special base query with swasembada column grouping
+      // Turn off all special filters for jenlap 12
+      setKdPN && setKdPN(false);
+      setKdPP && setKdPP(false);
+      setKdKegPP && setKdKegPP(false);
+      setKdPRI && setKdPRI(false);
+      setKdMP && setKdMP(false);
+      setKdTema && setKdTema(false);
+      setKdInflasi && setKdInflasi(false);
+      setKdStunting && setKdStunting(false);
+      setKdKemiskinan && setKdKemiskinan(false);
+      setKdPemilu && setKdPemilu(false);
+      setKdIkn && setKdIkn(false);
+      setKdPangan && setKdPangan(false);
+      setKdMBG && setKdMBG(false);
     } else {
       // Turn off all special filters for other report types
       setKdPN && setKdPN(false);
@@ -1024,7 +1041,7 @@ const FilterSection = ({ inquiryState }) => {
         kdprogram: false,
         kdgiat: false,
         kdoutput: false,
-        kdsoutput: false,
+        kdsoutput: false, // Sub-output is now available for all jenlap types
         kdakun: reportType === "10", // Turn on Akun for jenlap 10
         kdsdana: false,
         kdregister: false,
@@ -1219,13 +1236,13 @@ const FilterSection = ({ inquiryState }) => {
             label="Sumber Dana"
             disabled={disabledSwitches.includes("kdsdana")}
           />
-          <FilterSwitch
+          {/* <FilterSwitch
             id="kdregister-filter"
             checked={kdregister}
             onChange={setKdregister}
             label="Register"
             disabled={disabledSwitches.includes("kdregister")}
-          />
+          /> */}
         </div>
       </div>
 
@@ -1256,19 +1273,9 @@ const FilterSection = ({ inquiryState }) => {
         {kdsdana && (
           <SumberdanaFilter type="source" inquiryState={inquiryState} />
         )}
-        {kdregister && (
+        {/* {kdregister && (
           <RegisterFilter type="register" inquiryState={inquiryState} />
-        )}
-        {KdPN && <PrinasFilter inquiryState={inquiryState} />}
-        {KdMP && <MajorprFilter inquiryState={inquiryState} />}
-        {KdTema && <TematikFilter inquiryState={inquiryState} />}
-        {kdInflasi && <InflasiFilter inquiryState={inquiryState} />}
-        {KdStunting && <StuntingFilter inquiryState={inquiryState} />}
-        {kdKemiskinan && <KemiskinanFilter inquiryState={inquiryState} />}
-        {KdPemilu && <PemiluFilter inquiryState={inquiryState} />}
-        {kdIkn && <IknFilter inquiryState={inquiryState} />}
-        {KdPangan && <PanganFilter inquiryState={inquiryState} />}
-        {KdMBG && <MBGFilter inquiryState={inquiryState} />}
+        )} */}
       </div>
     </>
   );

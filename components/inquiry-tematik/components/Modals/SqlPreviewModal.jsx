@@ -44,11 +44,8 @@ const SqlPreviewModal = ({ isOpen, onClose, query, title }) => {
         </ModalHeader>
 
         <ModalBody>
-          <div className="bg-gray-100 p-8 rounded-xl overflow-auto max-h-[60vh]">
-            <pre
-              className="whitespace-pre-wrap text-sm font-mono text-gray-800"
-              style={{ textAlign: "center" }}
-            >
+          <div className="bg-gray-100 p-8 rounded-xl overflow-x-auto max-h-[60vh]">
+            <pre className="whitespace-pre-wrap break-words text-sm font-mono text-gray-800 text-center">
               {query && query.replace(/\s+/g, " ").trim()}
             </pre>
           </div>

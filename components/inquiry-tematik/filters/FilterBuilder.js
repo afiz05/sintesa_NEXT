@@ -125,20 +125,12 @@ class FilterBuilder {
         // But we still need their WHERE conditions for filtering
         enabled = this.isFilterEnabled(key, inquiryState);
         if (enabled) {
-          console.log(`🔍 Processing jenlap=1 priority filter ${key}:`, {
-            enabled,
-            filterState: this.getFilterState(key, inquiryState),
-          });
           try {
             const filterResult = filter.buildFromState(inquiryState);
-            console.log(`🔍 ${key} filter result:`, filterResult);
+
             // Only include WHERE conditions, skip columns, joins, and groupBy
             if (filterResult.whereConditions.length > 0) {
               result.whereConditions.push(...filterResult.whereConditions);
-              console.log(
-                `🔍 Added WHERE conditions from ${key}:`,
-                filterResult.whereConditions
-              );
             }
           } catch (error) {
             console.warn(
@@ -164,13 +156,6 @@ class FilterBuilder {
           "mbg",
         ].includes(key)
       ) {
-        console.log(`🔍 Special Filter Debug - ${key}:`, {
-          enabled,
-          jenlap: inquiryState.jenlap,
-          filterSwitch: this.getFilterSwitchValue(key, inquiryState),
-          radioValue: this.getFilterRadioValue(key, inquiryState),
-          optionValue: this.getFilterOptionValue(key, inquiryState),
-        });
       }
 
       if (!enabled) return;

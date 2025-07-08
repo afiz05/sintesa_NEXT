@@ -16,11 +16,7 @@ const KegiatanpriFilter = ({ inquiryState }) => {
   } = inquiryState;
 
   // Debug: log kegiatanprioritas to ensure it updates on selection
-  React.useEffect(() => {
-    console.log("[KegiatanpriFilter] kegiatanprioritas:", kegiatanprioritas);
-    console.log("[KegiatanpriFilter] Parent values - PN:", PN, "PP:", PP);
-    console.log("[KegiatanpriFilter] Types - PN:", typeof PN, "PP:", typeof PP);
-  }, [kegiatanprioritas, PN, PP]);
+  React.useEffect(() => {}, [kegiatanprioritas, PN, PP]);
 
   const KegiatanPrioritasOptions = [
     { value: "1", label: "Kode" },
@@ -49,11 +45,6 @@ const KegiatanpriFilter = ({ inquiryState }) => {
                 value={kegiatanprioritas}
                 onChange={(val) => {
                   setKegiatanPrioritas(val);
-                  // Debug: log value selected
-                  console.log(
-                    "[KegiatanpriFilter] setKegiatanPrioritas called with:",
-                    val
-                  );
                 }}
                 kdPN={PN}
                 kdPP={PP}
@@ -64,6 +55,7 @@ const KegiatanpriFilter = ({ inquiryState }) => {
             {/* Jenis Tampilan */}
             <div className="flex flex-col gap-1 w-full xl:flex-[1]">
               <Select
+                aria-label="Jenis Tampilan Kegiatan Prioritas"
                 selectedKeys={
                   kegiatanprioritasradio ? [kegiatanprioritasradio] : ["1"]
                 }

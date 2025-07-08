@@ -31,11 +31,6 @@ const InquiryModal = ({ isOpen, onClose, sql, from, thang, pembulatan }) => {
   // Debug pembulatan value
   useEffect(() => {
     if (process.env.NODE_ENV === "development") {
-      console.log(
-        "InquiryModal - pembulatan value:",
-        pembulatan,
-        typeof pembulatan
-      );
     }
   }, [pembulatan]);
 
@@ -282,20 +277,6 @@ const InquiryModal = ({ isOpen, onClose, sql, from, thang, pembulatan }) => {
 
         // Debug: Log the first few items to see raw data structure
         if (process.env.NODE_ENV === "development" && newData.length > 0) {
-          console.log("Raw data from backend:", newData.slice(0, 2));
-          console.log("Sample numeric values:", {
-            PAGU: newData[0]?.PAGU,
-            REALISASI: newData[0]?.REALISASI,
-            BLOKIR: newData[0]?.BLOKIR,
-          });
-          console.log("Backend API Response Structure:", {
-            total,
-            totalPages,
-            pembulatan,
-            dataLength: newData.length,
-            firstItemKeys: Object.keys(newData[0] || {}),
-            isTrillionData: pembulatan === "1000000000000",
-          });
         }
 
         setTotalData(total);
@@ -497,13 +478,6 @@ const InquiryModal = ({ isOpen, onClose, sql, from, thang, pembulatan }) => {
 
     // Debug logging
     if (process.env.NODE_ENV === "development") {
-      console.log("formatNumber debug:", {
-        backendValue: num,
-        numericValue,
-        pembulatan,
-        isTriliun,
-        finalValue: numericValue,
-      });
     }
 
     // Use European formatting: . for thousands, , for decimals

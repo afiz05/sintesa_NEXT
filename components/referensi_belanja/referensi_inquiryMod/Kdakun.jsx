@@ -28,6 +28,7 @@ const Kdakun = (props) => {
       className={props.className}
       size={props.size || "sm"}
       disallowEmptySelection
+      aria-label={props["aria-label"] || "Pilih Jenis Kode Akun"}
     >
       {/* Always show Kode Akun as the first option */}
       <SelectItem key="AKUN" textValue="Kode Akun">

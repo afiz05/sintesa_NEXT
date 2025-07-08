@@ -53,7 +53,10 @@ const AkunFilter = ({ inquiryState }) => {
             {/* Selection Component */}
             <div className="flex flex-col gap-1 w-full xl:flex-1 min-w-0 max-w-full overflow-hidden">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700">
+                <label
+                  className="text-sm font-medium text-gray-700"
+                  id="label-pilih-akun"
+                >
                   Pilih Akun
                 </label>
               </div>
@@ -73,6 +76,7 @@ const AkunFilter = ({ inquiryState }) => {
                 placeholder="Pilih Akun"
                 status="pilihakun"
                 isDisabled={false}
+                aria-labelledby="label-pilih-akun"
               />
             </div>
 
@@ -181,6 +185,7 @@ const AkunFilter = ({ inquiryState }) => {
                   }
                 }}
                 disallowEmptySelection
+                aria-label="Jenis Tampilan Akun"
               >
                 {AkunOptions.map((opt) => (
                   <SelectItem key={opt.value} textValue={opt.label}>

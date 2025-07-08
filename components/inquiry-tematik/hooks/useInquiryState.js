@@ -29,7 +29,7 @@ export default function useInquiryState() {
   const [showModalsimpan, setShowModalsimpan] = useState(false);
 
   // Form states
-  const [jenlap, setJenlap] = useState("2");
+  const [jenlap, setJenlap] = useState("1");
   const [thang, setThang] = useState(new Date().getFullYear().toString());
   const [tanggal, setTanggal] = useState(false);
   const [cutoff, setCutoff] = useState("0");

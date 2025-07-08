@@ -12,7 +12,9 @@
  * 7. Blokir Bulanan - monthly blokir breakdown
  * 8. Volume Output Kegiatan (Data Caput) - satuan, volume, monthly physical progress
  * 9. Ketahanan Pangan - pangan with monthly breakdown
- * 10-12. Reserved for Future Use - default structure with special filter support
+ * 10. Reserved for Future Use - default structure with special filter support
+ * 11. MBG (Makan Bergizi Gratis) - mbg with monthly breakdown
+ * 12. Swasembada Pangan - swasembada with monthly breakdown and special WHERE condition
  */
 
 import FilterBuilder from "./FilterBuilder";
@@ -193,8 +195,9 @@ class QueryBuilder {
         dynamicSelect = `ROUND(sum(a.pagu)/${pembulatan},0) AS PAGU, ROUND(SUM(real1)/${pembulatan},0) AS JAN, ROUND(SUM(real2)/${pembulatan}, 0) AS FEB, ROUND(SUM(real3)/${pembulatan}, 0) AS MAR, ROUND(SUM(real4)/${pembulatan}, 0) AS APR, ROUND(SUM(real5)/${pembulatan}, 0) AS MEI, ROUND(SUM(real6)/${pembulatan}, 0) AS JUN, ROUND(SUM(real7)/${pembulatan}, 0) AS JUL, ROUND(SUM(real8)/${pembulatan}, 0) AS AGS, ROUND(SUM(real9)/${pembulatan}, 0) AS SEP, ROUND(SUM(real10)/${pembulatan}, 0) AS OKT, ROUND(SUM(real11)/${pembulatan}, 0) AS NOV, ROUND(SUM(real12)/${pembulatan}, 0) AS DES, ROUND(SUM(a.blokir)/${pembulatan},0) AS BLOKIR`;
         break;
       case "12":
-        dynamicFrom = currentTable;
-        dynamicSelect = pagu + blokir;
+        // jenlap 12 (Swasembada Pangan) - Special table and WHERE condition
+        dynamicFrom = `monev${thang}.a_pagu_real_bkpk_dja_${thang} a`;
+        dynamicSelect = `, a.swasembada, ROUND(sum(a.pagu)/${pembulatan},0) AS PAGU, ROUND(SUM(real1)/${pembulatan},0) AS JAN, ROUND(SUM(real2)/${pembulatan}, 0) AS FEB, ROUND(SUM(real3)/${pembulatan}, 0) AS MAR, ROUND(SUM(real4)/${pembulatan}, 0) AS APR, ROUND(SUM(real5)/${pembulatan}, 0) AS MEI, ROUND(SUM(real6)/${pembulatan}, 0) AS JUN, ROUND(SUM(real7)/${pembulatan}, 0) AS JUL, ROUND(SUM(real8)/${pembulatan}, 0) AS AGS, ROUND(SUM(real9)/${pembulatan}, 0) AS SEP, ROUND(SUM(real10)/${pembulatan}, 0) AS OKT, ROUND(SUM(real11)/${pembulatan}, 0) AS NOV, ROUND(SUM(real12)/${pembulatan}, 0) AS DES, ROUND(SUM(a.blokir)/${pembulatan},0) AS BLOKIR`;
         break;
       default:
         dynamicFrom = currentTable;
@@ -427,6 +430,28 @@ class QueryBuilder {
     // Special handling for jenlap = 1: Add default WHERE condition for kdpn
     if (inquiryState.jenlap === "1") {
       const defaultCondition = "a.kdpn <>'00'";
+      if (
+        whereClause &&
+        whereClause.trim() !== "" &&
+        !whereClause.includes("WHERE")
+      ) {
+        whereClause = `WHERE ${defaultCondition} AND (${whereClause.replace(
+          /^WHERE\s*/i,
+          ""
+        )})`;
+      } else if (whereClause && whereClause.includes("WHERE")) {
+        whereClause = whereClause.replace(
+          /WHERE\s*/i,
+          `WHERE ${defaultCondition} AND `
+        );
+      } else {
+        whereClause = `WHERE ${defaultCondition}`;
+      }
+    }
+
+    // Special handling for jenlap = 12: Add default WHERE condition for swasembada
+    if (inquiryState.jenlap === "12") {
+      const defaultCondition = "a.swasembada <> 'NULL'";
       if (
         whereClause &&
         whereClause.trim() !== "" &&
@@ -756,6 +781,12 @@ class QueryBuilder {
     if (inquiryState.jenlap === "9") {
       // For jenlap=9, combine base filter columns with Pangan GROUP BY fields
       groupByFields.push("a.pangan");
+    }
+
+    // Special handling for jenlap = 12: Swasembada Pangan - add swasembada to GROUP BY
+    if (inquiryState.jenlap === "12") {
+      // For jenlap=12, combine base filter columns with Swasembada GROUP BY fields
+      groupByFields.push("a.swasembada");
     }
 
     // Special handling for jenlap = 11: MBG - MBG fields are already handled by MBGFilter

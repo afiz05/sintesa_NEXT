@@ -428,3 +428,32 @@ export class MBGFilter extends BaseFilter {
     return result;
   }
 }
+
+/**
+ * SwasembadaPanganFilter - Handles Swasembada Pangan filters for jenlap = 12
+ */
+export class SwasembadaPanganFilter extends BaseFilter {
+  constructor() {
+    super("swasembadapangan");
+  }
+
+  buildFromState(inquiryState) {
+    const { jenlap } = inquiryState;
+
+    // Only activate this filter for jenlap 12
+    if (jenlap !== "12") {
+      return this.getEmptyResult();
+    }
+
+    const result = this.getEmptyResult();
+
+    // For jenlap 12, we always group by swasembada column
+    // The SELECT clause and WHERE condition are handled by QueryBuilder
+    result.groupBy.push("a.swasembada");
+
+    // Add the special WHERE condition that filters out NULL values
+    result.whereConditions.push("a.swasembada <> 'NULL'");
+
+    return result;
+  }
+}

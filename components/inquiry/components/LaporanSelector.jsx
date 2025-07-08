@@ -77,7 +77,7 @@ const ReportTypeSelector = ({ inquiryState, onFilterChange }) => {
 
     if (!isAkumulatifActive) {
       // When akumulatif is not active (jenlap !== "3"), set to "0" (Non-Akumulatif)
-      console.log("Setting akumulatif to '0' because jenlap !== '3'");
+
       currentSetAkumulatif("0");
     } else {
       // When akumulatif becomes active (jenlap === "3"), ensure it has a valid value
@@ -86,13 +86,8 @@ const ReportTypeSelector = ({ inquiryState, onFilterChange }) => {
         !currentAkumulatif ||
         (currentAkumulatif !== "0" && currentAkumulatif !== "1")
       ) {
-        console.log(
-          "Setting akumulatif to '0' as default because invalid value:",
-          currentAkumulatif
-        );
         currentSetAkumulatif("0");
       } else {
-        console.log("Keeping current akumulatif value:", currentAkumulatif);
       }
     }
   }, [currentJenlap, isAkumulatifActive]); // Remove currentSetAkumulatif from dependencies
@@ -139,17 +134,13 @@ const ReportTypeSelector = ({ inquiryState, onFilterChange }) => {
 
   const handleSelectionChange = (setter) => (keys) => {
     const value = Array.from(keys)[0];
-    console.log("LaporanSelector - Selection change:", {
-      setter: setter.name,
-      value,
-      keys,
-    });
+
     if (setter && value !== undefined) setter(value);
   };
 
   return (
     <div className="mb-4">
-      <div className="w-full p-3 mb-4 sm:p-4 bg-white dark:bg-zinc-900 shadow-sm rounded-2xl">
+      <div className="w-full p-3 mb-4 sm:p-4 bg-gradient-to-r from-sky-100 to-teal-100 dark:from-zinc-900 dark:to-zinc-900 shadow-none rounded-2xl">
         {/* <h5 className="text-lg font-semibold mb-4">Report Settings</h5> */}
 
         <div className="flex flex-col md:flex-row gap-6 w-full">
