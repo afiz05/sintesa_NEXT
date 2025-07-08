@@ -348,15 +348,6 @@ const FilterSection = ({ inquiryState }) => {
 
   // Determine which switches should be disabled based on report type
   const getDisabledSwitches = (reportType) => {
-    // For Volume Output Kegiatan (6), disable akun, register, sumber dana
-    if (reportType === "6") {
-      return [
-        "kdakun", // Akun
-        "kdregister", // Register
-        "kdsdana", // Sumber Dana
-      ];
-    }
-
     // Base disabled switches for most report types
     const baseDisabledSwitches = [
       "kdsoutput", // Sub-output
@@ -373,6 +364,13 @@ const FilterSection = ({ inquiryState }) => {
       "KdPangan", // Pangan
     ];
 
+    // For Kemiskinan (6), enable Kemiskinan filter and disable akun, register, sumber dana
+    if (reportType === "6") {
+      return baseDisabledSwitches
+        .filter((item) => item !== "kdKemiskinan")
+        .concat(["kdakun", "kdregister", "kdsdana"]);
+    }
+
     // For Prioritas Nasional (1), enable Prinas-related filters but disable others
     if (reportType === "1") {
       return baseDisabledSwitches.filter(
@@ -383,6 +381,26 @@ const FilterSection = ({ inquiryState }) => {
     // For Major Project (2), enable Major Project filter but disable others
     if (reportType === "2") {
       return baseDisabledSwitches.filter((item) => item !== "KdMP");
+    }
+
+    // For Tematik Anggaran (3), enable Tematik filter but disable others
+    if (reportType === "3") {
+      return baseDisabledSwitches.filter((item) => item !== "KdTema");
+    }
+
+    // For Inflasi (4), enable Inflasi filter but disable others
+    if (reportType === "4") {
+      return baseDisabledSwitches.filter((item) => item !== "kdInflasi");
+    }
+
+    // For Stunting (5), enable Stunting filter but disable others
+    if (reportType === "5") {
+      return baseDisabledSwitches.filter((item) => item !== "KdStunting");
+    }
+
+    // For Belanja Pemilu (7), enable Pemilu filter but disable others
+    if (reportType === "7") {
+      return baseDisabledSwitches.filter((item) => item !== "KdPemilu");
     }
 
     // For all other report types (including Pagu Realisasi "2"), disable base switches
@@ -447,6 +465,12 @@ const FilterSection = ({ inquiryState }) => {
       setKdPRI && setKdPRI(true);
       // Turn off Major Project for jenlap 1
       setKdMP && setKdMP(false);
+      // Turn off Tematik for jenlap 1
+      setKdTema && setKdTema(false);
+      // Turn off Inflasi for jenlap 1
+      setKdInflasi && setKdInflasi(false);
+      // Turn off Stunting for jenlap 1
+      setKdStunting && setKdStunting(false);
     } else if (jenlap === "2") {
       // Turn on Major Project for jenlap 2
       setKdMP && setKdMP(true);
@@ -455,6 +479,73 @@ const FilterSection = ({ inquiryState }) => {
       setKdPP && setKdPP(false);
       setKdKegPP && setKdKegPP(false);
       setKdPRI && setKdPRI(false);
+      // Turn off Tematik for jenlap 2
+      setKdTema && setKdTema(false);
+      // Turn off Inflasi for jenlap 2
+      setKdInflasi && setKdInflasi(false);
+      // Turn off Stunting for jenlap 2
+      setKdStunting && setKdStunting(false);
+    } else if (jenlap === "3") {
+      // Turn on Tematik for jenlap 3 (Tematik Anggaran)
+      setKdTema && setKdTema(true);
+      // Turn off other special filters for jenlap 3
+      setKdPN && setKdPN(false);
+      setKdPP && setKdPP(false);
+      setKdKegPP && setKdKegPP(false);
+      setKdPRI && setKdPRI(false);
+      setKdMP && setKdMP(false);
+      // Turn off Inflasi for jenlap 3
+      setKdInflasi && setKdInflasi(false);
+      // Turn off Stunting for jenlap 3
+      setKdStunting && setKdStunting(false);
+    } else if (jenlap === "4") {
+      // Turn on Inflasi for jenlap 4 (Inflasi)
+      setKdInflasi && setKdInflasi(true);
+      // Turn off other special filters for jenlap 4
+      setKdPN && setKdPN(false);
+      setKdPP && setKdPP(false);
+      setKdKegPP && setKdKegPP(false);
+      setKdPRI && setKdPRI(false);
+      setKdMP && setKdMP(false);
+      setKdTema && setKdTema(false);
+      setKdStunting && setKdStunting(false);
+    } else if (jenlap === "5") {
+      // Turn on Stunting for jenlap 5 (Stunting)
+      setKdStunting && setKdStunting(true);
+      // Turn off other special filters for jenlap 5
+      setKdPN && setKdPN(false);
+      setKdPP && setKdPP(false);
+      setKdKegPP && setKdKegPP(false);
+      setKdPRI && setKdPRI(false);
+      setKdMP && setKdMP(false);
+      setKdTema && setKdTema(false);
+      setKdInflasi && setKdInflasi(false);
+    } else if (jenlap === "6") {
+      // Turn on Kemiskinan for jenlap 6 (Kemiskinan Extrem)
+      setKdKemiskinan && setKdKemiskinan(true);
+      // Turn off other special filters for jenlap 6
+      setKdPN && setKdPN(false);
+      setKdPP && setKdPP(false);
+      setKdKegPP && setKdKegPP(false);
+      setKdPRI && setKdPRI(false);
+      setKdMP && setKdMP(false);
+      setKdTema && setKdTema(false);
+      setKdInflasi && setKdInflasi(false);
+      setKdStunting && setKdStunting(false);
+      setKdPemilu && setKdPemilu(false);
+    } else if (jenlap === "7") {
+      // Turn on Pemilu for jenlap 7 (Belanja Pemilu)
+      setKdPemilu && setKdPemilu(true);
+      // Turn off other special filters for jenlap 7
+      setKdPN && setKdPN(false);
+      setKdPP && setKdPP(false);
+      setKdKegPP && setKdKegPP(false);
+      setKdPRI && setKdPRI(false);
+      setKdMP && setKdMP(false);
+      setKdTema && setKdTema(false);
+      setKdInflasi && setKdInflasi(false);
+      setKdStunting && setKdStunting(false);
+      setKdKemiskinan && setKdKemiskinan(false);
     } else {
       // Turn off all special filters for other report types
       setKdPN && setKdPN(false);
@@ -462,6 +553,11 @@ const FilterSection = ({ inquiryState }) => {
       setKdKegPP && setKdKegPP(false);
       setKdPRI && setKdPRI(false);
       setKdMP && setKdMP(false);
+      setKdTema && setKdTema(false);
+      setKdInflasi && setKdInflasi(false);
+      setKdStunting && setKdStunting(false);
+      setKdKemiskinan && setKdKemiskinan(false);
+      setKdPemilu && setKdPemilu(false);
     }
   }, [jenlap]); // Only run when jenlap changes
 
@@ -856,8 +952,8 @@ const FilterSection = ({ inquiryState }) => {
     // setKdKegPP && setKdKegPP(defaultSwitches.KdKegPP);
     // setKdPRI && setKdPRI(defaultSwitches.KdPRI);
     // setKdMP && setKdMP(defaultSwitches.KdMP);
-    setKdTema && setKdTema(defaultSwitches.KdTema);
-    setKdInflasi && setKdInflasi(defaultSwitches.kdInflasi);
+    // setKdTema && setKdTema(defaultSwitches.KdTema);
+    // setKdInflasi && setKdInflasi(defaultSwitches.kdInflasi); // Now controlled by jenlap logic
     setKdStunting && setKdStunting(defaultSwitches.KdStunting);
     setKdKemiskinan && setKdKemiskinan(defaultSwitches.kdKemiskinan);
     setKdPemilu && setKdPemilu(defaultSwitches.KdPemilu);
@@ -868,7 +964,7 @@ const FilterSection = ({ inquiryState }) => {
   return (
     <>
       {/* Filter Options Card - Modern design with gradient and rounded corners */}
-      <div className="w-full p-3 mb-4 sm:p-4 bg-white dark:bg-zinc-900 shadow-sm rounded-2xl">
+      <div className="w-full p-3 mb-6 sm:p-4 bg-gradient-to-r from-yellow-100 to-amber-100 dark:from-zinc-900 dark:to-zinc-900 shadow-none rounded-2xl">
         {/* <div className="flex items-center gap-3 mb-4">
           <h5 className="text-lg font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
             Filter Options
@@ -1008,41 +1104,6 @@ const FilterSection = ({ inquiryState }) => {
             disabled={disabledSwitches.includes("kdregister")}
           />
           <FilterSwitch
-            id="tematik-filter"
-            checked={KdTema}
-            onChange={setKdTema}
-            label="Tematik"
-            disabled={disabledSwitches.includes("KdTema")}
-          />
-          <FilterSwitch
-            id="inflasi-filter"
-            checked={kdInflasi}
-            onChange={setKdInflasi}
-            label="Inflasi"
-            disabled={disabledSwitches.includes("kdInflasi")}
-          />
-          <FilterSwitch
-            id="stunting-filter"
-            checked={KdStunting}
-            onChange={setKdStunting}
-            label="Stunting"
-            disabled={disabledSwitches.includes("KdStunting")}
-          />
-          <FilterSwitch
-            id="kemiskinan-filter"
-            checked={kdKemiskinan}
-            onChange={setKdKemiskinan}
-            label="Kemiskinan Extrem"
-            disabled={disabledSwitches.includes("kdKemiskinan")}
-          />
-          <FilterSwitch
-            id="pemilu-filter"
-            checked={KdPemilu}
-            onChange={setKdPemilu}
-            label="Pemilu"
-            disabled={disabledSwitches.includes("KdPemilu")}
-          />
-          <FilterSwitch
             id="ikn-filter"
             checked={kdIkn}
             onChange={setKdIkn}
@@ -1089,7 +1150,8 @@ const FilterSection = ({ inquiryState }) => {
         {kdregister && (
           <RegisterFilter type="register" inquiryState={inquiryState} />
         )}
-
+        {KdPN && <PrinasFilter inquiryState={inquiryState} />}
+        {KdMP && <MajorprFilter inquiryState={inquiryState} />}
         {KdTema && <TematikFilter inquiryState={inquiryState} />}
         {kdInflasi && <InflasiFilter inquiryState={inquiryState} />}
         {KdStunting && <StuntingFilter inquiryState={inquiryState} />}
