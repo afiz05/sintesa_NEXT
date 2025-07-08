@@ -48,7 +48,7 @@ const ReportTypeSelector = ({ inquiryState, onFilterChange }) => {
     { value: "5", label: "Penanganan Stunting" },
     { value: "6", label: "Kemiskinan Ekstrim" },
     { value: "7", label: "Belanja Pemilu" },
-    { value: "8", label: "Ibu Kota Nusantara" },
+    { value: "8", label: "Ibu Kota Nusantara (IKN)" },
     { value: "9", label: "Ketahanan Pangan" },
     { value: "10", label: "Bantuan Pemerintah" },
     { value: "11", label: "Makanan Bergizi Gratis" },

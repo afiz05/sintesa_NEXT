@@ -377,3 +377,54 @@ export class SpecialGroupingFilter extends BaseFilter {
     return result;
   }
 }
+
+/**
+ * MBG Filter - Handles MBG (Makan Bergizi Gratis) budget filters for jenlap = 11
+ */
+export class MBGFilter extends BaseFilter {
+  constructor() {
+    super("mbg");
+  }
+
+  buildFromState(inquiryState) {
+    const { jenlap, mbg, mbgradio } = inquiryState;
+
+    // Only activate this filter for jenlap 11
+    if (jenlap !== "11") {
+      return this.getEmptyResult();
+    }
+
+    const result = this.getEmptyResult();
+
+    // MBG columns based on mbgradio
+    if (mbgradio === "1" && mbg !== "XX") {
+      // Kode only
+      result.columns.push("A.MBG");
+      result.groupBy.push("A.MBG");
+    } else if (mbgradio === "2" && mbg !== "XX") {
+      // Kode + Uraian
+      result.columns.push("A.MBG", "mbg.nmmbg");
+      result.joinClause = ` LEFT JOIN DBREF.T_MBG mbg ON A.MBG=mbg.kdmbg`;
+      result.groupBy.push("A.MBG");
+    } else if (mbgradio === "3" && mbg !== "XX") {
+      // Uraian only
+      result.columns.push("mbg.nmmbg");
+      result.joinClause = ` LEFT JOIN DBREF.T_MBG mbg ON A.MBG=mbg.kdmbg`;
+      result.groupBy.push("A.MBG");
+    } else if (mbgradio === "4") {
+      // Jangan Tampilkan - don't add any columns but still group by MBG for proper aggregation
+      result.groupBy.push("A.MBG");
+    } else {
+      // Default: group by MBG
+      result.columns.push("A.MBG");
+      result.groupBy.push("A.MBG");
+    }
+
+    // Add WHERE condition when specific MBG is selected
+    if (mbg && mbg !== "XX" && mbg !== "00") {
+      result.whereConditions.push(`A.MBG = '${mbg}'`);
+    }
+
+    return result;
+  }
+}

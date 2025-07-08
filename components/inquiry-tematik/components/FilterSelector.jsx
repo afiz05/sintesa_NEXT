@@ -34,6 +34,7 @@ import KabkotaFilter from "./FilterGroups/KabkotaFilter";
 import KanwilFilter from "./FilterGroups/KanwilFilter";
 import KppnFilter from "./FilterGroups/KppnFilter";
 import SatkerFilter from "./FilterGroups/SatkerFilter";
+import MBGFilter from "./FilterGroups/MBGFilter";
 
 const FilterSection = ({ inquiryState }) => {
   const {
@@ -110,6 +111,8 @@ const FilterSection = ({ inquiryState }) => {
     setKdKegPP,
     KdMP,
     setKdMP,
+    KdMBG,
+    setKdMBG,
 
     // Filter values and conditions
     dept,
@@ -322,6 +325,10 @@ const FilterSection = ({ inquiryState }) => {
     setPRI,
     priradio,
     setPriradio,
+    mbg,
+    setmbg,
+    mbgradio,
+    setmbgradio,
   } = inquiryState;
 
   // Remove local state - use the actual filter switch states from inquiryState instead
@@ -362,6 +369,7 @@ const FilterSection = ({ inquiryState }) => {
       "KdPemilu", // Pemilu
       "kdIkn", // IKN
       "KdPangan", // Pangan
+      "KdMBG", // MBG
     ];
 
     // For Kemiskinan (6), enable Kemiskinan filter and disable akun, register, sumber dana
@@ -401,6 +409,26 @@ const FilterSection = ({ inquiryState }) => {
     // For Belanja Pemilu (7), enable Pemilu filter but disable others
     if (reportType === "7") {
       return baseDisabledSwitches.filter((item) => item !== "KdPemilu");
+    }
+
+    // For IKN (8), enable IKN filter but disable others
+    if (reportType === "8") {
+      return baseDisabledSwitches.filter((item) => item !== "kdIkn");
+    }
+
+    // For Pangan (9), enable Pangan filter but disable others
+    if (reportType === "9") {
+      return baseDisabledSwitches.filter((item) => item !== "KdPangan");
+    }
+
+    // For Special Akun Filter (10), disable other switches but keep Akun available (controlled separately)
+    if (reportType === "10") {
+      return baseDisabledSwitches;
+    }
+
+    // For MBG (11), enable MBG filter but disable others
+    if (reportType === "11") {
+      return baseDisabledSwitches.filter((item) => item !== "KdMBG");
     }
 
     // For all other report types (including Pagu Realisasi "2"), disable base switches
@@ -451,6 +479,9 @@ const FilterSection = ({ inquiryState }) => {
       }
       if (disabledSwitches.includes("KdPangan") && KdPangan) {
         setKdPangan && setKdPangan(false);
+      }
+      if (disabledSwitches.includes("KdMBG") && KdMBG) {
+        setKdMBG && setKdMBG(false);
       }
     }
   }, [jenlap]); // Only depend on jenlap to avoid circular dependencies
@@ -546,6 +577,76 @@ const FilterSection = ({ inquiryState }) => {
       setKdInflasi && setKdInflasi(false);
       setKdStunting && setKdStunting(false);
       setKdKemiskinan && setKdKemiskinan(false);
+      setKdIkn && setKdIkn(false);
+    } else if (jenlap === "8") {
+      // Turn on IKN for jenlap 8 (Ibu Kota Nusantara)
+      setKdIkn && setKdIkn(true);
+      // Turn off other special filters for jenlap 8
+      setKdPN && setKdPN(false);
+      setKdPP && setKdPP(false);
+      setKdKegPP && setKdKegPP(false);
+      setKdPRI && setKdPRI(false);
+      setKdMP && setKdMP(false);
+      setKdTema && setKdTema(false);
+      setKdInflasi && setKdInflasi(false);
+      setKdStunting && setKdStunting(false);
+      setKdKemiskinan && setKdKemiskinan(false);
+      setKdPemilu && setKdPemilu(false);
+    } else if (jenlap === "9") {
+      // Turn on Pangan for jenlap 9 (Ketahanan Pangan)
+      setKdPangan && setKdPangan(true);
+      // Turn off other special filters for jenlap 9
+      setKdPN && setKdPN(false);
+      setKdPP && setKdPP(false);
+      setKdKegPP && setKdKegPP(false);
+      setKdPRI && setKdPRI(false);
+      setKdMP && setKdMP(false);
+      setKdTema && setKdTema(false);
+      setKdInflasi && setKdInflasi(false);
+      setKdStunting && setKdStunting(false);
+      setKdKemiskinan && setKdKemiskinan(false);
+      setKdPemilu && setKdPemilu(false);
+      setKdIkn && setKdIkn(false);
+    } else if (jenlap === "10") {
+      // Turn on Akun for jenlap 10 (Special Akun Filter with predefined codes)
+      setKdakun && setKdakun(true);
+      // Set specific akun kondisi for the predefined codes
+      setAkunkondisi &&
+        setAkunkondisi(
+          "511521,511522,511529,521231,521232,521233,521234,526111,526112,526113,526114,526115,526121,526122,526123,526124,526131,526132,526311,526312,526313,526321,526322,526323"
+        );
+      // Set radio to show codes only since user can't modify
+      setAkunradio && setAkunradio("1");
+      // Turn off other special filters for jenlap 10
+      setKdPN && setKdPN(false);
+      setKdPP && setKdPP(false);
+      setKdKegPP && setKdKegPP(false);
+      setKdPRI && setKdPRI(false);
+      setKdMP && setKdMP(false);
+      setKdTema && setKdTema(false);
+      setKdInflasi && setKdInflasi(false);
+      setKdStunting && setKdStunting(false);
+      setKdKemiskinan && setKdKemiskinan(false);
+      setKdPemilu && setKdPemilu(false);
+      setKdIkn && setKdIkn(false);
+      setKdPangan && setKdPangan(false);
+      setKdMBG && setKdMBG(false);
+    } else if (jenlap === "11") {
+      // Turn on MBG for jenlap 11 (Makan Bergizi Gratis)
+      setKdMBG && setKdMBG(true);
+      // Turn off other special filters for jenlap 11
+      setKdPN && setKdPN(false);
+      setKdPP && setKdPP(false);
+      setKdKegPP && setKdKegPP(false);
+      setKdPRI && setKdPRI(false);
+      setKdMP && setKdMP(false);
+      setKdTema && setKdTema(false);
+      setKdInflasi && setKdInflasi(false);
+      setKdStunting && setKdStunting(false);
+      setKdKemiskinan && setKdKemiskinan(false);
+      setKdPemilu && setKdPemilu(false);
+      setKdIkn && setKdIkn(false);
+      setKdPangan && setKdPangan(false);
     } else {
       // Turn off all special filters for other report types
       setKdPN && setKdPN(false);
@@ -558,6 +659,9 @@ const FilterSection = ({ inquiryState }) => {
       setKdStunting && setKdStunting(false);
       setKdKemiskinan && setKdKemiskinan(false);
       setKdPemilu && setKdPemilu(false);
+      setKdIkn && setKdIkn(false);
+      setKdPangan && setKdPangan(false);
+      setKdMBG && setKdMBG(false);
     }
   }, [jenlap]); // Only run when jenlap changes
 
@@ -765,8 +869,17 @@ const FilterSection = ({ inquiryState }) => {
       setAkunkondisi && setAkunkondisi("");
       setKataakun && setKataakun("");
       setAkunradio && setAkunradio("1");
+    } else if (kdakun && jenlap === "10") {
+      // For jenlap 10, ensure the specific codes are set and maintained
+      setAkunkondisi &&
+        setAkunkondisi(
+          "511521,511522,511529,521231,521232,521233,521234,526111,526112,526113,526114,526115,526121,526122,526123,526124,526131,526132,526311,526312,526313,526321,526322,526323"
+        );
+      setAkunradio && setAkunradio("1");
+      // Clear other akun fields for jenlap 10 since kondisi is predefined
+      setKataakun && setKataakun("");
     }
-  }, [kdakun, setAkun, setAkunkondisi, setKataakun, setAkunradio]);
+  }, [kdakun, jenlap, setAkun, setAkunkondisi, setKataakun, setAkunradio]);
 
   React.useEffect(() => {
     if (!kdsdana) {
@@ -882,6 +995,14 @@ const FilterSection = ({ inquiryState }) => {
     }
   }, [KdPemilu, setPemilu, setPemiluradio]);
 
+  React.useEffect(() => {
+    if (!KdMBG) {
+      // Reset MBG filter state
+      setmbg && setmbg("XX");
+      setmbgradio && setmbgradio("1");
+    }
+  }, [KdMBG, setmbg, setmbgradio]);
+
   // Set default filter switches based on report type (jenlap)
   React.useEffect(() => {
     if (!jenlap) return; // Don't do anything if jenlap is not set
@@ -904,7 +1025,7 @@ const FilterSection = ({ inquiryState }) => {
         kdgiat: false,
         kdoutput: false,
         kdsoutput: false,
-        kdakun: false,
+        kdakun: reportType === "10", // Turn on Akun for jenlap 10
         kdsdana: false,
         kdregister: false,
         // These switches are now controlled by jenlap-specific logic
@@ -1074,7 +1195,9 @@ const FilterSection = ({ inquiryState }) => {
             checked={kdakun}
             onChange={setKdakun}
             label="Akun"
-            disabled={disabledSwitches.includes("kdakun")}
+            disabled={
+              jenlap === "10" ? true : disabledSwitches.includes("kdakun")
+            }
           />
           {/* <FilterSwitch
             id="kdkomponen-filter"
@@ -1102,20 +1225,6 @@ const FilterSection = ({ inquiryState }) => {
             onChange={setKdregister}
             label="Register"
             disabled={disabledSwitches.includes("kdregister")}
-          />
-          <FilterSwitch
-            id="ikn-filter"
-            checked={kdIkn}
-            onChange={setKdIkn}
-            label="IKN"
-            disabled={disabledSwitches.includes("kdIkn")}
-          />
-          <FilterSwitch
-            id="pangan-filter"
-            checked={KdPangan}
-            onChange={setKdPangan}
-            label="Ketahanan Pangan"
-            disabled={disabledSwitches.includes("KdPangan")}
           />
         </div>
       </div>
@@ -1159,6 +1268,7 @@ const FilterSection = ({ inquiryState }) => {
         {KdPemilu && <PemiluFilter inquiryState={inquiryState} />}
         {kdIkn && <IknFilter inquiryState={inquiryState} />}
         {KdPangan && <PanganFilter inquiryState={inquiryState} />}
+        {KdMBG && <MBGFilter inquiryState={inquiryState} />}
       </div>
     </>
   );

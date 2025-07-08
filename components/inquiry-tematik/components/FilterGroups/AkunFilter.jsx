@@ -23,9 +23,10 @@ const AkunFilter = ({ inquiryState }) => {
   } = inquiryState;
 
   // Disable logic: kondisi disables kata, kata disables kondisi, pilih akun is never disabled
+  // Special case: for jenlap 10, kondisi should be disabled since it contains predefined codes
   const hasKondisiFilter = akunkondisi && akunkondisi.trim() !== "";
   const hasKataFilter = kataakun && kataakun.trim() !== "";
-  const isKondisiDisabled = hasKataFilter;
+  const isKondisiDisabled = hasKataFilter || jenlap === "10"; // Disable kondisi for jenlap 10
   const isKataDisabled = hasKondisiFilter;
 
   const AkunOptions = [
@@ -114,7 +115,7 @@ const AkunFilter = ({ inquiryState }) => {
                     </span>
                   </Tooltip>
                 </div>
-                {hasKondisiFilter && (
+                {hasKondisiFilter && jenlap !== "10" && (
                   <Button
                     size="sm"
                     variant="light"
