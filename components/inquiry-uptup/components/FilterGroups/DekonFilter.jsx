@@ -1,33 +1,37 @@
 import React from "react";
 import { Button, Input, Select, SelectItem, Tooltip } from "@heroui/react";
-import Kddept from "../../../referensi_belanja/referensi_inquiryMod/Kddept";
-import { Building, Info } from "lucide-react";
+import { Landmark, Info } from "lucide-react";
+import Kddekon from "../../../referensi_belanja/referensi_inquiryMod/Kddekon";
 
-const KementerianFilter = ({ inquiryState, status }) => {
-  // Use inquiryState for dept, deptradio, deptkondisi, katadept
+const DekonFilter = ({ inquiryState }) => {
+  // Use inquiryState for dekon, dekonkondisi, katadekon, dekonradio
   const {
-    dept,
-    setDept,
-    deptradio,
-    setDeptradio,
-    deptkondisi,
-    setDeptkondisi,
-    katadept,
-    setKatadept,
-  } = inquiryState || {};
+    dekon,
+    setDekon,
+    dekonkondisi,
+    setDekonkondisi,
+    katadekon,
+    setKatadekon,
+    dekonradio,
+    setDekonradio,
+  } = inquiryState;
 
   // Determine which filter type is currently active (priority order)
-  const hasKataFilter = katadept && katadept.trim() !== "";
-  const hasKondisiFilter = deptkondisi && deptkondisi.trim() !== "";
+  const hasKataFilter = katadekon && katadekon.trim() !== "";
+  const hasKondisiFilter = dekonkondisi && dekonkondisi.trim() !== "";
   const hasPilihFilter =
-    dept && dept !== "XXX" && dept !== "000" && dept !== "XX";
+    dekon &&
+    dekon !== "XXX" &&
+    dekon !== "XX" &&
+    dekon !== "000" &&
+    dekon.trim() !== "";
 
   // Disable other inputs based on active filter
-  const isKddeptDisabled = hasKataFilter || hasKondisiFilter;
+  const isKddekonDisabled = hasKataFilter || hasKondisiFilter;
   const isKondisiDisabled = hasKataFilter || hasPilihFilter;
   const isKataDisabled = hasKondisiFilter || hasPilihFilter;
-
-  const KementerianOptions = [
+  // 4 display options, matching the other filters
+  const DekonOptions = [
     { value: "1", label: "Kode" },
     { value: "2", label: "Kode Uraian" },
     { value: "3", label: "Uraian" },
@@ -35,48 +39,48 @@ const KementerianFilter = ({ inquiryState, status }) => {
   ];
 
   return (
-    <div className="p-3 sm:mx-16 rounded-2xl bg-gradient-to-r from-pink-100 to-rose-100 dark:from-zinc-900 dark:to-zinc-900 shadow-sm">
+    <div className="p-3 sm:mx-16 rounded-2xl bg-gradient-to-r from-green-100 to-emerald-100 dark:from-zinc-900 dark:to-zinc-900 shadow-sm">
       {/* Mobile/Tablet: Stack vertically, Desktop: Row layout */}
       <div className="flex flex-col lg:flex-row lg:items-center gap-4 w-full">
         {/* Title - Full width on mobile, fixed width on desktop */}
         <h6 className="font-semibold flex items-center gap-2 lg:min-w-[100px] lg:flex-[2]">
-          <Building size={20} className="ml-4 text-secondary" />
-          Kementerian
+          <Landmark size={20} className="ml-4 text-secondary" />
+          Kewenangan
         </h6>{" "}
         {/* Form fields container */}
         <div className="flex flex-col lg:flex-[8] gap-3 lg:gap-1 w-full">
           {/* Fields: Stack on mobile/tablet, row on large desktop */}
           <div className="flex flex-col xl:flex xl:flex-row xl:items-end gap-3 xl:gap-4 w-full">
-            {" "}
-            {/* Kddept */}
+            {/* Kddekon */}
             <div className="flex flex-col gap-1 w-full xl:flex-1 min-w-0 max-w-full overflow-hidden">
               <div className="flex items-center justify-between">
                 <label
                   className={`text-sm font-medium ${
-                    isKddeptDisabled ? "text-gray-400" : "text-gray-700"
+                    isKddekonDisabled ? "text-gray-400" : "text-gray-700"
                   }`}
                 >
-                  Pilih Kementerian
+                  Pilih Kewenangan
                 </label>
-                {hasPilihFilter && !isKddeptDisabled && (
+
+                {hasPilihFilter && !isKddekonDisabled && (
                   <Button
                     size="sm"
                     variant="light"
                     color="warning"
                     className="h-6 px-2 text-xs"
-                    onPress={() => setDept && setDept("000")}
+                    onPress={() => setDekon && setDekon("XX")}
                   >
                     Clear
                   </Button>
                 )}
               </div>
-              <Kddept
-                value={dept}
-                onChange={setDept}
+              <Kddekon
+                value={dekon}
+                onChange={setDekon}
                 className="w-full min-w-0 max-w-full"
                 size="sm"
-                status={status}
-                isDisabled={isKddeptDisabled}
+                status="pilihdekon"
+                isDisabled={isKddekonDisabled}
               />
             </div>
             {/* Kondisi */}
@@ -118,30 +122,27 @@ const KementerianFilter = ({ inquiryState, status }) => {
                     </span>
                   </Tooltip>
                 </div>
-
                 {hasKondisiFilter && !isKondisiDisabled && (
                   <Button
                     size="sm"
                     variant="light"
                     color="warning"
                     className="h-6 px-2 text-xs"
-                    onPress={() => setDeptkondisi && setDeptkondisi("")}
+                    onPress={() => setDekonkondisi && setDekonkondisi("")}
                   >
                     Clear
                   </Button>
                 )}
               </div>
-
               <Input
-                placeholder="misalkan: 001,002,003, dst"
+                placeholder="misalkan: DK,TP,UB, dst"
                 className="w-full min-w-0"
                 size="sm"
-                value={deptkondisi || ""}
+                value={dekonkondisi || ""}
                 isDisabled={isKondisiDisabled}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setDeptkondisi && setDeptkondisi(value);
-                }}
+                onChange={(e) =>
+                  setDekonkondisi && setDekonkondisi(e.target.value)
+                }
               />
             </div>
             {/* Kata */}
@@ -160,22 +161,19 @@ const KementerianFilter = ({ inquiryState, status }) => {
                     variant="light"
                     color="warning"
                     className="h-6 px-2 text-xs"
-                    onPress={() => setKatadept && setKatadept("")}
+                    onPress={() => setKatadekon && setKatadekon("")}
                   >
                     Clear
                   </Button>
                 )}
               </div>
               <Input
-                placeholder="misalkan: keuangan"
+                placeholder="misalkan: dekonsentrasi"
                 className="w-full min-w-0"
                 size="sm"
-                value={katadept || ""}
+                value={katadekon || ""}
                 isDisabled={isKataDisabled}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setKatadept && setKatadept(value);
-                }}
+                onChange={(e) => setKatadekon && setKatadekon(e.target.value)}
               />
             </div>
             {/* Jenis Tampilan */}
@@ -187,21 +185,17 @@ const KementerianFilter = ({ inquiryState, status }) => {
                 aria-label="Pilih tampilan"
                 className="w-full min-w-0"
                 size="sm"
-                selectedKeys={[deptradio || "1"]}
-                onSelectionChange={(key) => {
-                  let selected = key;
-                  if (key && typeof key !== "string" && key.size) {
-                    selected = Array.from(key)[0];
+                selectedKeys={new Set([dekonradio])}
+                onSelectionChange={(keys) => {
+                  // HeroUI Select passes a Set object
+                  const selected = Array.from(keys)[0];
+                  if (selected) {
+                    setDekonradio(selected);
                   }
-                  if (!selected) {
-                    setDeptradio && setDeptradio("1");
-                    return;
-                  }
-                  setDeptradio && setDeptradio(selected);
                 }}
                 disallowEmptySelection
               >
-                {KementerianOptions.map((opt) => (
+                {DekonOptions.map((opt) => (
                   <SelectItem key={opt.value} textValue={opt.label}>
                     {opt.label}
                   </SelectItem>
@@ -209,9 +203,10 @@ const KementerianFilter = ({ inquiryState, status }) => {
               </Select>
             </div>
           </div>
+
           {/* Helper text row - only show on extra large screens */}
           <div className="hidden xl:flex xl:flex-row gap-4 w-full">
-            {/* Spacer for Kddept */}
+            {/* Spacer for Kddekon */}
             <div className="flex-1"></div>
             {/* Spacer for Kata */}
             <div className="flex-1"></div>
@@ -224,4 +219,4 @@ const KementerianFilter = ({ inquiryState, status }) => {
   );
 };
 
-export default KementerianFilter;
+export default DekonFilter;

@@ -1,82 +1,89 @@
 import React from "react";
 import { Button, Input, Select, SelectItem, Tooltip } from "@heroui/react";
-import Kddept from "../../../referensi_belanja/referensi_inquiryMod/Kddept";
-import { Building, Info } from "lucide-react";
+import { Map, Info } from "lucide-react";
+import Kdkabkota from "../../../referensi_belanja/referensi_inquiryMod/Kdkabkota";
 
-const KementerianFilter = ({ inquiryState, status }) => {
-  // Use inquiryState for dept, deptradio, deptkondisi, katadept
+const KabkotaFilter = ({ inquiryState }) => {
   const {
-    dept,
-    setDept,
-    deptradio,
-    setDeptradio,
-    deptkondisi,
-    setDeptkondisi,
-    katadept,
-    setKatadept,
-  } = inquiryState || {};
+    kabkota,
+    setKabkota,
+    prov,
+    kabkotakondisi,
+    setKabkotakondisi,
+    katakabkota,
+    setKatakabkota,
+    kabkotaradio,
+    setKabkotaradio,
+  } = inquiryState;
 
   // Determine which filter type is currently active (priority order)
-  const hasKataFilter = katadept && katadept.trim() !== "";
-  const hasKondisiFilter = deptkondisi && deptkondisi.trim() !== "";
+  const hasKataFilter = katakabkota && katakabkota.trim() !== "";
+  const hasKondisiFilter = kabkotakondisi && kabkotakondisi.trim() !== "";
   const hasPilihFilter =
-    dept && dept !== "XXX" && dept !== "000" && dept !== "XX";
+    kabkota && kabkota !== "XXX" && kabkota !== "XX" && kabkota !== "XX";
 
   // Disable other inputs based on active filter
-  const isKddeptDisabled = hasKataFilter || hasKondisiFilter;
+  const isPilihDisabled = hasKataFilter || hasKondisiFilter;
   const isKondisiDisabled = hasKataFilter || hasPilihFilter;
-  const isKataDisabled = hasKondisiFilter || hasPilihFilter;
+  const isKataDisabled = hasKondisiFilter || hasPilihFilter; // When the province changes, reset the selected kabkota to "Semua Kabupaten/Kota"
+  React.useEffect(() => {
+    if (setKabkota) {
+      setKabkota("XX");
+    }
+  }, [prov, setKabkota]);
 
-  const KementerianOptions = [
+  const KabkotaOptions = [
     { value: "1", label: "Kode" },
     { value: "2", label: "Kode Uraian" },
     { value: "3", label: "Uraian" },
     { value: "4", label: "Jangan Tampilkan" },
   ];
-
   return (
-    <div className="p-3 sm:mx-16 rounded-2xl bg-gradient-to-r from-pink-100 to-rose-100 dark:from-zinc-900 dark:to-zinc-900 shadow-sm">
+    <div className="p-3 sm:mx-16 rounded-2xl bg-gradient-to-r from-sky-100 to-teal-100 dark:from-zinc-900 dark:to-zinc-900 shadow-sm">
       {/* Mobile/Tablet: Stack vertically, Desktop: Row layout */}
       <div className="flex flex-col lg:flex-row lg:items-center gap-4 w-full">
-        {/* Title - Full width on mobile, fixed width on desktop */}
+        {/* Title - Full width on mobile, fixed width on desktop */}{" "}
         <h6 className="font-semibold flex items-center gap-2 lg:min-w-[100px] lg:flex-[2]">
-          <Building size={20} className="ml-4 text-secondary" />
-          Kementerian
-        </h6>{" "}
+          <Map size={20} className="ml-4 text-secondary" />
+          Kabupaten/Kota
+        </h6>
         {/* Form fields container */}
         <div className="flex flex-col lg:flex-[8] gap-3 lg:gap-1 w-full">
           {/* Fields: Stack on mobile/tablet, row on large desktop */}
           <div className="flex flex-col xl:flex xl:flex-row xl:items-end gap-3 xl:gap-4 w-full">
-            {" "}
-            {/* Kddept */}
+            {/* Kdkabkota */}
             <div className="flex flex-col gap-1 w-full xl:flex-1 min-w-0 max-w-full overflow-hidden">
               <div className="flex items-center justify-between">
                 <label
                   className={`text-sm font-medium ${
-                    isKddeptDisabled ? "text-gray-400" : "text-gray-700"
+                    isPilihDisabled ? "text-gray-400" : "text-gray-700"
                   }`}
                 >
-                  Pilih Kementerian
+                  Pilih Kabupaten/Kota
                 </label>
-                {hasPilihFilter && !isKddeptDisabled && (
+                {hasPilihFilter && !isPilihDisabled && (
                   <Button
                     size="sm"
                     variant="light"
                     color="warning"
                     className="h-6 px-2 text-xs"
-                    onPress={() => setDept && setDept("000")}
+                    onPress={() => setKabkota && setKabkota("XX")}
                   >
                     Clear
                   </Button>
                 )}
               </div>
-              <Kddept
-                value={dept}
-                onChange={setDept}
+              <Kdkabkota
+                value={kabkota}
+                onChange={
+                  setKabkota || (() => console.warn("setKabkota is undefined"))
+                }
+                kdlokasi={prov}
                 className="w-full min-w-0 max-w-full"
                 size="sm"
-                status={status}
-                isDisabled={isKddeptDisabled}
+                placeholder="Pilih Kabupaten/Kota"
+                status="pilihkdkabkota"
+                isDisabled={isPilihDisabled}
               />
             </div>
             {/* Kondisi */}
@@ -124,8 +131,8 @@ const KementerianFilter = ({ inquiryState, status }) => {
                     size="sm"
                     variant="light"
                     color="warning"
-                    className="h-6 px-2 text-xs"
-                    onPress={() => setDeptkondisi && setDeptkondisi("")}
+                    className="h-6 px-2 text-xs flex-shrink-0"
+                    onPress={() => setKabkotakondisi && setKabkotakondisi("")}
                   >
                     Clear
                   </Button>
@@ -133,15 +140,14 @@ const KementerianFilter = ({ inquiryState, status }) => {
               </div>
 
               <Input
-                placeholder="misalkan: 001,002,003, dst"
+                placeholder="misalkan: 01,02,03, dst"
                 className="w-full min-w-0"
                 size="sm"
-                value={deptkondisi || ""}
+                value={kabkotakondisi || ""}
                 isDisabled={isKondisiDisabled}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setDeptkondisi && setDeptkondisi(value);
-                }}
+                onChange={(e) =>
+                  setKabkotakondisi && setKabkotakondisi(e.target.value)
+                }
               />
             </div>
             {/* Kata */}
@@ -160,22 +166,21 @@ const KementerianFilter = ({ inquiryState, status }) => {
                     variant="light"
                     color="warning"
                     className="h-6 px-2 text-xs"
-                    onPress={() => setKatadept && setKatadept("")}
+                    onPress={() => setKatakabkota && setKatakabkota("")}
                   >
                     Clear
                   </Button>
                 )}
               </div>
               <Input
-                placeholder="misalkan: keuangan"
+                placeholder="misalkan: jakarta"
                 className="w-full min-w-0"
                 size="sm"
-                value={katadept || ""}
+                value={katakabkota || ""}
                 isDisabled={isKataDisabled}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setKatadept && setKatadept(value);
-                }}
+                onChange={(e) =>
+                  setKatakabkota && setKatakabkota(e.target.value)
+                }
               />
             </div>
             {/* Jenis Tampilan */}
@@ -187,21 +192,33 @@ const KementerianFilter = ({ inquiryState, status }) => {
                 aria-label="Pilih tampilan"
                 className="w-full min-w-0"
                 size="sm"
-                selectedKeys={[deptradio || "1"]}
+                selectedKeys={[kabkotaradio || "1"]}
                 onSelectionChange={(key) => {
                   let selected = key;
                   if (key && typeof key !== "string" && key.size) {
                     selected = Array.from(key)[0];
                   }
+
+                  // Clean up the weird $.X format that HeroUI sometimes uses
+                  if (
+                    typeof selected === "string" &&
+                    selected.startsWith("$.")
+                  ) {
+                    selected = selected.replace("$.", "");
+                  }
+
                   if (!selected) {
-                    setDeptradio && setDeptradio("1");
+                    setKabkotaradio && setKabkotaradio("1");
                     return;
                   }
-                  setDeptradio && setDeptradio(selected);
+
+                  if (setKabkotaradio) {
+                    setKabkotaradio(selected);
+                  }
                 }}
                 disallowEmptySelection
               >
-                {KementerianOptions.map((opt) => (
+                {KabkotaOptions.map((opt) => (
                   <SelectItem key={opt.value} textValue={opt.label}>
                     {opt.label}
                   </SelectItem>
@@ -213,6 +230,7 @@ const KementerianFilter = ({ inquiryState, status }) => {
           <div className="hidden xl:flex xl:flex-row gap-4 w-full">
             {/* Spacer for Kddept */}
             <div className="flex-1"></div>
+
             {/* Spacer for Kata */}
             <div className="flex-1"></div>
             {/* Spacer for Jenis Tampilan */}
@@ -224,4 +242,4 @@ const KementerianFilter = ({ inquiryState, status }) => {
   );
 };
 
-export default KementerianFilter;
+export default KabkotaFilter;

@@ -16,7 +16,7 @@ const ReportTypeSelector = ({ inquiryState, onFilterChange }) => {
 
   // --- FALLBACK STATE FOR BACKWARDS COMPATIBILITY ---
   const [localThang, setLocalThang] = React.useState("2025");
-  const [localJenlap, setLocalJenlap] = React.useState("2");
+  const [localJenlap, setLocalJenlap] = React.useState("1");
   const [localPembulatan, setLocalPembulatan] = React.useState("1");
 
   // Use inquiryState values if available, otherwise use local state
@@ -45,24 +45,10 @@ const ReportTypeSelector = ({ inquiryState, onFilterChange }) => {
   }, [currentThang, currentJenlap, currentPembulatan, onFilterChange]);
 
   // Available years for selection
-  const Tahun = [
-    "2025",
-    "2024",
-    "2023",
-    "2022",
-    "2021",
-    "2020",
-    "2019",
-    "2018",
-    "2017",
-    "2016",
-  ];
+  const Tahun = ["2025", "2024", "2023", "2022", "2021", "2020", "2019"];
 
-  // Only two report types for inquiry-kontrak
-  const jenlapOpt = [
-    { value: "1", label: "Data Semua Kontrak" },
-    { value: "2", label: "Data Kontrak Valas" },
-  ];
+  // Only one report type for inquiry-uptup
+  const jenlapOpt = [{ value: "1", label: "Outstanding UP/TUP" }];
 
   // Akumulatif options
   const akumulatifOpt = [
@@ -87,7 +73,7 @@ const ReportTypeSelector = ({ inquiryState, onFilterChange }) => {
 
   return (
     <div className="mb-4">
-      <div className="w-full p-3 mb-4 sm:p-4 bg-gradient-to-r from-pink-100 to-rose-100 dark:from-zinc-900 dark:to-zinc-900 shadow-none rounded-2xl">
+      <div className="w-full p-3 mb-4 sm:p-4 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-zinc-900 dark:to-zinc-900 shadow-none rounded-2xl">
         {/* <h5 className="text-lg font-semibold mb-4">Report Settings</h5> */}
 
         <div className="flex flex-col md:flex-row gap-6 w-full">
