@@ -11,8 +11,10 @@
  * 6. Kemiskinan - kemiskinan_ekstrim with monthly breakdown
  * 7. Blokir Bulanan - monthly blokir breakdown
  * 8. Volume Output Kegiatan (Data Caput) - satuan, volume, monthly physical progress
- * 9. Pergerakan Blokir Bulanan per Jenis - kdblokir, nmblokir, monthly breakdown
- * 10-12. Reserved for Future Use - default structure with special filter support
+ * 9. Ketahanan Pangan - pangan with monthly breakdown
+ * 10. Reserved for Future Use - default structure with special filter support
+ * 11. MBG (Makan Bergizi Gratis) - mbg with monthly breakdown
+ * 12. Swasembada Pangan - swasembada with monthly breakdown and special WHERE condition
  */
 
 import FilterBuilder from "./FilterBuilder";
@@ -140,119 +142,64 @@ class QueryBuilder {
     let dynamicFrom = "";
     let dynamicSelect = "";
 
-    // Debug logging to check jenlap value
-    console.log("🔍 QueryBuilder Debug:", {
-      jenlap,
-      jenlapType: typeof jenlap,
-      allParams: Object.keys(params).filter(
-        (key) =>
-          key.includes("jenlap") ||
-          key.includes("kemis") ||
-          key.includes("Miskin")
-      ),
-    });
-
     switch (jenlap) {
       case "1":
-        console.log("📊 Using jenlap 1 (Proyek Nasional - PN)");
-        console.log("🔍 Jenlap 1 Radio Values:", {
-          pnradio: params.pnradio,
-          ppradio: params.ppradio,
-          kegiatanprioritasradio: params.kegiatanprioritasradio,
-          priradio: params.priradio,
-        });
         dynamicFrom = `monev${thang}.a_pagu_real_bkpk_dja_${thang} a`;
         // For jenlap=1, we need to build priority columns dynamically based on Jenis Tampilan radio values
         const priorityColumns = this.buildJenlap1PriorityColumns(params);
-        console.log("🔍 Built priority columns:", priorityColumns);
         dynamicSelect = `${priorityColumns}, ROUND(sum(a.pagu)/${pembulatan},0) AS PAGU, ROUND(SUM(real1)/${pembulatan},0) AS JAN, ROUND(SUM(real2)/${pembulatan}, 0) AS FEB, ROUND(SUM(real3)/${pembulatan}, 0) AS MAR, ROUND(SUM(real4)/${pembulatan}, 0) AS APR, ROUND(SUM(real5)/${pembulatan}, 0) AS MEI, ROUND(SUM(real6)/${pembulatan}, 0) AS JUN, ROUND(SUM(real7)/${pembulatan}, 0) AS JUL, ROUND(SUM(real8)/${pembulatan}, 0) AS AGS, ROUND(SUM(real9)/${pembulatan}, 0) AS SEP, ROUND(SUM(real10)/${pembulatan}, 0) AS OKT, ROUND(SUM(real11)/${pembulatan}, 0) AS NOV, ROUND(SUM(real12)/${pembulatan}, 0) AS DES, ROUND(SUM(a.blokir) /${pembulatan},0) AS BLOKIR`;
         break;
       case "2":
-        console.log("📊 Using jenlap 2 (Major Project)");
         dynamicFrom = `monev${thang}.a_pagu_real_bkpk_dja_${thang} a`;
         dynamicSelect = `, ROUND(sum(a.pagu)/${pembulatan},0) AS PAGU, ROUND(SUM(real1)/${pembulatan},0) AS JAN, ROUND(SUM(real2)/${pembulatan}, 0) AS FEB, ROUND(SUM(real3)/${pembulatan}, 0) AS MAR, ROUND(SUM(real4)/${pembulatan}, 0) AS APR, ROUND(SUM(real5)/${pembulatan}, 0) AS MEI, ROUND(SUM(real6)/${pembulatan}, 0) AS JUN, ROUND(SUM(real7)/${pembulatan}, 0) AS JUL, ROUND(SUM(real8)/${pembulatan}, 0) AS AGS, ROUND(SUM(real9)/${pembulatan}, 0) AS SEP, ROUND(SUM(real10)/${pembulatan}, 0) AS OKT, ROUND(SUM(real11)/${pembulatan}, 0) AS NOV, ROUND(SUM(real12)/${pembulatan}, 0) AS DES, ROUND(SUM(a.blokir) /${pembulatan},0) AS BLOKIR`;
         break;
       case "3":
-        console.log("📊 Using jenlap 3 (Tematik Anggaran)");
         dynamicFrom = `monev${thang}.a_pagu_real_bkpk_dja_${thang} a`;
         dynamicSelect = `, ROUND(sum(a.pagu)/${pembulatan},0) AS PAGU, ROUND(SUM(real1)/${pembulatan},0) AS JAN, ROUND(SUM(real2)/${pembulatan}, 0) AS FEB, ROUND(SUM(real3)/${pembulatan}, 0) AS MAR, ROUND(SUM(real4)/${pembulatan}, 0) AS APR, ROUND(SUM(real5)/${pembulatan}, 0) AS MEI, ROUND(SUM(real6)/${pembulatan}, 0) AS JUN, ROUND(SUM(real7)/${pembulatan}, 0) AS JUL, ROUND(SUM(real8)/${pembulatan}, 0) AS AGS, ROUND(SUM(real9)/${pembulatan}, 0) AS SEP, ROUND(SUM(real10)/${pembulatan}, 0) AS OKT, ROUND(SUM(real11)/${pembulatan}, 0) AS NOV, ROUND(SUM(real12)/${pembulatan}, 0) AS DES, ROUND(SUM(a.blokir) /${pembulatan},0) AS BLOKIR`;
         break;
       case "4":
-        console.log("📊 Using jenlap 4 (Inflasi)");
-        console.log("🔍 Jenlap 4 Radio Values:", {
-          inflasiradio: params.inflasiradio,
-          infintervensiradio: params.infintervensiradio,
-          jenistampilanradio: params.jenistampilanradio,
-          allParams: Object.keys(params),
-        });
         // For jenlap 4 (Inflasi), use the bkpk_dja table instead of regular tables
         dynamicFrom = `monev${thang}.a_pagu_real_bkpk_dja_${thang} a`;
         // Build inflasi-specific SELECT clause with dynamic columns based on Jenis Tampilan radio values
         const inflasiColumns = this.buildJenlap4InflasiColumns(params);
-        console.log("🔍 Built inflasi columns:", inflasiColumns);
         dynamicSelect = `${inflasiColumns}, ROUND(sum(a.pagu)/${pembulatan},0) AS PAGU, ROUND(SUM(real1)/${pembulatan},0) AS JAN, ROUND(SUM(real2)/${pembulatan}, 0) AS FEB, ROUND(SUM(real3)/${pembulatan}, 0) AS MAR, ROUND(SUM(real4)/${pembulatan}, 0) AS APR, ROUND(SUM(real5)/${pembulatan}, 0) AS MEI, ROUND(SUM(real6)/${pembulatan}, 0) AS JUN, ROUND(SUM(real7)/${pembulatan}, 0) AS JUL, ROUND(SUM(real8)/${pembulatan}, 0) AS AGS, ROUND(SUM(real9)/${pembulatan}, 0) AS SEP, ROUND(SUM(real10)/${pembulatan}, 0) AS OKT, ROUND(SUM(real11)/${pembulatan}, 0) AS NOV, ROUND(SUM(real12)/${pembulatan}, 0) AS DES, ROUND(SUM(a.blokir)/${pembulatan},0) AS BLOKIR`;
         break;
       case "5":
-        console.log("📊 Using jenlap 5 (Stunting)");
-        console.log("🔍 Jenlap 5 Radio Values:", {
-          stuntingradio: params.stuntingradio,
-          jenistampilanradio: params.jenistampilanradio,
-        });
         dynamicFrom = `monev${thang}.a_pagu_real_bkpk_dja_${thang}_stunting a`;
         // Build stunting-specific SELECT clause with dynamic columns based on Jenis Tampilan radio values
         const stuntingColumns = this.buildJenlap5StuntingColumns(params);
-        console.log("🔍 Built stunting columns:", stuntingColumns);
         dynamicSelect = `${stuntingColumns}, ROUND(sum(a.pagu)/${pembulatan},0) AS PAGU, ROUND(SUM(real1)/${pembulatan},0) AS JAN, ROUND(SUM(real2)/${pembulatan}, 0) AS FEB, ROUND(SUM(real3)/${pembulatan}, 0) AS MAR, ROUND(SUM(real4)/${pembulatan}, 0) AS APR, ROUND(SUM(real5)/${pembulatan}, 0) AS MEI, ROUND(SUM(real6)/${pembulatan}, 0) AS JUN, ROUND(SUM(real7)/${pembulatan}, 0) AS JUL, ROUND(SUM(real8)/${pembulatan}, 0) AS AGS, ROUND(SUM(real9)/${pembulatan}, 0) AS SEP, ROUND(SUM(real10)/${pembulatan}, 0) AS OKT, ROUND(SUM(real11)/${pembulatan}, 0) AS NOV, ROUND(SUM(real12)/${pembulatan}, 0) AS DES, ROUND(SUM(a.blokir)/${pembulatan},0) AS BLOKIR`;
         break;
       case "6":
-        console.log("📊 Using jenlap 6 (Kemiskinan)");
-        console.log("🔍 Jenlap 6 Radio Values:", {
-          kemiskinanradio: params.kemiskinanradio,
-          jenistampilanradio: params.jenistampilanradio,
-          allParams: Object.keys(params).filter(
-            (key) => key.includes("kemis") || key.includes("Miskin")
-          ),
-        });
         dynamicFrom = `monev${thang}.a_pagu_real_bkpk_dja_${thang} a`;
         dynamicSelect = `a.kemiskinan_ekstrim, ROUND(sum(a.pagu)/${pembulatan},0) AS PAGU, ROUND(SUM(real1)/${pembulatan},0) AS JAN, ROUND(SUM(real2)/${pembulatan}, 0) AS FEB, ROUND(SUM(real3)/${pembulatan}, 0) AS MAR, ROUND(SUM(real4)/${pembulatan}, 0) AS APR, ROUND(SUM(real5)/${pembulatan}, 0) AS MEI, ROUND(SUM(real6)/${pembulatan}, 0) AS JUN, ROUND(SUM(real7)/${pembulatan}, 0) AS JUL, ROUND(SUM(real8)/${pembulatan}, 0) AS AGS, ROUND(SUM(real9)/${pembulatan}, 0) AS SEP, ROUND(SUM(real10)/${pembulatan}, 0) AS OKT, ROUND(SUM(real11)/${pembulatan}, 0) AS NOV, ROUND(SUM(real12)/${pembulatan}, 0) AS DES, ROUND(SUM(a.blokir)/${pembulatan},0) AS BLOKIR`;
         break;
       case "7":
-        console.log("📊 Using jenlap 7 (Belanja Pemilu)");
         dynamicFrom = `monev${thang}.a_pagu_real_bkpk_dja_${thang} a`;
         dynamicSelect = `a.pemilu, ROUND(sum(a.pagu)/${pembulatan},0) AS PAGU, ROUND(SUM(real1)/${pembulatan},0) AS JAN, ROUND(SUM(real2)/${pembulatan}, 0) AS FEB, ROUND(SUM(real3)/${pembulatan}, 0) AS MAR, ROUND(SUM(real4)/${pembulatan}, 0) AS APR, ROUND(SUM(real5)/${pembulatan}, 0) AS MEI, ROUND(SUM(real6)/${pembulatan}, 0) AS JUN, ROUND(SUM(real7)/${pembulatan}, 0) AS JUL, ROUND(SUM(real8)/${pembulatan}, 0) AS AGS, ROUND(SUM(real9)/${pembulatan}, 0) AS SEP, ROUND(SUM(real10)/${pembulatan}, 0) AS OKT, ROUND(SUM(real11)/${pembulatan}, 0) AS NOV, ROUND(SUM(real12)/${pembulatan}, 0) AS DES, ROUND(SUM(a.blokir)/${pembulatan},0) AS BLOKIR`;
         break;
       case "8":
-        console.log("📊 Using jenlap 8 (Volume Output Kegiatan - Data Caput)");
-        dynamicFrom = fromcaput;
-        dynamicSelect = jenlap8Select;
+        dynamicFrom = `monev${thang}.a_pagu_real_bkpk_dja_${thang} a`;
+        dynamicSelect = `a.ikn, ROUND(sum(a.pagu)/${pembulatan},0) AS PAGU, ROUND(SUM(real1)/${pembulatan},0) AS JAN, ROUND(SUM(real2)/${pembulatan}, 0) AS FEB, ROUND(SUM(real3)/${pembulatan}, 0) AS MAR, ROUND(SUM(real4)/${pembulatan}, 0) AS APR, ROUND(SUM(real5)/${pembulatan}, 0) AS MEI, ROUND(SUM(real6)/${pembulatan}, 0) AS JUN, ROUND(SUM(real7)/${pembulatan}, 0) AS JUL, ROUND(SUM(real8)/${pembulatan}, 0) AS AGS, ROUND(SUM(real9)/${pembulatan}, 0) AS SEP, ROUND(SUM(real10)/${pembulatan}, 0) AS OKT, ROUND(SUM(real11)/${pembulatan}, 0) AS NOV, ROUND(SUM(real12)/${pembulatan}, 0) AS DES, ROUND(SUM(a.blokir)/${pembulatan},0) AS BLOKIR`;
         break;
       case "9":
-        console.log("📊 Using jenlap 9 (Pergerakan Blokir Bulanan per Jenis)");
-        dynamicFrom = fromJnsblokir;
-        dynamicSelect = blokirBulananSelect;
-        break;
-      case "9":
-        console.log("📊 Using jenlap 9 (Reserved for Future Use)");
-        dynamicFrom = currentTable;
-        dynamicSelect = pagu + blokir;
+        dynamicFrom = `monev${thang}.a_pagu_real_bkpk_dja_${thang} a`;
+        dynamicSelect = `a.pangan, ROUND(sum(a.pagu)/${pembulatan},0) AS PAGU, ROUND(SUM(real1)/${pembulatan},0) AS JAN, ROUND(SUM(real2)/${pembulatan}, 0) AS FEB, ROUND(SUM(real3)/${pembulatan}, 0) AS MAR, ROUND(SUM(real4)/${pembulatan}, 0) AS APR, ROUND(SUM(real5)/${pembulatan}, 0) AS MEI, ROUND(SUM(real6)/${pembulatan}, 0) AS JUN, ROUND(SUM(real7)/${pembulatan}, 0) AS JUL, ROUND(SUM(real8)/${pembulatan}, 0) AS AGS, ROUND(SUM(real9)/${pembulatan}, 0) AS SEP, ROUND(SUM(real10)/${pembulatan}, 0) AS OKT, ROUND(SUM(real11)/${pembulatan}, 0) AS NOV, ROUND(SUM(real12)/${pembulatan}, 0) AS DES, ROUND(SUM(a.blokir)/${pembulatan},0) AS BLOKIR`;
         break;
       case "10":
-        console.log("📊 Using jenlap 10 (Reserved for Future Use)");
-        dynamicFrom = currentTable;
-        dynamicSelect = pagu + blokir;
+        dynamicFrom = `monev${thang}.a_pagu_real_bkpk_dja_${thang} a`;
+        dynamicSelect = `, ROUND(sum(a.pagu)/${pembulatan},0) AS PAGU, ROUND(SUM(real1)/${pembulatan},0) AS JAN, ROUND(SUM(real2)/${pembulatan}, 0) AS FEB, ROUND(SUM(real3)/${pembulatan}, 0) AS MAR, ROUND(SUM(real4)/${pembulatan}, 0) AS APR, ROUND(SUM(real5)/${pembulatan}, 0) AS MEI, ROUND(SUM(real6)/${pembulatan}, 0) AS JUN, ROUND(SUM(real7)/${pembulatan}, 0) AS JUL, ROUND(SUM(real8)/${pembulatan}, 0) AS AGS, ROUND(SUM(real9)/${pembulatan}, 0) AS SEP, ROUND(SUM(real10)/${pembulatan}, 0) AS OKT, ROUND(SUM(real11)/${pembulatan}, 0) AS NOV, ROUND(SUM(real12)/${pembulatan}, 0) AS DES, ROUND(SUM(a.blokir)/${pembulatan},0) AS BLOKIR`;
         break;
       case "11":
-        console.log("📊 Using jenlap 11 (Reserved for Future Use)");
-        dynamicFrom = currentTable;
-        dynamicSelect = pagu + blokir;
+        dynamicFrom = `monev${thang}.a_pagu_real_bkpk_dja_${thang} a`;
+        dynamicSelect = `ROUND(sum(a.pagu)/${pembulatan},0) AS PAGU, ROUND(SUM(real1)/${pembulatan},0) AS JAN, ROUND(SUM(real2)/${pembulatan}, 0) AS FEB, ROUND(SUM(real3)/${pembulatan}, 0) AS MAR, ROUND(SUM(real4)/${pembulatan}, 0) AS APR, ROUND(SUM(real5)/${pembulatan}, 0) AS MEI, ROUND(SUM(real6)/${pembulatan}, 0) AS JUN, ROUND(SUM(real7)/${pembulatan}, 0) AS JUL, ROUND(SUM(real8)/${pembulatan}, 0) AS AGS, ROUND(SUM(real9)/${pembulatan}, 0) AS SEP, ROUND(SUM(real10)/${pembulatan}, 0) AS OKT, ROUND(SUM(real11)/${pembulatan}, 0) AS NOV, ROUND(SUM(real12)/${pembulatan}, 0) AS DES, ROUND(SUM(a.blokir)/${pembulatan},0) AS BLOKIR`;
         break;
       case "12":
-        console.log("📊 Using jenlap 12 (Reserved for Future Use)");
-        dynamicFrom = currentTable;
-        dynamicSelect = pagu + blokir;
+        // jenlap 12 (Swasembada Pangan) - Special table and WHERE condition
+        dynamicFrom = `monev${thang}.a_pagu_real_bkpk_dja_${thang} a`;
+        dynamicSelect = `, a.swasembada, ROUND(sum(a.pagu)/${pembulatan},0) AS PAGU, ROUND(SUM(real1)/${pembulatan},0) AS JAN, ROUND(SUM(real2)/${pembulatan}, 0) AS FEB, ROUND(SUM(real3)/${pembulatan}, 0) AS MAR, ROUND(SUM(real4)/${pembulatan}, 0) AS APR, ROUND(SUM(real5)/${pembulatan}, 0) AS MEI, ROUND(SUM(real6)/${pembulatan}, 0) AS JUN, ROUND(SUM(real7)/${pembulatan}, 0) AS JUL, ROUND(SUM(real8)/${pembulatan}, 0) AS AGS, ROUND(SUM(real9)/${pembulatan}, 0) AS SEP, ROUND(SUM(real10)/${pembulatan}, 0) AS OKT, ROUND(SUM(real11)/${pembulatan}, 0) AS NOV, ROUND(SUM(real12)/${pembulatan}, 0) AS DES, ROUND(SUM(a.blokir)/${pembulatan},0) AS BLOKIR`;
         break;
       default:
-        console.log("📊 Using default jenlap");
         dynamicFrom = currentTable;
         dynamicSelect = pagu + blokir;
         break;
@@ -435,13 +382,41 @@ class QueryBuilder {
   }
 
   /**
+   * Remove duplicate GROUP BY fields
+   * @param {string[]} groupByFields - Array of GROUP BY fields
+   * @returns {string[]} - Deduplicated GROUP BY fields
+   */
+  deduplicateGroupByFields(groupByFields) {
+    if (!groupByFields || groupByFields.length === 0) {
+      return [];
+    }
+
+    // Use Set to remove duplicates while preserving order with Array.from
+    const uniqueFields = new Set();
+    const result = [];
+
+    groupByFields.forEach((field) => {
+      if (field && field.trim() !== "") {
+        // Normalize the field by removing extra spaces and converting to consistent case
+        const normalizedField = field.trim().replace(/\s+/g, " ");
+        const lowerField = normalizedField.toLowerCase();
+
+        if (!uniqueFields.has(lowerField)) {
+          uniqueFields.add(lowerField);
+          result.push(normalizedField);
+        }
+      }
+    });
+
+    return result;
+  }
+
+  /**
    * Build complete SQL query from inquiry state
    * @param {object} inquiryState - Complete inquiry state
    * @returns {string} - Complete SQL query
    */
   buildQuery(inquiryState) {
-    console.log("🔍 BuildQuery called with jenlap:", inquiryState.jenlap);
-
     // Build dynamic FROM and SELECT
     const { dynamicFrom, dynamicSelect } =
       this.buildDynamicFromAndSelect(inquiryState);
@@ -449,26 +424,8 @@ class QueryBuilder {
     // Build all filters
     const filterResult = this.filterBuilder.buildAllFilters(inquiryState);
 
-    // Debug logging for jenlap=1
-    if (inquiryState.jenlap === "1") {
-      console.log("🔍 Jenlap 1 Filter Debug:", {
-        filterColumns: filterResult.columns,
-        filterJoins: filterResult.joinClauses,
-        filterGroupBy: filterResult.groupBy,
-        filterWhereConditions: filterResult.whereConditions,
-      });
-    }
-
     // Build WHERE clause with access control
     let whereClause = this.filterBuilder.buildWhereClause(inquiryState);
-
-    // Debug logging for WHERE clause
-    if (inquiryState.jenlap === "1") {
-      console.log("🔍 WHERE Clause Debug:", {
-        originalWhereClause: whereClause,
-        filterWhereConditions: filterResult.whereConditions,
-      });
-    }
 
     // Special handling for jenlap = 1: Add default WHERE condition for kdpn
     if (inquiryState.jenlap === "1") {
@@ -492,10 +449,30 @@ class QueryBuilder {
       }
     }
 
+    // Special handling for jenlap = 12: Add default WHERE condition for swasembada
+    if (inquiryState.jenlap === "12") {
+      const defaultCondition = "a.swasembada <> 'NULL'";
+      if (
+        whereClause &&
+        whereClause.trim() !== "" &&
+        !whereClause.includes("WHERE")
+      ) {
+        whereClause = `WHERE ${defaultCondition} AND (${whereClause.replace(
+          /^WHERE\s*/i,
+          ""
+        )})`;
+      } else if (whereClause && whereClause.includes("WHERE")) {
+        whereClause = whereClause.replace(
+          /WHERE\s*/i,
+          `WHERE ${defaultCondition} AND `
+        );
+      } else {
+        whereClause = `WHERE ${defaultCondition}`;
+      }
+    }
+
     // Special handling for jenlap = 3: Modify Tematik WHERE conditions to use LIKE
     if (inquiryState.jenlap === "3") {
-      console.log("🔍 Jenlap 3 WHERE Clause Before Modification:", whereClause);
-
       // Convert exact match conditions to LIKE conditions for Tematik filter
       if (
         inquiryState.KdTema &&
@@ -512,10 +489,6 @@ class QueryBuilder {
             temaPattern,
             `a.kdtema LIKE '%${inquiryState.Tema}%'`
           );
-          console.log(
-            "🔍 Jenlap 3 WHERE Clause After LIKE Modification:",
-            whereClause
-          );
         } else if (whereClause) {
           // If the pattern doesn't exist but we have a WHERE clause, add the LIKE condition
           const likeCondition = `a.kdtema LIKE '%${inquiryState.Tema}%'`;
@@ -524,17 +497,9 @@ class QueryBuilder {
           } else {
             whereClause = `WHERE ${likeCondition}`;
           }
-          console.log(
-            "🔍 Jenlap 3 WHERE Clause After Adding LIKE Condition:",
-            whereClause
-          );
         } else {
           // No WHERE clause exists, create one with LIKE condition
           whereClause = `WHERE a.kdtema LIKE '%${inquiryState.Tema}%'`;
-          console.log(
-            "🔍 Jenlap 3 WHERE Clause Created with LIKE Condition:",
-            whereClause
-          );
         }
 
         // Also handle name-based filtering if available
@@ -554,10 +519,6 @@ class QueryBuilder {
             } else {
               whereClause = `WHERE ${temaNameCondition}`;
             }
-            console.log(
-              "🔍 Jenlap 3 WHERE Clause After Name LIKE Addition:",
-              whereClause
-            );
           }
         }
       }
@@ -565,8 +526,6 @@ class QueryBuilder {
 
     // Special handling for jenlap = 4: Add inflasi WHERE condition
     if (inquiryState.jenlap === "4") {
-      console.log("🔍 Jenlap 4 WHERE Clause Before Modification:", whereClause);
-
       const inflasiCondition =
         "(A.inf_intervensi <> 'NULL' or A.inf_pengeluaran <> 'NULL')";
 
@@ -579,22 +538,10 @@ class QueryBuilder {
       } else {
         whereClause = `WHERE ${inflasiCondition}`;
       }
-
-      console.log(
-        "🔍 Jenlap 4 WHERE Clause After Adding Inflasi Condition:",
-        whereClause
-      );
     }
 
     // Special handling for jenlap = 5: Add stunting WHERE condition
     if (inquiryState.jenlap === "5") {
-      console.log("🔍 Jenlap 5 WHERE Clause Before Modification:", whereClause);
-      console.log("🔍 Jenlap 5 Available Parameters:", {
-        Stunting: inquiryState.Stunting,
-        StunIntervensi: inquiryState.StunIntervensi,
-        allKeys: Object.keys(inquiryState),
-      });
-
       let stuntingCondition = "A.STUN_INTERVENSI IS NOT NULL";
 
       // Add specific stunting selection if provided - check both possible parameter names
@@ -606,11 +553,6 @@ class QueryBuilder {
         stuntingValue !== "00"
       ) {
         stuntingCondition += ` AND A.STUN_INTERVENSI = '${stuntingValue}'`;
-        console.log("🔍 Adding specific stunting selection:", stuntingValue);
-      } else {
-        console.log(
-          "🔍 No specific stunting selection or 'Semua Stunting' selected, using only IS NOT NULL condition"
-        );
       }
 
       if (
@@ -622,17 +564,10 @@ class QueryBuilder {
       } else {
         whereClause = `WHERE ${stuntingCondition}`;
       }
-
-      console.log(
-        "🔍 Jenlap 5 WHERE Clause After Adding Stunting Condition:",
-        whereClause
-      );
     }
 
     // Special handling for jenlap = 6: Add kemiskinan WHERE condition
     if (inquiryState.jenlap === "6") {
-      console.log("🔍 Jenlap 6 WHERE Clause Before Modification:", whereClause);
-
       const kemiskinanCondition = "a.kemiskinan_ekstrim <> 'NULL'";
 
       if (
@@ -644,17 +579,10 @@ class QueryBuilder {
       } else {
         whereClause = `WHERE ${kemiskinanCondition}`;
       }
-
-      console.log(
-        "🔍 Jenlap 6 WHERE Clause After Adding Kemiskinan Condition:",
-        whereClause
-      );
     }
 
     // Special handling for jenlap = 7: Add pemilu WHERE condition
     if (inquiryState.jenlap === "7") {
-      console.log("🔍 Jenlap 7 WHERE Clause Before Modification:", whereClause);
-
       const pemiluCondition = "a.pemilu <> 'NULL'";
 
       if (
@@ -666,11 +594,51 @@ class QueryBuilder {
       } else {
         whereClause = `WHERE ${pemiluCondition}`;
       }
+    }
 
-      console.log(
-        "🔍 Jenlap 7 WHERE Clause After Adding Pemilu Condition:",
-        whereClause
-      );
+    // Special handling for jenlap = 8: Add IKN WHERE condition
+    if (inquiryState.jenlap === "8") {
+      const iknCondition = "a.ikn <> 'NULL'";
+
+      if (
+        whereClause &&
+        whereClause.trim() !== "" &&
+        whereClause.includes("WHERE")
+      ) {
+        whereClause += ` AND ${iknCondition}`;
+      } else {
+        whereClause = `WHERE ${iknCondition}`;
+      }
+    }
+
+    // Special handling for jenlap = 9: Add Pangan WHERE condition
+    if (inquiryState.jenlap === "9") {
+      const panganCondition = "a.pangan <> 'NULL'";
+
+      if (
+        whereClause &&
+        whereClause.trim() !== "" &&
+        whereClause.includes("WHERE")
+      ) {
+        whereClause += ` AND ${panganCondition}`;
+      } else {
+        whereClause = `WHERE ${panganCondition}`;
+      }
+    }
+
+    // Special handling for jenlap = 11: Add MBG WHERE condition
+    if (inquiryState.jenlap === "11") {
+      const mbgCondition = "A.MBG IS NOT NULL";
+
+      if (
+        whereClause &&
+        whereClause.trim() !== "" &&
+        whereClause.includes("WHERE")
+      ) {
+        whereClause += ` AND ${mbgCondition}`;
+      } else {
+        whereClause = `WHERE ${mbgCondition}`;
+      }
     }
 
     // Build final SELECT clause
@@ -682,80 +650,64 @@ class QueryBuilder {
       if (filterResult.columns.length > 0) {
         finalSelectClause =
           filterResult.columns.join(", ") + ", " + dynamicSelect;
-        console.log(
-          "🔍 Jenlap 1 Final SELECT (with filters):",
-          finalSelectClause
-        );
       } else {
         finalSelectClause = dynamicSelect;
-        console.log(
-          "🔍 Jenlap 1 Final SELECT (no filters):",
-          finalSelectClause
-        );
       }
     } else if (inquiryState.jenlap === "4") {
       // Special handling for jenlap = 4: Combine base filter columns with inflasi columns
       if (filterResult.columns.length > 0) {
         finalSelectClause =
           filterResult.columns.join(", ") + ", " + dynamicSelect;
-        console.log(
-          "🔍 Jenlap 4 Final SELECT (with filters):",
-          finalSelectClause
-        );
       } else {
         finalSelectClause = dynamicSelect;
-        console.log(
-          "🔍 Jenlap 4 Final SELECT (no filters):",
-          finalSelectClause
-        );
       }
     } else if (inquiryState.jenlap === "5") {
       // Special handling for jenlap = 5: Combine base filter columns with stunting columns
       if (filterResult.columns.length > 0) {
         finalSelectClause =
           filterResult.columns.join(", ") + ", " + dynamicSelect;
-        console.log(
-          "🔍 Jenlap 5 Final SELECT (with filters):",
-          finalSelectClause
-        );
       } else {
         finalSelectClause = dynamicSelect;
-        console.log(
-          "🔍 Jenlap 5 Final SELECT (no filters):",
-          finalSelectClause
-        );
       }
     } else if (inquiryState.jenlap === "6") {
       // Special handling for jenlap = 6: Combine base filter columns with kemiskinan columns
       if (filterResult.columns.length > 0) {
         finalSelectClause =
           filterResult.columns.join(", ") + ", " + dynamicSelect;
-        console.log(
-          "🔍 Jenlap 6 Final SELECT (with filters):",
-          finalSelectClause
-        );
       } else {
         finalSelectClause = dynamicSelect;
-        console.log(
-          "🔍 Jenlap 6 Final SELECT (no filters):",
-          finalSelectClause
-        );
       }
     } else if (inquiryState.jenlap === "7") {
       // Special handling for jenlap = 7: Combine base filter columns with pemilu columns
       if (filterResult.columns.length > 0) {
         finalSelectClause =
           filterResult.columns.join(", ") + ", " + dynamicSelect;
-        console.log(
-          "🔍 Jenlap 7 Final SELECT (with filters):",
-          finalSelectClause
-        );
       } else {
         finalSelectClause = dynamicSelect;
-        console.log(
-          "🔍 Jenlap 7 Final SELECT (no filters):",
-          finalSelectClause
-        );
+      }
+    } else if (inquiryState.jenlap === "8") {
+      // Special handling for jenlap = 8: Combine base filter columns with IKN columns
+      if (filterResult.columns.length > 0) {
+        finalSelectClause =
+          filterResult.columns.join(", ") + ", " + dynamicSelect;
+      } else {
+        finalSelectClause = dynamicSelect;
+      }
+    } else if (inquiryState.jenlap === "9") {
+      // Special handling for jenlap = 9: Combine base filter columns with Pangan columns
+      if (filterResult.columns.length > 0) {
+        finalSelectClause =
+          filterResult.columns.join(", ") + ", " + dynamicSelect;
+      } else {
+        finalSelectClause = dynamicSelect;
+      }
+    } else if (inquiryState.jenlap === "11") {
+      // Special handling for jenlap = 11: Combine base filter columns with MBG columns
+      if (filterResult.columns.length > 0) {
+        finalSelectClause =
+          filterResult.columns.join(", ") + ", " + dynamicSelect;
+      } else {
+        finalSelectClause = dynamicSelect;
       }
     } else {
       // For other jenlap values, combine filter columns with dynamic select
@@ -770,12 +722,8 @@ class QueryBuilder {
     let groupByClause = "";
     const groupByFields = [...filterResult.groupBy];
 
-    console.log("🔍 Initial groupByFields:", groupByFields);
-
     // Special handling for jenlap = 1: Add priority fields to GROUP BY based on what's actually selected (Proyek Nasional)
     if (inquiryState.jenlap === "1") {
-      console.log("📊 Adding priority fields to GROUP BY for jenlap 1");
-
       // Build GROUP BY based on the selected columns in dynamicSelect
       const priorityGroupBy = this.buildJenlap1GroupBy(inquiryState);
       if (priorityGroupBy.length > 0) {
@@ -787,18 +735,12 @@ class QueryBuilder {
 
     // Special handling for jenlap = 2: Major Project - use same base grouping as filter columns (simpler than jenlap=1)
     if (inquiryState.jenlap === "2") {
-      console.log(
-        "📊 Adding standard fields to GROUP BY for jenlap 2 (Major Project)"
-      );
       // For jenlap=2, just use the filter-selected columns for grouping - no special priority handling needed
       // The filterResult.groupBy already contains the appropriate fields based on selected filters
     }
 
     // Special handling for jenlap = 4: Inflasi - add inflasi fields to GROUP BY
     if (inquiryState.jenlap === "4") {
-      console.log(
-        "📊 Adding inflasi fields to GROUP BY for jenlap 4 (Inflasi)"
-      );
       // Build GROUP BY based on the selected columns in dynamicSelect
       const inflasiGroupBy = this.buildJenlap4GroupBy(inquiryState);
       if (inflasiGroupBy.length > 0) {
@@ -809,9 +751,6 @@ class QueryBuilder {
 
     // Special handling for jenlap = 5: Stunting - add stunting fields to GROUP BY
     if (inquiryState.jenlap === "5") {
-      console.log(
-        "📊 Adding stunting fields to GROUP BY for jenlap 5 (Stunting)"
-      );
       // Build GROUP BY based on the selected columns in dynamicSelect
       const stuntingGroupBy = this.buildJenlap5GroupBy(inquiryState);
       if (stuntingGroupBy.length > 0) {
@@ -822,36 +761,43 @@ class QueryBuilder {
 
     // Special handling for jenlap = 6: Kemiskinan - add kemiskinan_ekstrim to GROUP BY
     if (inquiryState.jenlap === "6") {
-      console.log(
-        "📊 Adding kemiskinan_ekstrim to GROUP BY for jenlap 6 (Kemiskinan)"
-      );
       // For jenlap=6, combine base filter columns with kemiskinan GROUP BY fields
       groupByFields.push("a.kemiskinan_ekstrim");
     }
 
     // Special handling for jenlap = 7: Pemilu - add pemilu to GROUP BY
     if (inquiryState.jenlap === "7") {
-      console.log("📊 Adding pemilu to GROUP BY for jenlap 7 (Belanja Pemilu)");
       // For jenlap=7, combine base filter columns with pemilu GROUP BY fields
       groupByFields.push("a.pemilu");
     }
 
-    // Special handling for jenlap = 8: Add sat, os, ket to GROUP BY (Volume Output Kegiatan - Data Caput)
+    // Special handling for jenlap = 8: IKN - add ikn to GROUP BY
     if (inquiryState.jenlap === "8") {
-      console.log("📊 Adding sat, os, ket to GROUP BY for jenlap 8");
-      groupByFields.push("a.sat", "a.os", "a.ket");
+      // For jenlap=8, combine base filter columns with IKN GROUP BY fields
+      groupByFields.push("a.ikn");
     }
 
-    // Special handling for jenlap = 9: Add kdblokir to GROUP BY for blokir breakdown (Pergerakan Blokir Bulanan per Jenis)
+    // Special handling for jenlap = 9: Pangan - add pangan to GROUP BY
     if (inquiryState.jenlap === "9") {
-      console.log("📊 Adding kdblokir to GROUP BY for jenlap 9");
-      groupByFields.push("a.kdblokir");
+      // For jenlap=9, combine base filter columns with Pangan GROUP BY fields
+      groupByFields.push("a.pangan");
     }
 
-    console.log("🔍 Final groupByFields:", groupByFields);
+    // Special handling for jenlap = 12: Swasembada Pangan - add swasembada to GROUP BY
+    if (inquiryState.jenlap === "12") {
+      // For jenlap=12, combine base filter columns with Swasembada GROUP BY fields
+      groupByFields.push("a.swasembada");
+    }
 
-    if (groupByFields.length > 0) {
-      groupByClause = `GROUP BY ${groupByFields.join(", ")}`;
+    // Special handling for jenlap = 11: MBG - MBG fields are already handled by MBGFilter
+    // No additional GROUP BY fields needed as MBGFilter already adds A.MBG to groupBy
+
+    // Deduplicate GROUP BY fields to prevent duplicates like a.mbg appearing twice
+    const deduplicatedGroupByFields =
+      this.deduplicateGroupByFields(groupByFields);
+
+    if (deduplicatedGroupByFields.length > 0) {
+      groupByClause = `GROUP BY ${deduplicatedGroupByFields.join(", ")}`;
     }
 
     // Combine JOIN clauses
@@ -860,43 +806,34 @@ class QueryBuilder {
     // Special handling for jenlap = 1: Add priority table JOINs based on Jenis Tampilan radio values
     if (inquiryState.jenlap === "1") {
       const jenlap1Joins = this.buildJenlap1JoinClauses(inquiryState);
-      console.log("🔍 Original joinClause:", joinClause);
-      console.log("🔍 Jenlap1 joins:", jenlap1Joins);
+
       joinClause += jenlap1Joins;
 
       // Remove duplicate JOINs
       const originalJoinClause = joinClause;
       joinClause = this.deduplicateJoins(joinClause);
-      console.log("🔍 Before deduplication:", originalJoinClause);
-      console.log("🔍 After deduplication:", joinClause);
     }
 
     // Special handling for jenlap = 4: Add inflasi table JOINs based on Jenis Tampilan radio values
     if (inquiryState.jenlap === "4") {
       const jenlap4Joins = this.buildJenlap4JoinClauses(inquiryState);
-      console.log("🔍 Original joinClause:", joinClause);
-      console.log("🔍 Jenlap4 joins:", jenlap4Joins);
+
       joinClause += jenlap4Joins;
 
       // Remove duplicate JOINs
       const originalJoinClause = joinClause;
       joinClause = this.deduplicateJoins(joinClause);
-      console.log("🔍 Before deduplication:", originalJoinClause);
-      console.log("🔍 After deduplication:", joinClause);
     }
 
     // Special handling for jenlap = 5: Add stunting table JOINs based on Jenis Tampilan radio values
     if (inquiryState.jenlap === "5") {
       const jenlap5Joins = this.buildJenlap5JoinClauses(inquiryState);
-      console.log("🔍 Original joinClause:", joinClause);
-      console.log("🔍 Jenlap5 joins:", jenlap5Joins);
+
       joinClause += jenlap5Joins;
 
       // Remove duplicate JOINs
       const originalJoinClause = joinClause;
       joinClause = this.deduplicateJoins(joinClause);
-      console.log("🔍 Before deduplication:", originalJoinClause);
-      console.log("🔍 After deduplication:", joinClause);
     }
 
     // Build final query
@@ -1144,14 +1081,6 @@ class QueryBuilder {
     const radioValue =
       inflasiradio || infintervensiradio || jenistampilanradio || "1";
 
-    console.log("🔍 buildJenlap4InflasiColumns Debug:", {
-      inflasiradio,
-      infintervensiradio,
-      jenistampilanradio,
-      radioValue,
-      params: Object.keys(params),
-    });
-
     // inf_intervensi columns based on radio value
     if (radioValue && radioValue !== "4") {
       // Not "Jangan Tampilkan"
@@ -1191,20 +1120,11 @@ class QueryBuilder {
     const radioValue =
       inflasiradio || infintervensiradio || jenistampilanradio || "1";
 
-    console.log("🔍 buildJenlap4JoinClauses Debug:", {
-      inflasiradio,
-      infintervensiradio,
-      jenistampilanradio,
-      radioValue,
-      thang,
-    });
-
     // inf_pengeluaran JOIN if uraian is needed
     if (radioValue && (radioValue === "2" || radioValue === "3")) {
       joins.push(
         ` LEFT JOIN DBREF.REF_INF_PENGELUARAN rip ON A.inf_pengeluaran=rip.inf_pengeluaran`
       );
-      console.log("🔍 Adding JOIN for inf_pengeluaran uraian");
     }
 
     return joins.join("");
@@ -1222,13 +1142,6 @@ class QueryBuilder {
     // Use the correct parameter name - inflasiradio from InflasiFilter component
     const radioValue =
       inflasiradio || infintervensiradio || jenistampilanradio || "1";
-
-    console.log("🔍 buildJenlap4GroupBy Debug:", {
-      inflasiradio,
-      infintervensiradio,
-      jenistampilanradio,
-      radioValue,
-    });
 
     // inf_intervensi grouping based on radio selection
     if (radioValue && radioValue !== "4") {
@@ -1266,13 +1179,6 @@ class QueryBuilder {
     // Use the correct parameter name - stuntingradio from StuntingFilter component
     const radioValue = stuntingradio || jenistampilanradio || "1";
 
-    console.log("🔍 buildJenlap5StuntingColumns Debug:", {
-      stuntingradio,
-      jenistampilanradio,
-      radioValue,
-      params: Object.keys(params),
-    });
-
     // STUN_INTERVENSI columns based on radio value
     if (radioValue && radioValue !== "4") {
       // Not "Jangan Tampilkan"
@@ -1307,19 +1213,11 @@ class QueryBuilder {
     // Use the correct parameter name - stuntingradio from StuntingFilter component
     const radioValue = stuntingradio || jenistampilanradio || "1";
 
-    console.log("🔍 buildJenlap5JoinClauses Debug:", {
-      stuntingradio,
-      jenistampilanradio,
-      radioValue,
-      thang,
-    });
-
     // stun_intervensi JOIN if uraian is needed
     if (radioValue && (radioValue === "2" || radioValue === "3")) {
       joins.push(
         ` LEFT JOIN DBREF.REF_STUNTING_INTERVENSI rst ON A.STUN_INTERVENSI=rst.stun_intervensi`
       );
-      console.log("🔍 Adding JOIN for stun_intervensi uraian");
     }
 
     return joins.join("");
@@ -1336,12 +1234,6 @@ class QueryBuilder {
 
     // Use the correct parameter name - stuntingradio from StuntingFilter component
     const radioValue = stuntingradio || jenistampilanradio || "1";
-
-    console.log("🔍 buildJenlap5GroupBy Debug:", {
-      stuntingradio,
-      jenistampilanradio,
-      radioValue,
-    });
 
     // STUN_INTERVENSI grouping based on radio selection
     if (radioValue && radioValue !== "4") {

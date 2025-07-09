@@ -37,6 +37,7 @@ const StuntingFilter = ({ inquiryState }) => {
                 className="w-full min-w-0 max-w-full"
                 size="sm"
                 placeholder="Pilih Tematik Stunting"
+                aria-label="Pilih Tematik Stunting"
               />
             </div>
 
@@ -53,6 +54,7 @@ const StuntingFilter = ({ inquiryState }) => {
                 disallowEmptySelection
                 size="sm"
                 className="w-full min-w-0"
+                aria-label="Jenis Tampilan Stunting"
               >
                 {StuntingOptions.map((opt) => (
                   <SelectItem key={opt.value} textValue={opt.label}>

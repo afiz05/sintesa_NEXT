@@ -18,7 +18,7 @@ const JenisInflasiInquiry = (props) => {
       }}
       size="sm"
       placeholder="Pilih Jenis Inflasi"
-      className="max-w-2xl"
+      className="max-w-full"
       aria-label="Pilih Jenis Inflasi"
     >
       <SelectItem key="00" value="00" textValue="Semua Belanja dan Inflasi">

@@ -18,7 +18,8 @@ const JenisStuntingInquiry = (props) => {
       }}
       size="sm"
       placeholder="Pilih Tematik Stunting"
-      className="max-w-2xl"
+      className="min-w-2xl max-w-full"
+      aria-label={props["aria-label"] || "Pilih Tematik Stunting"}
     >
       <SelectItem
         key="00"

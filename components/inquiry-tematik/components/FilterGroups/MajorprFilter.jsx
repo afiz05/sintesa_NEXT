@@ -42,6 +42,7 @@ const MajorprFilter = ({ inquiryState }) => {
             {/* Jenis Tampilan */}
             <div className="flex flex-col gap-1 w-full xl:flex-[1]">
               <Select
+                aria-label="Jenis Tampilan Major Project"
                 selectedKeys={mpradio ? [mpradio] : ["1"]}
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0];

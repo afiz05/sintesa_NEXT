@@ -67,9 +67,6 @@ class PropresFilter extends BaseFilter {
     let processedPilihValue = pilihValue;
     if (pilihValue && pilihValue.includes("-")) {
       processedPilihValue = pilihValue.split("-")[1]; // Get the part after the dash
-      console.log(
-        `PropresFilter - Extracted PP from composite value: "${pilihValue}" -> "${processedPilihValue}"`
-      );
     }
 
     return this.build(
@@ -110,15 +107,6 @@ class KegiatanPrioritasFilter extends BaseFilter {
     const kondisiValue = undefined;
     const kataValue = undefined;
 
-    // DEBUG: Log the state values
-    console.log("🔍 KegiatanPrioritasFilter DEBUG:", {
-      isEnabled,
-      pilihValue,
-      radio,
-      thang,
-      timestamp: new Date().toISOString(),
-    });
-
     const result = this.build(
       {
         isEnabled,
@@ -130,15 +118,11 @@ class KegiatanPrioritasFilter extends BaseFilter {
       thang
     );
 
-    // DEBUG: Log the result
-    console.log("🔍 KegiatanPrioritasFilter RESULT:", result);
-
     // SPECIAL HANDLING: For Kegiatan Prioritas, we always need the JOIN clause when enabled,
     // even if pilihValue is "00" (Semua) and radio is "4" (Jangan Tampilkan)
     // This ensures the table is included in the query structure for proper filtering
     if (isEnabled && !result.joinClause) {
       result.joinClause = this.buildJoinClause(thang);
-      console.log("🔍 KegiatanPrioritasFilter FORCED JOIN:", result.joinClause);
     }
 
     return result;

@@ -29,7 +29,7 @@ export default function useInquiryState() {
   const [showModalsimpan, setShowModalsimpan] = useState(false);
 
   // Form states
-  const [jenlap, setJenlap] = useState("2");
+  const [jenlap, setJenlap] = useState("1");
   const [thang, setThang] = useState(new Date().getFullYear().toString());
   const [tanggal, setTanggal] = useState(false);
   const [cutoff, setCutoff] = useState("0");
@@ -74,6 +74,7 @@ export default function useInquiryState() {
   const [KdPP, setKdPP] = useState(false);
   const [KdKegPP, setKdKegPP] = useState(false);
   const [KdMP, setKdMP] = useState(false);
+  const [KdMBG, setKdMBG] = useState(false);
 
   // Filter values
   const [dept, setDept] = useState("000");
@@ -317,6 +318,9 @@ export default function useInquiryState() {
     KdKegPP,
     setKdKegPP,
     KdMP,
+    setKdMP,
+    KdMBG,
+    setKdMBG,
     setKdMP,
 
     // Filter values

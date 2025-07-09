@@ -23,9 +23,10 @@ const AkunFilter = ({ inquiryState }) => {
   } = inquiryState;
 
   // Disable logic: kondisi disables kata, kata disables kondisi, pilih akun is never disabled
+  // Special case: for jenlap 10, kondisi should be disabled since it contains predefined codes
   const hasKondisiFilter = akunkondisi && akunkondisi.trim() !== "";
   const hasKataFilter = kataakun && kataakun.trim() !== "";
-  const isKondisiDisabled = hasKataFilter;
+  const isKondisiDisabled = hasKataFilter || jenlap === "10"; // Disable kondisi for jenlap 10
   const isKataDisabled = hasKondisiFilter;
 
   const AkunOptions = [
@@ -52,7 +53,10 @@ const AkunFilter = ({ inquiryState }) => {
             {/* Selection Component */}
             <div className="flex flex-col gap-1 w-full xl:flex-1 min-w-0 max-w-full overflow-hidden">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700">
+                <label
+                  className="text-sm font-medium text-gray-700"
+                  id="label-pilih-akun"
+                >
                   Pilih Akun
                 </label>
               </div>
@@ -72,6 +76,7 @@ const AkunFilter = ({ inquiryState }) => {
                 placeholder="Pilih Akun"
                 status="pilihakun"
                 isDisabled={false}
+                aria-labelledby="label-pilih-akun"
               />
             </div>
 
@@ -114,7 +119,7 @@ const AkunFilter = ({ inquiryState }) => {
                     </span>
                   </Tooltip>
                 </div>
-                {hasKondisiFilter && (
+                {hasKondisiFilter && jenlap !== "10" && (
                   <Button
                     size="sm"
                     variant="light"
@@ -180,6 +185,7 @@ const AkunFilter = ({ inquiryState }) => {
                   }
                 }}
                 disallowEmptySelection
+                aria-label="Jenis Tampilan Akun"
               >
                 {AkunOptions.map((opt) => (
                   <SelectItem key={opt.value} textValue={opt.label}>

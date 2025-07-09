@@ -8,7 +8,7 @@ const ReportTypeSelector = ({ inquiryState, onFilterChange }) => {
 
   // --- FALLBACK STATE FOR BACKWARDS COMPATIBILITY ---
   const [localThang, setLocalThang] = React.useState("2025");
-  const [localJenlap, setLocalJenlap] = React.useState("2");
+  const [localJenlap, setLocalJenlap] = React.useState("1");
   const [localPembulatan, setLocalPembulatan] = React.useState("1");
 
   // Use inquiryState values if available, otherwise use local state
@@ -48,7 +48,7 @@ const ReportTypeSelector = ({ inquiryState, onFilterChange }) => {
     { value: "5", label: "Penanganan Stunting" },
     { value: "6", label: "Kemiskinan Ekstrim" },
     { value: "7", label: "Belanja Pemilu" },
-    { value: "8", label: "Ibu Kota Nusantara" },
+    { value: "8", label: "Ibu Kota Nusantara (IKN)" },
     { value: "9", label: "Ketahanan Pangan" },
     { value: "10", label: "Bantuan Pemerintah" },
     { value: "11", label: "Makanan Bergizi Gratis" },
@@ -66,11 +66,7 @@ const ReportTypeSelector = ({ inquiryState, onFilterChange }) => {
 
   const handleSelectionChange = (setter) => (keys) => {
     const value = Array.from(keys)[0];
-    console.log("LaporanSelector - Selection change:", {
-      setter: setter.name,
-      value,
-      keys,
-    });
+
     if (setter && value !== undefined) setter(value);
   };
 

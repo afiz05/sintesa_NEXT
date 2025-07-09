@@ -41,6 +41,7 @@ const PrinasFilter = ({ inquiryState }) => {
             {/* Jenis Tampilan - Takes remaining space */}
             <div className="flex flex-col gap-1 w-full xl:flex-[1]">
               <Select
+                aria-label="Jenis Tampilan Prioritas Nasional"
                 selectedKeys={pnradio ? [pnradio] : ["1"]}
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0];

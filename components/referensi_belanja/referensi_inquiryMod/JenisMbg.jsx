@@ -18,7 +18,7 @@ const JenisMbg = (props) => {
       }}
       size="sm"
       placeholder="Pilih Intervensi"
-      className="max-w-2xl"
+      className="max-w-full"
       aria-label="Pilih Jenis MBG"
     >
       <SelectItem key="00" value="00" textValue="Semua Intervensi">

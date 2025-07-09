@@ -42,6 +42,7 @@ import {
   PanganFilter,
   BlokirFilter,
   SpecialGroupingFilter,
+  MBGFilter,
 } from "./SpecialFilter";
 
 class FilterBuilder {
@@ -90,6 +91,7 @@ class FilterBuilder {
       pangan: new PanganFilter(),
       blokir: new BlokirFilter(),
       specialgrouping: new SpecialGroupingFilter(),
+      mbg: new MBGFilter(),
     };
   }
 
@@ -123,20 +125,12 @@ class FilterBuilder {
         // But we still need their WHERE conditions for filtering
         enabled = this.isFilterEnabled(key, inquiryState);
         if (enabled) {
-          console.log(`🔍 Processing jenlap=1 priority filter ${key}:`, {
-            enabled,
-            filterState: this.getFilterState(key, inquiryState),
-          });
           try {
             const filterResult = filter.buildFromState(inquiryState);
-            console.log(`🔍 ${key} filter result:`, filterResult);
+
             // Only include WHERE conditions, skip columns, joins, and groupBy
             if (filterResult.whereConditions.length > 0) {
               result.whereConditions.push(...filterResult.whereConditions);
-              console.log(
-                `🔍 Added WHERE conditions from ${key}:`,
-                filterResult.whereConditions
-              );
             }
           } catch (error) {
             console.warn(
@@ -159,15 +153,9 @@ class FilterBuilder {
           "pemilu",
           "ikn",
           "pangan",
+          "mbg",
         ].includes(key)
       ) {
-        console.log(`🔍 Special Filter Debug - ${key}:`, {
-          enabled,
-          jenlap: inquiryState.jenlap,
-          filterSwitch: this.getFilterSwitchValue(key, inquiryState),
-          radioValue: this.getFilterRadioValue(key, inquiryState),
-          optionValue: this.getFilterOptionValue(key, inquiryState),
-        });
       }
 
       if (!enabled) return;
@@ -263,7 +251,13 @@ class FilterBuilder {
       pemilu: "KdPemilu",
       ikn: "kdIkn",
       pangan: "KdPangan",
+      mbg: "KdMBG",
     };
+
+    // Special case for MBG: always enabled when jenlap = 11
+    if (filterName === "mbg" && inquiryState.jenlap === "11") {
+      return true;
+    }
 
     const enabledField = enabledFields[filterName];
     return enabledField ? Boolean(inquiryState[enabledField]) : false;
@@ -396,6 +390,7 @@ class FilterBuilder {
       pemilu: "KdPemilu",
       ikn: "kdIkn",
       pangan: "KdPangan",
+      mbg: "KdMBG",
     };
     const field = enabledFields[filterName];
     return field ? inquiryState[field] : undefined;
@@ -415,6 +410,7 @@ class FilterBuilder {
       pemilu: "pemiluradio",
       ikn: "iknradio",
       pangan: "panganradio",
+      mbg: "mbgradio",
     };
     const field = radioFields[filterName];
     return field ? inquiryState[field] : undefined;
@@ -434,6 +430,7 @@ class FilterBuilder {
       pemilu: "Pemilu",
       ikn: "Ikn",
       pangan: "Pangan",
+      mbg: "mbg",
     };
     const field = optionFields[filterName];
     return field ? inquiryState[field] : undefined;

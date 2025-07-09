@@ -36,6 +36,7 @@ const InflasiFilter = ({ inquiryState }) => {
                 className="w-full min-w-0 max-w-full"
                 size="sm"
                 placeholder="Pilih Jenis Inflasi"
+                aria-label="Pilih Jenis Inflasi"
               />
             </div>
 
@@ -52,6 +53,7 @@ const InflasiFilter = ({ inquiryState }) => {
                 disallowEmptySelection
                 size="sm"
                 className="w-full min-w-0"
+                aria-label="Jenis Tampilan Inflasi"
               >
                 {InflasiOptions.map((opt) => (
                   <SelectItem key={opt.value} textValue={opt.label}>

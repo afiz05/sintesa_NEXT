@@ -10,6 +10,7 @@ const KodePN = (props) => {
 
   return (
     <Select
+      aria-label="Pilih Prioritas Nasional"
       selectedKeys={new Set([selectedValue])}
       onSelectionChange={(keys) => {
         const value = Array.from(keys)[0];
@@ -17,7 +18,7 @@ const KodePN = (props) => {
       }}
       size="sm"
       placeholder="Pilih Prioritas Nasional"
-      className="max-w-2xl"
+      className="max-w-full"
     >
       <SelectItem key="00" value="00" textValue="Semua Prioritas Nasional">
         Semua Prioritas Nasional

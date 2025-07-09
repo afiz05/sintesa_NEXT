@@ -36,6 +36,7 @@ const MBGFilter = ({ inquiryState }) => {
                 className="w-full min-w-0 max-w-full"
                 size="sm"
                 placeholder="Pilih Major Project"
+                aria-label="Pilih Major Project"
               />
             </div>
 
@@ -52,6 +53,7 @@ const MBGFilter = ({ inquiryState }) => {
                 disallowEmptySelection
                 size="sm"
                 className="w-full min-w-0"
+                aria-label="Jenis Tampilan MBG"
               >
                 {MbgOptions.map((opt) => (
                   <SelectItem key={opt.value} textValue={opt.label}>

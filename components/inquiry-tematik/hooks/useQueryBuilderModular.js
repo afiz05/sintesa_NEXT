@@ -116,14 +116,6 @@ export default function useQueryBuilder(inquiryState) {
     const filterResult = buildFilter(filterName);
     const isEnabled = isFilterEnabled(filterName);
 
-    console.log(`🔍 Debug Filter: ${filterName}`, {
-      isEnabled,
-      columns: filterResult.columns,
-      joinClause: filterResult.joinClause,
-      whereConditions: filterResult.whereConditions,
-      groupBy: filterResult.groupBy,
-    });
-
     return { filterName, isEnabled, ...filterResult };
   };
 
@@ -135,11 +127,11 @@ export default function useQueryBuilder(inquiryState) {
 
     if (jenlap === "1") {
       // jenlap = 1: Proyek Nasional - special handling for kdpn, kdpp, kdkp, kdproy
-      console.log("📊 Debugging jenlap 1 (Proyek Nasional)");
+
       return [];
     } else if (jenlap === "7") {
       // jenlap = 7: Volume Output Kegiatan - Data Caput (formerly jenlap = 6)
-      console.log("📊 Debugging jenlap 7 (Volume Output Kegiatan)");
+
       return [];
     } else if (jenlap === "8") {
       // jenlap = 8: Pergerakan Blokir Bulanan per Jenis (formerly jenlap = 7)
@@ -227,13 +219,6 @@ export default function useQueryBuilder(inquiryState) {
             metrics.recommendations
           );
         }
-
-        console.log("📊 Query Stats:", {
-          buildTime: `${metrics.buildTime.toFixed(2)}ms`,
-          enabledFilters: metrics.filterStats.enabledFilters,
-          queryLength: metrics.validation.stats.queryLength,
-          joinCount: metrics.validation.stats.joinCount,
-        });
       } catch (error) {
         console.warn("Error getting query performance metrics:", error);
       }
@@ -273,13 +258,6 @@ export default function useQueryBuilder(inquiryState) {
     const query = queryBuilder.buildQuery(testState);
     const validation = queryBuilder.validateQuery(query);
     const preview = queryBuilder.generateSqlPreview(testState);
-
-    console.log(`🔍 Debug Jenlap ${jenlapValue}:`, {
-      query: query.substring(0, 200) + "...",
-      validation,
-      fromClause: preview.fromClause,
-      selectClause: preview.selectClause.substring(0, 100) + "...",
-    });
 
     return {
       jenlapValue,

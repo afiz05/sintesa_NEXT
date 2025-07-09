@@ -36,6 +36,7 @@ const TematikFilter = ({ inquiryState }) => {
                 className="w-full min-w-0 max-w-full"
                 size="sm"
                 placeholder="Pilih Tematik"
+                aria-label="Pilih Tematik"
               />
             </div>
 
@@ -52,6 +53,7 @@ const TematikFilter = ({ inquiryState }) => {
                 disallowEmptySelection
                 size="sm"
                 className="w-full min-w-0"
+                aria-label="Jenis Tampilan Tematik"
               >
                 {TemaOptions.map((opt) => (
                   <SelectItem key={opt.value} textValue={opt.label}>
