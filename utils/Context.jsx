@@ -23,6 +23,7 @@ const MyContext = createContext({
   statusLogin: false,
   token: "",
   axiosJWT: null,
+  isInitializing: true,
 });
 
 export const MyContextProvider = ({ children }) => {
@@ -66,9 +67,10 @@ export const MyContextProvider = ({ children }) => {
   const [loginDengan, setloginDengan] = useState(null);
   const [dataEpa, setDataEpa] = useState({});
   const [viewMode, setViewMode] = useState("sppg");
+  const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
-    const checkAndRefreshToken = async () => {
+    const checkTokenStatus = async () => {
       if (typeof window === "undefined") {
         return;
       }
@@ -83,10 +85,11 @@ export const MyContextProvider = ({ children }) => {
         if (!storedToken) {
           setstatusLogin(false);
           await deleteAuthCookie(); // Hapus cookie auth
+          setIsInitializing(false);
 
           // Hanya redirect jika tidak sedang di halaman auth
           if (!isOnAuthPage) {
-            window.location.href = "/login";
+            window.location.href = "/login2";
           }
           return;
         }
@@ -118,30 +121,54 @@ export const MyContextProvider = ({ children }) => {
 
           // Sinkronisasi dengan cookie auth
           await createAuthCookie("token", storedToken);
+          setIsInitializing(false);
         } else {
-          await refreshToken();
+          // Token expired, remove from localStorage and logout
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("token");
+          }
+          await deleteAuthCookie();
+          setstatusLogin(false);
+          setIsInitializing(false);
+
+          // Hanya redirect jika tidak sedang di halaman auth
+          if (!isOnAuthPage) {
+            window.location.href = "/login2";
+          }
         }
       } catch (error) {
-        console.error("Error in checkAndRefreshToken:", error);
-        // if (typeof window !== "undefined") {
-        //   localStorage.removeItem("token");
-        // }
-        // await deleteAuthCookie(); // Hapus cookie auth
-        // setstatusLogin(false);
+        console.error("Error in checkTokenStatus:", error);
 
-        // Hanya redirect jika tidak sedang di halaman auth
-        if (!isOnAuthPage) {
-          window.location.href = "/login";
+        // Hanya hapus token jika ada masalah dengan token (bukan network error)
+        if (
+          error.name === "InvalidTokenError" ||
+          error.message.includes("decode")
+        ) {
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("token");
+          }
+          await deleteAuthCookie();
+          setstatusLogin(false);
+          setIsInitializing(false);
+
+          // Hanya redirect jika tidak sedang di halaman auth
+          if (!isOnAuthPage) {
+            window.location.href = "/login2";
+          }
+        } else {
+          // Untuk error lain (network, dll), jangan logout otomatis
+          console.warn("Non-critical error in token check:", error);
+          setIsInitializing(false);
         }
       }
     };
 
-    checkAndRefreshToken();
+    checkTokenStatus();
   }, []);
 
   // Efek untuk memantau perubahan localStorage token
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || isInitializing) return;
 
     // Setup watcher menggunakan helper function yang lebih robust
     const cleanup = setupStorageWatcher(() => {
@@ -154,7 +181,7 @@ export const MyContextProvider = ({ children }) => {
     });
 
     return cleanup;
-  }, [statusLogin]);
+  }, [statusLogin, isInitializing]);
 
   const logout = async () => {
     try {
@@ -225,132 +252,56 @@ export const MyContextProvider = ({ children }) => {
     }
   };
 
-  const refreshToken = async () => {
-    try {
-      const response = await axios.get(
-        process.env.NEXT_PUBLIC_LOCAL_REFRESH_TOKEN,
-        {
-          withCredentials: true,
-        }
-      );
-
-      const newAccessToken = response.data.accessToken;
-
-      if (typeof window !== "undefined") {
-        localStorage.setItem("token", newAccessToken);
-      }
-
-      setToken(newAccessToken);
-      const decoded = jwtDecode(decryptData(newAccessToken));
-
-      setName(decoded.name);
-      setExpire(decoded.exp);
-      setstatusLogin(true);
-      setRole(decoded.role);
-      setKdkanwil(decoded.kdkanwil);
-      setKdkppn(decoded.kdkppn);
-      setKdlokasi(decoded.kdlokasi);
-      setActive(decoded.active);
-      setDeptlimit(decoded.dept_limit);
-      setNmrole(decoded.namarole);
-      setIduser(decoded.userId);
-      setUrl(decoded.url);
-      setUsername(decoded.username);
-      setMode(decoded.mode);
-      setTampil(decoded.tampil);
-      setTampilverify(decoded.tampilverify);
-      setSession(decoded.session);
-      setVerified(decoded.verified);
-      setTelp(decoded.telp);
-
-      // Sinkronisasi dengan cookie auth
-      await createAuthCookie("token", newAccessToken);
-    } catch (error) {
-      console.error("Error refreshing token:", error);
-      if (error.response) {
-        setstatusLogin(false);
-        setToken("");
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("token");
-          localStorage.removeItem("status");
-        }
-        await deleteAuthCookie(); // Hapus cookie auth
-
-        // Hanya redirect jika tidak sedang di halaman auth
-        const isOnAuthPage = isAuthPage();
-
-        if (!isOnAuthPage) {
-          window.location.href = "/login";
-        }
-      }
-    }
-  };
-
   const axiosJWT = axios.create({
     withCredentials: true,
   });
 
   axiosJWT.interceptors.request.use(
     async (config) => {
-      const currentTime = Date.now() / 1000;
+      const storedToken = localStorage.getItem("token");
 
-      if (expire < currentTime && localStorage.getItem("token")) {
-        try {
-          const response = await axios.get(
-            process.env.NEXT_PUBLIC_LOCAL_REFRESH_TOKEN,
-            {
-              withCredentials: true,
-            }
-          );
-          const newAccessToken = response.data.accessToken;
+      if (!storedToken) {
+        // No token available, redirect to login
+        const isOnAuthPage = isAuthPage();
+        if (!isOnAuthPage) {
+          logout();
+        }
+        return Promise.reject(new Error("No token available"));
+      }
 
-          if (typeof window !== "undefined") {
-            localStorage.setItem("token", newAccessToken);
-          }
+      try {
+        // Decode token untuk cek expiry secara real-time
+        const decoded = jwtDecode(decryptData(storedToken));
+        const currentTime = Date.now() / 1000;
 
-          setToken(newAccessToken);
-
-          const decoded = jwtDecode(decryptData(newAccessToken));
-          setName(decoded.name);
-          setExpire(decoded.exp);
-          setstatusLogin(true);
-          setRole(decoded.role);
-          setKdkanwil(decoded.kdkanwil);
-          setKdkppn(decoded.kdkppn);
-          setKdlokasi(decoded.kdlokasi);
-          setActive(decoded.active);
-          setDeptlimit(decoded.dept_limit);
-          setNmrole(decoded.namarole);
-          setIduser(decoded.userId);
-          setUrl(decoded.url);
-          setUsername(decoded.username);
-          setMode(decoded.mode);
-          setTampil(decoded.tampil);
-          setTampilverify(decoded.tampilverify);
-          setSession(decoded.session);
-          setVerified(decoded.verified);
-          setTelp(decoded.telp);
-
-          // Sinkronisasi dengan cookie auth
-          await createAuthCookie("token", newAccessToken);
-
-          config.headers.Authorization = `Bearer ${newAccessToken}`;
-        } catch (error) {
+        if (decoded.exp < currentTime) {
+          // Token expired, remove from localStorage and logout
           if (typeof window !== "undefined") {
             localStorage.removeItem("token");
           }
-          await deleteAuthCookie(); // Hapus cookie auth
+          await deleteAuthCookie();
 
-          // Hanya logout jika tidak sedang di halaman auth
           const isOnAuthPage = isAuthPage();
-
           if (!isOnAuthPage) {
             logout();
           }
-          return Promise.reject(error);
+          return Promise.reject(new Error("Token expired"));
+        } else {
+          config.headers.Authorization = `Bearer ${storedToken}`;
         }
-      } else {
-        config.headers.Authorization = `Bearer ${token}`;
+      } catch (error) {
+        // Token tidak valid, hapus dan logout
+        console.error("Invalid token in interceptor:", error);
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("token");
+        }
+        await deleteAuthCookie();
+
+        const isOnAuthPage = isAuthPage();
+        if (!isOnAuthPage) {
+          logout();
+        }
+        return Promise.reject(new Error("Invalid token"));
       }
 
       return config;
@@ -518,6 +469,7 @@ export const MyContextProvider = ({ children }) => {
         setDataEpa,
         viewMode,
         setViewMode,
+        isInitializing,
       }}
     >
       {children}

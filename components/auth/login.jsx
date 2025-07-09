@@ -206,7 +206,7 @@ export const Login = () => {
 
           const decrypted = decryptData(data.data.token);
           const decoded = jwtDecode(decrypted);
-
+          console.log(data.data.token);
           setTelp(decoded.telp);
           setToken(data.token);
           setstatusLogin(true);
