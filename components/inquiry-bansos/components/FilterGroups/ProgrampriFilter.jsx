@@ -15,7 +15,7 @@ const ProgrampriFilter = ({ inquiryState }) => {
   ];
 
   return (
-    <div>
+    <div className="p-3 sm:mx-16 rounded-2xl bg-gradient-to-r from-pink-100 to-rose-100 dark:from-zinc-900 dark:to-zinc-900 shadow-sm">
       {/* Mobile/Tablet: Stack vertically, Desktop: Row layout */}
       <div className="flex flex-col lg:flex-row lg:items-center gap-4 w-full">
         {/* Title - Full width on mobile, fixed width on desktop */}
@@ -29,21 +29,54 @@ const ProgrampriFilter = ({ inquiryState }) => {
           {/* Fields: Stack on mobile/tablet, row on large desktop */}
           <div className="flex flex-col xl:flex xl:flex-row xl:items-end gap-3 xl:gap-4 w-full">
             {/* Selection Component */}
-            <div className="flex flex-col gap-1 w-full xl:flex-[4] xl:max-w-[800px] xl:min-w-[350px]">
+            <div className="flex flex-col gap-1 w-full xl:flex-1 min-w-0 max-w-full overflow-hidden">
+              <label className="text-sm font-medium text-gray-700">
+                Pilih Program Prioritas
+              </label>
               <KodePP
                 value={PP}
                 onChange={setPP}
                 kdPN={PN}
-                className="w-full"
+                className="w-full min-w-0 max-w-full"
                 size="sm"
                 placeholder="Pilih Program Prioritas"
               />
             </div>
 
+            {/* Kondisi - Disabled for Program Prioritas */}
+            <div className="flex flex-col gap-1 w-full xl:flex-1">
+              <label className="text-sm font-medium text-gray-400">
+                Masukkan Kondisi
+              </label>
+              <Input
+                placeholder="Tidak tersedia untuk Program Prioritas"
+                className="w-full min-w-0"
+                size="sm"
+                isDisabled
+                value=""
+              />
+            </div>
+
+            {/* Kata - Disabled for Program Prioritas */}
+            <div className="flex flex-col gap-1 w-full xl:flex-1">
+              <label className="text-sm font-medium text-gray-400">
+                Mengandung Kata
+              </label>
+              <Input
+                placeholder="Tidak tersedia untuk Program Prioritas"
+                className="w-full min-w-0"
+                size="sm"
+                isDisabled
+                value=""
+              />
+            </div>
+
             {/* Jenis Tampilan */}
-            <div className="flex flex-col gap-1 w-full xl:flex-[1] xl:min-w-[150px]">
+            <div className="flex flex-col gap-1 w-full xl:flex-1">
+              <label className="text-sm font-medium text-gray-700">
+                Jenis Tampilan
+              </label>
               <Select
-                aria-label="Jenis Tampilan Program Prioritas"
                 selectedKeys={ppradio ? [ppradio] : ["1"]}
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0];
