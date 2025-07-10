@@ -30,7 +30,7 @@ const PRIFilter = ({ inquiryState }) => {
           {/* Fields: Stack on mobile/tablet, row on large desktop */}
           <div className="flex flex-col xl:flex xl:flex-row xl:items-end gap-3 xl:gap-4 w-full">
             {/* Selection Component */}
-            <div className="flex flex-col gap-1 w-full xl:flex-[4] xl:max-w-[800px] xl:min-w-[350px]">
+            <div className="flex flex-col gap-1 w-full xl:flex-[2] min-w-0 max-w-full overflow-hidden">
               <KodePRI
                 value={PRI}
                 onChange={setPRI}
@@ -45,7 +45,7 @@ const PRIFilter = ({ inquiryState }) => {
             </div>
 
             {/* Jenis Tampilan */}
-            <div className="flex flex-col gap-1 w-full xl:flex-[1] xl:min-w-[150px]">
+            <div className="flex flex-col gap-1 w-full xl:flex-[1]">
               <Select
                 aria-label="Jenis Tampilan Proyek Prioritas"
                 selectedKeys={priradio ? [priradio] : ["1"]}

@@ -27,19 +27,19 @@ const PrinasFilter = ({ inquiryState }) => {
         {/* Form fields container */}
         <div className="flex flex-col lg:flex-[8] gap-3 lg:gap-1 w-full">
           {/* Fields: Stack on mobile/tablet, row on large desktop */}
-          <div className="flex flex-col xl:flex xl:flex-row xl:items-end gap-3 xl:gap-6 w-full">
-            {/* Selection Component - Takes more space */}
-            <div className="flex flex-col gap-1 w-full xl:flex-[2] min-w-0 max-w-full overflow-hidden">
+          <div className="flex flex-col xl:flex xl:flex-row xl:items-end gap-3 xl:gap-4 w-full">
+            {/* Selection Component - Longer field */}
+            <div className="flex flex-col gap-1 w-full xl:flex-[4] xl:max-w-[800px] xl:min-w-[350px]">
               <KodePN
                 value={PN}
                 onChange={setPN}
-                className="w-full min-w-0 max-w-full"
+                className="w-full"
                 size="sm"
                 placeholder="Pilih Prioritas Nasional"
               />
             </div>
-            {/* Jenis Tampilan - Takes remaining space */}
-            <div className="flex flex-col gap-1 w-full xl:flex-[1]">
+            {/* Jenis Tampilan - Shorter field */}
+            <div className="flex flex-col gap-1 w-full xl:flex-[1] xl:min-w-[150px]">
               <Select
                 aria-label="Jenis Tampilan Prioritas Nasional"
                 selectedKeys={pnradio ? [pnradio] : ["1"]}

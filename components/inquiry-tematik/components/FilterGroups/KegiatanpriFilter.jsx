@@ -40,7 +40,7 @@ const KegiatanpriFilter = ({ inquiryState }) => {
           {/* Fields: Stack on mobile/tablet, row on large desktop */}
           <div className="flex flex-col xl:flex xl:flex-row xl:items-end gap-3 xl:gap-4 w-full">
             {/* Selection Component */}
-            <div className="flex flex-col gap-1 w-full xl:flex-[2] min-w-0 max-w-full overflow-hidden">
+            <div className="flex flex-col gap-1 w-full xl:flex-[4] xl:max-w-[800px] xl:min-w-[350px]">
               <KodeKegPP
                 value={kegiatanprioritas}
                 onChange={(val) => {
@@ -53,7 +53,7 @@ const KegiatanpriFilter = ({ inquiryState }) => {
             </div>
 
             {/* Jenis Tampilan */}
-            <div className="flex flex-col gap-1 w-full xl:flex-[1]">
+            <div className="fflex flex-col gap-1 w-full xl:flex-[1] xl:min-w-[150px]">
               <Select
                 aria-label="Jenis Tampilan Kegiatan Prioritas"
                 selectedKeys={
