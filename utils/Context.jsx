@@ -89,7 +89,7 @@ export const MyContextProvider = ({ children }) => {
 
           // Hanya redirect jika tidak sedang di halaman auth
           if (!isOnAuthPage) {
-            window.location.href = "/login2";
+            window.location.href = "/v3/next/login";
           }
           return;
         }
@@ -133,7 +133,7 @@ export const MyContextProvider = ({ children }) => {
 
           // Hanya redirect jika tidak sedang di halaman auth
           if (!isOnAuthPage) {
-            window.location.href = "/login2";
+            window.location.href = "v3/login2";
           }
         }
       } catch (error) {
@@ -153,7 +153,7 @@ export const MyContextProvider = ({ children }) => {
 
           // Hanya redirect jika tidak sedang di halaman auth
           if (!isOnAuthPage) {
-            window.location.href = "/login2";
+            window.location.href = "v3/next/login";
           }
         } else {
           // Untuk error lain (network, dll), jangan logout otomatis

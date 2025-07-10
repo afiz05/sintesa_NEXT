@@ -24,9 +24,10 @@ export default function OfflinePage() {
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const { data } = await response.json(); // destruksi properti data
         return data.status === "OK";
       }
+
       return false;
     } catch (error) {
       console.error("Backend check failed:", error);
@@ -117,7 +118,7 @@ export default function OfflinePage() {
         </p>
 
         <Button
-          onClick={handleTryAgain}
+          onPress={handleTryAgain}
           disabled={isChecking}
           className={`font-bold py-3 px-6 rounded-lg w-96 transition-colors ${
             isChecking
