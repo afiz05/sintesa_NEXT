@@ -18,15 +18,16 @@ export default function OfflinePage() {
   // Simple HTTP check for manual retry
   const checkBackendStatus = async () => {
     try {
-      const response = await fetch("http://localhost:88/next/status", {
+      const response = await fetch("http://localhost:8080/next/status", {
         method: "GET",
         signal: AbortSignal.timeout(5000),
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const { data } = await response.json(); // destruksi properti data
         return data.status === "OK";
       }
+
       return false;
     } catch (error) {
       console.error("Backend check failed:", error);
@@ -117,7 +118,7 @@ export default function OfflinePage() {
         </p>
 
         <Button
-          onClick={handleTryAgain}
+          onPress={handleTryAgain}
           disabled={isChecking}
           className={`font-bold py-3 px-6 rounded-lg w-96 transition-colors ${
             isChecking

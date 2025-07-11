@@ -7,6 +7,7 @@ import { PieChart, Database, FileX } from "lucide-react";
 import dynamic from "next/dynamic";
 import MyContext from "@/utils/Context";
 import Encrypt from "@/utils/Random";
+import { handleHttpError } from "../notifikasi/toastError";
 
 const Chart = dynamic(() => import("./client-chart"), {
   ssr: false,
@@ -92,14 +93,7 @@ export const DukmanTeknis = ({ selectedKanwil, selectedKddept }) => {
       setLoading(true);
       const response = await axiosJWT.post(
         process.env.NEXT_PUBLIC_GET_REFERENSI,
-        { query: encryptedQuery },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json, text/plain, */*",
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { query: encryptedQuery }
       );
       setDataDukmanTeknis(response.data.result || []);
     } catch (err) {
