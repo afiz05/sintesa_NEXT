@@ -456,7 +456,6 @@ const InquiryModTematik = () => {
 
   // Handler to turn all switches on/off
   const handlePilihSemua = (isOn) => {
-    setTanggal(isOn);
     setKddept(isOn);
     setKddekon(isOn);
     setKdlokasi(isOn);
@@ -470,14 +469,9 @@ const InquiryModTematik = () => {
     setKdgiat(isOn);
     setKdoutput(isOn);
     setKdsoutput(isOn);
-    setKdkomponen(isOn);
-    setKdskomponen(isOn);
     setKdakun(isOn);
     setKdsdana(isOn);
-    setKdregister(isOn);
     // Only set boolean switches, do not set 'unit' or other radio/select values
-    setCutoff(isOn ? "12" : "0");
-    setShowCutoffSelector(isOn);
   };
 
   // Handler to reset all filters and parameters to their initial state

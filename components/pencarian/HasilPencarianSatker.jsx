@@ -1,6 +1,7 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Card, CardBody, Spinner, Chip } from "@heroui/react";
 
 export const HasilPencarianSatker = ({
@@ -8,7 +9,20 @@ export const HasilPencarianSatker = ({
   sedangMemuat,
   onPilihSatker,
   kataPencarian,
+  inputRef,
 }) => {
+  const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
+
+  useEffect(() => {
+    if (inputRef?.current) {
+      const rect = inputRef.current.getBoundingClientRect();
+      setPosition({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    }
+  }, [inputRef, hasil]);
   const highlightText = (text, searchTerm) => {
     if (!searchTerm) return text;
 
@@ -30,8 +44,16 @@ export const HasilPencarianSatker = ({
   };
 
   if (sedangMemuat) {
-    return (
-      <Card className="absolute top-full left-0 right-0 z-50 mt-1 shadow-lg">
+    const loadingContent = (
+      <Card
+        className="fixed z-[9999] mt-1 shadow-lg"
+        style={{
+          top: `${position.top}px`,
+          left: `${position.left}px`,
+          width: `${position.width}px`,
+          zIndex: 9999,
+        }}
+      >
         <CardBody className="p-4">
           <div className="flex items-center justify-center gap-2">
             <Spinner size="sm" />
@@ -40,11 +62,22 @@ export const HasilPencarianSatker = ({
         </CardBody>
       </Card>
     );
+    return typeof window !== "undefined"
+      ? createPortal(loadingContent, document.body)
+      : null;
   }
 
   if (hasil.length === 0 && kataPencarian.length >= 3) {
-    return (
-      <Card className="absolute top-full left-0 right-0 z-50 mt-1 shadow-lg">
+    const noResultsContent = (
+      <Card
+        className="fixed z-[9999] mt-1 shadow-lg"
+        style={{
+          top: `${position.top}px`,
+          left: `${position.left}px`,
+          width: `${position.width}px`,
+          zIndex: 9999,
+        }}
+      >
         <CardBody className="p-4">
           <div className="text-center text-gray-500">
             <p className="text-sm">
@@ -55,12 +88,23 @@ export const HasilPencarianSatker = ({
         </CardBody>
       </Card>
     );
+    return typeof window !== "undefined"
+      ? createPortal(noResultsContent, document.body)
+      : null;
   }
 
   if (hasil.length === 0) return null;
 
-  return (
-    <Card className="absolute top-full left-0 right-0 z-50 mt-1 shadow-lg max-h-80 overflow-y-auto">
+  const searchResults = (
+    <Card
+      className="fixed z-[9999] mt-1 shadow-lg max-h-80 overflow-y-auto"
+      style={{
+        top: `${position.top}px`,
+        left: `${position.left}px`,
+        width: `${position.width}px`,
+        zIndex: 9999,
+      }}
+    >
       <CardBody className="p-0">
         {hasil.map((satker, index) => (
           <div
@@ -107,4 +151,9 @@ export const HasilPencarianSatker = ({
       </CardBody>
     </Card>
   );
+
+  // Use portal to render outside of any stacking context
+  return typeof window !== "undefined"
+    ? createPortal(searchResults, document.body)
+    : null;
 };

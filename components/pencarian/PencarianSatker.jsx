@@ -16,6 +16,7 @@ export const PencarianSatker = ({
   const [sedangMemuat, setSedangMemuat] = useState(false);
   const [tampilkanHasil, setTampilkanHasil] = useState(false);
   const pencarianRef = useRef(null);
+  const inputRef = useRef(null);
   const router = useRouter();
 
   const { cariSatker } = useSatkerService();
@@ -83,6 +84,7 @@ export const PencarianSatker = ({
   return (
     <div ref={pencarianRef} className={`relative ${className}`}>
       <Input
+        ref={inputRef}
         startContent={<SearchIcon />}
         isClearable
         value={nilaiPencarian}
@@ -107,6 +109,7 @@ export const PencarianSatker = ({
           sedangMemuat={sedangMemuat}
           onPilihSatker={tanganiPilihSatker}
           kataPencarian={nilaiPencarian}
+          inputRef={inputRef}
         />
       )}
     </div>

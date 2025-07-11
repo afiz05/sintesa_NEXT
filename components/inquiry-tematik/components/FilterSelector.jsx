@@ -12,43 +12,20 @@ import ProgramFilter from "./FilterGroups/ProgramFilter";
 import KegiatanFilter from "./FilterGroups/KegiatanFilter";
 import OutputFilter from "./FilterGroups/OutputFilter";
 import SuboutputFilter from "./FilterGroups/SuboutputFilter";
-import KomponenFilter from "./FilterGroups/KomponenFilter";
-import SubkomponenFilter from "./FilterGroups/SubkomponenFilter";
+
 import AkunFilter from "./FilterGroups/AkunFilter";
 import SumberdanaFilter from "./FilterGroups/SumberDanaFilter";
-import RegisterFilter from "./FilterGroups/RegisterFilter";
-import InflasiFilter from "./FilterGroups/InflasiFilter";
-import IknFilter from "./FilterGroups/IknFilter";
-import KemiskinanFilter from "./FilterGroups/KemiskinanFilter";
-import PanganFilter from "./FilterGroups/PanganFilter";
-import StuntingFilter from "./FilterGroups/StuntingFilter";
-import PemiluFilter from "./FilterGroups/PemiluFilter";
-import PrinasFilter from "./FilterGroups/PrinasFilter";
-import ProgrampriFilter from "./FilterGroups/ProgrampriFilter";
-import KegiatanpriFilter from "./FilterGroups/KegiatanpriFilter";
-import ProyekprioritasFilter from "./FilterGroups/ProyekpriFilter";
-import MajorprFilter from "./FilterGroups/MajorprFilter";
-import TematikFilter from "./FilterGroups/TematikFilter";
 import DekonFilter from "./FilterGroups/DekonFilter";
 import KabkotaFilter from "./FilterGroups/KabkotaFilter";
 import KanwilFilter from "./FilterGroups/KanwilFilter";
 import KppnFilter from "./FilterGroups/KppnFilter";
 import SatkerFilter from "./FilterGroups/SatkerFilter";
-import MBGFilter from "./FilterGroups/MBGFilter";
 
 const FilterSection = ({ inquiryState }) => {
   const {
     // Report type for determining default switches
     jenlap,
     // Filter visibility states
-    tanggal,
-    setTanggal,
-    cutoff,
-    setCutoff,
-    showCutoffSelector,
-    setShowCutoffSelector,
-    akumulatif,
-    setAkumulatif,
     kddept,
     setKddept,
     unit,
@@ -77,16 +54,12 @@ const FilterSection = ({ inquiryState }) => {
     setKdoutput,
     kdsoutput,
     setKdsoutput,
-    kdkomponen,
-    setKdkomponen,
-    kdskomponen,
-    setKdskomponen,
+
     kdakun,
     setKdakun,
     kdsdana,
     setKdsdana,
-    kdregister,
-    setKdregister,
+    // Special filter switches (used in useEffect logic)
     kdInflasi,
     setKdInflasi,
     kdIkn,
@@ -114,7 +87,7 @@ const FilterSection = ({ inquiryState }) => {
     KdMBG,
     setKdMBG,
 
-    // Filter values and conditions
+    // Filter values and conditions (used in useEffect hooks)
     dept,
     setDept,
     deptkondisi,
@@ -227,22 +200,7 @@ const FilterSection = ({ inquiryState }) => {
     setKatasoutput,
     soutputradio,
     setsOutputradio,
-    komponen,
-    setKomponen,
-    komponenkondisi,
-    setKomponenkondisi,
-    katakomponen,
-    setKatakomponen,
-    komponenradio,
-    setKomponenradio,
-    skomponen,
-    setSkomponen,
-    skomponenkondisi,
-    setSkomponenkondisi,
-    kataskomponen,
-    setKataskomponen,
-    skomponenradio,
-    setSkomponenradio,
+
     akun,
     setAkun,
     akunkondisi,
@@ -259,76 +217,6 @@ const FilterSection = ({ inquiryState }) => {
     setKatasdana,
     sdanaradio,
     setSdanaradio,
-    register,
-    setRegister,
-    registerkondisi,
-    setRegisterkondisi,
-    kataregister,
-    setKataregister,
-    registerradio,
-    setRegisterradio,
-    Inflasi,
-    setInflasi,
-    inflasiradio,
-    setInflasiradio,
-    opsiInflasi,
-    setOpsiInflasi,
-    Ikn,
-    setIkn,
-    iknradio,
-    setIknradio,
-    opsiIkn,
-    setOpsiIkn,
-    Miskin,
-    setMiskin,
-    kemiskinanradio,
-    setKemiskinanradio,
-    opsiKemiskinan,
-    setOpsiKemiskinan,
-    Pangan,
-    setPangan,
-    panganradio,
-    setPanganradio,
-    opsiPangan,
-    setOpsiPangan,
-    Stunting,
-    setStunting,
-    stuntingradio,
-    setStuntingradio,
-    opsiStunting,
-    setOpsiStunting,
-    PN,
-    setPN,
-    pnradio,
-    setPnradio,
-    PP,
-    setPP,
-    ppradio,
-    setPpradio,
-    kegiatanprioritas,
-    setKegiatanPrioritas,
-    kegiatanprioritasradio,
-    setKegiatanPrioritasRadio,
-    MP,
-    setMP,
-    mpradio,
-    setMpradio,
-    Tema,
-    setTema,
-    temaradio,
-    setTemaradio,
-    Pemilu,
-    setPemilu,
-    pemiluradio,
-    setPemiluradio,
-    PRI,
-    setPRI,
-    priradio,
-    setPriradio,
-    mbg,
-    setmbg,
-    mbgradio,
-    setmbgradio,
   } = inquiryState;
 
   // Remove local state - use the actual filter switch states from inquiryState instead
@@ -848,38 +736,6 @@ const FilterSection = ({ inquiryState }) => {
   ]);
 
   React.useEffect(() => {
-    if (!kdkomponen) {
-      // Reset Komponen filter state
-      setKomponen && setKomponen("XX");
-      setKomponenkondisi && setKomponenkondisi("");
-      setKatakomponen && setKatakomponen("");
-      setKomponenradio && setKomponenradio("1");
-    }
-  }, [
-    kdkomponen,
-    setKomponen,
-    setKomponenkondisi,
-    setKatakomponen,
-    setKomponenradio,
-  ]);
-
-  React.useEffect(() => {
-    if (!kdskomponen) {
-      // Reset Sub-komponen filter state
-      setSkomponen && setSkomponen("XX");
-      setSkomponenkondisi && setSkomponenkondisi("");
-      setKataskomponen && setKataskomponen("");
-      setSkomponenradio && setSkomponenradio("1");
-    }
-  }, [
-    kdskomponen,
-    setSkomponen,
-    setSkomponenkondisi,
-    setKataskomponen,
-    setSkomponenradio,
-  ]);
-
-  React.useEffect(() => {
     if (!kdakun) {
       // Reset Akun filter state
       setAkun && setAkun("AKUN");
@@ -908,117 +764,8 @@ const FilterSection = ({ inquiryState }) => {
     }
   }, [kdsdana, setSdana, setSdanakondisi, setKatasdana, setSdanaradio]);
 
-  React.useEffect(() => {
-    if (!kdregister) {
-      // Reset Register filter state
-      setRegister && setRegister("XX");
-      setRegisterkondisi && setRegisterkondisi("");
-      setKataregister && setKataregister("");
-      setRegisterradio && setRegisterradio("1");
-    }
-  }, [
-    kdregister,
-    setRegister,
-    setRegisterkondisi,
-    setKataregister,
-    setRegisterradio,
-  ]);
-
-  React.useEffect(() => {
-    if (!kdInflasi) {
-      // Reset Inflasi filter state
-      setInflasi && setInflasi("00");
-      setInflasiradio && setInflasiradio("1");
-    }
-  }, [kdInflasi, setInflasi, setInflasiradio]);
-
-  React.useEffect(() => {
-    if (!kdIkn) {
-      // Reset IKN filter state
-      setIkn && setIkn("00");
-      setIknradio && setIknradio("1");
-    }
-  }, [kdIkn, setIkn, setIknradio]);
-
-  React.useEffect(() => {
-    if (!kdKemiskinan) {
-      // Reset Kemiskinan filter state
-      setMiskin && setMiskin("00");
-      setKemiskinanradio && setKemiskinanradio("1");
-    }
-  }, [kdKemiskinan, setMiskin, setKemiskinanradio]);
-
-  React.useEffect(() => {
-    if (!KdPangan) {
-      // Reset Pangan filter state
-      setPangan && setPangan("00");
-      setPanganradio && setPanganradio("1");
-    }
-  }, [KdPangan, setPangan, setPanganradio]);
-
-  React.useEffect(() => {
-    if (!KdStunting) {
-      // Reset Stunting filter state
-      setStunting && setStunting("00");
-      setStuntingradio && setStuntingradio("1");
-    }
-  }, [KdStunting, setStunting, setStuntingradio]);
-
-  React.useEffect(() => {
-    if (!KdPN) {
-      // Reset Prinas filter state
-      setPN && setPN("00");
-      setPnradio && setPnradio("1");
-    }
-  }, [KdPN, setPN, setPnradio]);
-
-  React.useEffect(() => {
-    if (!KdPP) {
-      // Reset Programpri filter state
-      setPP && setPP("00");
-      setPpradio && setPpradio("1");
-    }
-  }, [KdPP, setPP, setPpradio]);
-
-  React.useEffect(() => {
-    if (!KdKegPP) {
-      // Reset Kegiatanpri filter state
-      setKegiatanPrioritas && setKegiatanPrioritas("XX");
-      setKegiatanPrioritasRadio && setKegiatanPrioritasRadio("1");
-    }
-  }, [KdKegPP, setKegiatanPrioritas, setKegiatanPrioritasRadio]);
-
-  React.useEffect(() => {
-    if (!KdMP) {
-      // Reset Majorpr filter state
-      setMP && setMP("00");
-      setMpradio && setMpradio("1");
-    }
-  }, [KdMP, setMP, setMpradio]);
-
-  React.useEffect(() => {
-    if (!KdTema) {
-      // Reset Tematik filter state
-      setTema && setTema("00");
-      setTemaradio && setTemaradio("1");
-    }
-  }, [KdTema, setTema, setTemaradio]);
-
-  React.useEffect(() => {
-    if (!KdPemilu) {
-      // Reset Pemilu filter state
-      setPemilu && setPemilu("00");
-      setPemiluradio && setPemiluradio("1");
-    }
-  }, [KdPemilu, setPemilu, setPemiluradio]);
-
-  React.useEffect(() => {
-    if (!KdMBG) {
-      // Reset MBG filter state
-      setmbg && setmbg("XX");
-      setmbgradio && setmbgradio("1");
-    }
-  }, [KdMBG, setmbg, setmbgradio]);
+  // Note: Special filter state management (Inflasi, IKN, Kemiskinan, etc.)
+  // is handled by their respective card components, not here in FilterSelector
 
   // Set default filter switches based on report type (jenlap)
   React.useEffect(() => {
@@ -1044,7 +791,7 @@ const FilterSection = ({ inquiryState }) => {
         kdsoutput: false, // Sub-output is now available for all jenlap types
         kdakun: reportType === "10", // Turn on Akun for jenlap 10
         kdsdana: false,
-        kdregister: false,
+
         // These switches are now controlled by jenlap-specific logic
         KdPP: false,
         KdKegPP: false,
@@ -1084,7 +831,7 @@ const FilterSection = ({ inquiryState }) => {
     setKdsoutput && setKdsoutput(defaultSwitches.kdsoutput);
     setKdakun && setKdakun(defaultSwitches.kdakun);
     setKdsdana && setKdsdana(defaultSwitches.kdsdana);
-    setKdregister && setKdregister(defaultSwitches.kdregister);
+
     // These switches are now controlled by jenlap-specific logic in separate useEffect
     // setKdPP && setKdPP(defaultSwitches.KdPP);
     // setKdKegPP && setKdKegPP(defaultSwitches.KdKegPP);
@@ -1268,14 +1015,9 @@ const FilterSection = ({ inquiryState }) => {
         {kdoutput && <OutputFilter type="output" inquiryState={inquiryState} />}
         {kdsoutput && <SuboutputFilter inquiryState={inquiryState} />}
         {kdakun && <AkunFilter inquiryState={inquiryState} />}
-        {kdkomponen && <KomponenFilter inquiryState={inquiryState} />}
-        {kdskomponen && <SubkomponenFilter inquiryState={inquiryState} />}
         {kdsdana && (
           <SumberdanaFilter type="source" inquiryState={inquiryState} />
         )}
-        {/* {kdregister && (
-          <RegisterFilter type="register" inquiryState={inquiryState} />
-        )} */}
       </div>
     </>
   );
