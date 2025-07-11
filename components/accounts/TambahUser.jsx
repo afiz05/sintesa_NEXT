@@ -100,7 +100,7 @@ const TambahUser = ({ isOpen, onClose, onUserAdded }) => {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      size="2xl"
+      size="4xl"
       scrollBehavior="inside"
       closeButton
     >
@@ -230,6 +230,18 @@ const TambahUser = ({ isOpen, onClose, onUserAdded }) => {
                               label="NIP "
                               {...field}
                               variant="bordered"
+                              maxLength={18}
+                              onInput={(e) => {
+                                // Hanya izinkan angka
+                                e.target.value = e.target.value.replace(
+                                  /[^0-9]/g,
+                                  ""
+                                );
+                                // Batasi maksimal 18 digit
+                                if (e.target.value.length > 18) {
+                                  e.target.value = e.target.value.slice(0, 18);
+                                }
+                              }}
                               isInvalid={touched.nip && errors.nip}
                               color={
                                 touched.nip && errors.nip ? "danger" : "default"
@@ -248,7 +260,15 @@ const TambahUser = ({ isOpen, onClose, onUserAdded }) => {
                             <div className="col-span-2">
                               <Select
                                 label="Role"
-                                {...field}
+                                selectedKeys={values.role ? [values.role] : []}
+                                onSelectionChange={(selection) => {
+                                  const selectedValue =
+                                    Array.from(selection)[0] || "";
+                                  setFieldValue("role", selectedValue);
+                                  // Reset location fields when role changes
+                                  setFieldValue("kdkanwil", "");
+                                  setFieldValue("kdkppn", "");
+                                }}
                                 variant="bordered"
                                 className="w-full"
                                 isInvalid={touched.role && errors.role}
@@ -258,14 +278,6 @@ const TambahUser = ({ isOpen, onClose, onUserAdded }) => {
                                     : "default"
                                 }
                               >
-                                <SelectItem
-                                  key="placeholder"
-                                  value=""
-                                  isPlaceholder
-                                >
-                                  Pilih Role
-                                </SelectItem>
-
                                 {roleOptions.map((role) => (
                                   <SelectItem key={role.key} value={role.key}>
                                     {role.label}
@@ -285,10 +297,16 @@ const TambahUser = ({ isOpen, onClose, onUserAdded }) => {
                           {/* Select Kanwil */}
                           <Select
                             label="Kanwil"
-                            value={values.kdkanwil}
-                            onChange={(e) =>
-                              setFieldValue("kdkanwil", e.target.value)
+                            selectedKeys={
+                              values.kdkanwil ? [values.kdkanwil] : []
                             }
+                            onSelectionChange={(selection) => {
+                              const selectedValue =
+                                Array.from(selection)[0] || "";
+                              setFieldValue("kdkanwil", selectedValue);
+                              // Reset KPPN when kanwil changes
+                              setFieldValue("kdkppn", "");
+                            }}
                             variant="bordered"
                             isInvalid={touched.kdkanwil && errors.kdkanwil}
                             color={
@@ -297,8 +315,6 @@ const TambahUser = ({ isOpen, onClose, onUserAdded }) => {
                                 : "default"
                             }
                           >
-                            <SelectItem value="">Pilih Kanwil</SelectItem>{" "}
-                            {/* pastikan value="" */}
                             {kdkanwilData.map((kanwil) => (
                               <SelectItem
                                 key={kanwil.kdkanwil}
@@ -318,10 +334,12 @@ const TambahUser = ({ isOpen, onClose, onUserAdded }) => {
 
                           <Select
                             label="KPPN"
-                            value={values.kdkppn}
-                            onChange={(e) =>
-                              setFieldValue("kdkppn", e.target.value)
-                            }
+                            selectedKeys={values.kdkppn ? [values.kdkppn] : []}
+                            onSelectionChange={(selection) => {
+                              const selectedValue =
+                                Array.from(selection)[0] || "";
+                              setFieldValue("kdkppn", selectedValue);
+                            }}
                             variant="bordered"
                             isDisabled={!values.kdkanwil}
                             isInvalid={touched.kdkppn && errors.kdkppn}
@@ -331,7 +349,6 @@ const TambahUser = ({ isOpen, onClose, onUserAdded }) => {
                                 : "default"
                             }
                           >
-                            <SelectItem value="">Pilih KPPN</SelectItem>
                             {kdkppnData
                               .filter(
                                 (kppn) =>
