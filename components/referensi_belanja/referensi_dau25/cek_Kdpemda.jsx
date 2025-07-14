@@ -1,8 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
-import MyContext from "../../../auth/Context";
-import { Encrypt } from "../../utils/Encrypt";
-import { handleHttpError } from "../../aplikasi/notifikasi/toastError";
-// import { Button, Container, Spinner, Form } from "react-bootstrap";
+import MyContext from "../../../utils/Context";
+import Encrypt from "../../../utils/Encrypt";
+import { handleHttpError } from "../../notifikasi/toastError";
 
 const CekKdpemda25 = (props) => {
   const { axiosJWT, token, username, role, kdkanwil } = useContext(MyContext);
@@ -67,22 +66,19 @@ const CekKdpemda25 = (props) => {
     }
   };
   return (
-    <Form.Group controlId="inputState">
-      <Form.Control
-        value={props.kdpemda}
-        as="select"
-        className="form-select form-select-md text-select"
-        name={props.name}
-        onChange={(e) => props.onChange(e.target.value)} // Pass the selected value to props.onChange
-      >
-        <option value="">-- Pilih Kabupaten/ Kota --</option>
-        {data.map((dau, index) => (
-          <option key={index} value={dau.kdkabkota}>
-            {dau.kdkabkota} - {dau.nmkabkota}
-          </option>
-        ))}
-      </Form.Control>
-    </Form.Group>
+    <select
+      className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white"
+      value={props.kdpemda}
+      name={props.name}
+      onChange={(e) => props.onChange(e.target.value)} // Pass the selected value to props.onChange
+    >
+      <option value="">-- Pilih Kabupaten/ Kota --</option>
+      {data.map((dau, index) => (
+        <option key={index} value={dau.kdkabkota}>
+          {dau.kdkabkota} - {dau.nmkabkota}
+        </option>
+      ))}
+    </select>
   );
 };
 

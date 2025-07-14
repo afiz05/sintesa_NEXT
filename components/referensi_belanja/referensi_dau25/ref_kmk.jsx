@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
-import MyContext from "../../../auth/Context";
-import { Encrypt } from "../../utils/Encrypt";
-import { handleHttpError } from "../../aplikasi/notifikasi/toastError";
+import MyContext from "../../../utils/Context";
+import Encrypt from "../../../utils/Encrypt";
+import { handleHttpError } from "../../notifikasi/toastError";
 // import { Button, Container, Spinner, Form } from "react-bootstrap";
 
 const Kdkmk25 = (props) => {
@@ -63,22 +63,25 @@ const Kdkmk25 = (props) => {
       setLoading(false);
     }
   };
+
+  // Return data for parent component to use
+  if (props.returnData) {
+    return { data, loading };
+  }
+
   return (
-    <Form.Group controlId="inputState">
-      <Form.Control
-        as="select"
-        className="form-select form-select-md text-select"
-        name={props.name}
-        onChange={(e) => props.onChange(e.target.value)} // Pass the selected value to props.onChange
-      >
-        <option value="">-- Pilih Jenis KMK --</option>
-        {data.map((dau, index) => (
-          <option key={index} value={dau.jenis}>
-            {dau.jenis} - {dau.nmjenis}
-          </option>
-        ))}
-      </Form.Control>
-    </Form.Group>
+    <select
+      className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white"
+      name={props.name}
+      onChange={(e) => props.onChange(e.target.value)} // Pass the selected value to props.onChange
+    >
+      <option value="">-- Pilih Jenis KMK --</option>
+      {data.map((dau, index) => (
+        <option key={index} value={dau.jenis}>
+          {dau.jenis} - {dau.nmjenis}
+        </option>
+      ))}
+    </select>
   );
 };
 

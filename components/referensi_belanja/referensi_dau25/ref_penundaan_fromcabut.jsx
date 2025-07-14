@@ -1,8 +1,8 @@
 import React, { useState, useContext, useEffect } from "react";
-import MyContext from "../../../auth/Context";
-import { Encrypt } from "../../utils/Encrypt";
-import { handleHttpError } from "../../aplikasi/notifikasi/toastError";
-// import { Button, Container, Spinner, Form } from "react-bootstrap";
+import { Select, SelectItem } from "@heroui/react";
+import MyContext from "../../../utils/Context";
+import Encrypt from "../../../utils/Encrypt";
+import { handleHttpError } from "../../notifikasi/toastError";
 
 const RefPenundaanCabut25 = (props) => {
   const { axiosJWT, token, username, role, kdkanwil } = useContext(MyContext);
@@ -53,21 +53,22 @@ const RefPenundaanCabut25 = (props) => {
     }
   };
   return (
-    <Form.Group controlId="inputState">
-      <Form.Control
-        as="select"
-        className="form-select form-select-md text-select"
-        value={props.refPenundaan}
-        onChange={(e) => props.onChange(e.target.value)}
-      >
-        <option value="">-- Pilih KMK --</option>
-        {data.map((dau, index) => (
-          <option key={index} value={dau.no_kmk}>
-            {dau.no_kmk}
-          </option>
-        ))}
-      </Form.Control>
-    </Form.Group>
+    <Select
+      placeholder="-- Pilih KMK --"
+      selectedKeys={props.refPenundaan ? [props.refPenundaan] : []}
+      onSelectionChange={(keys) => {
+        const selectedValue = Array.from(keys)[0] || "";
+        props.onChange(selectedValue);
+      }}
+      variant="bordered"
+      className="w-full"
+    >
+      {data.map((dau, index) => (
+        <SelectItem key={dau.no_kmk} value={dau.no_kmk}>
+          {dau.no_kmk}
+        </SelectItem>
+      ))}
+    </Select>
   );
 };
 

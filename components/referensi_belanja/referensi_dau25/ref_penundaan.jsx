@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
-import MyContext from "../../../auth/Context";
-import { Encrypt } from "../../utils/Encrypt";
-import { handleHttpError } from "../../aplikasi/notifikasi/toastError";
+import MyContext from "../../../utils/Context";
+import Encrypt from "../../../utils/Encrypt";
+import { handleHttpError } from "../../notifikasi/toastError";
 // import { Button, Container, Spinner, Form } from "react-bootstrap";
 
 const RefPenundaan25 = (props) => {
@@ -62,23 +62,20 @@ const RefPenundaan25 = (props) => {
     }
   };
   return (
-    <Form.Group controlId="inputState">
-      <Form.Control
-        as="select"
-        className="form-select form-select-md text-select"
-        value={props.refPenundaan}
-        onChange={(e) => props.onChange(e.target.value)}
-      >
-        <option value="">-- Pilih KMK --</option>
-        {data
-          .filter((item) => item.kriteria === props.kriteria)
-          .map((dau, index) => (
-            <option key={index} value={dau.no_kmk}>
-              {dau.no_kmk}
-            </option>
-          ))}
-      </Form.Control>
-    </Form.Group>
+    <select
+      className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white"
+      value={props.refPenundaan}
+      onChange={(e) => props.onChange(e.target.value)}
+    >
+      <option value="">-- Pilih KMK --</option>
+      {data
+        .filter((item) => item.kriteria === props.kriteria)
+        .map((dau, index) => (
+          <option key={index} value={dau.no_kmk}>
+            {dau.no_kmk}
+          </option>
+        ))}
+    </select>
   );
 };
 
