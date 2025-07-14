@@ -344,13 +344,6 @@ const InquiryMod = () => {
     akunSql,
   } = inquiry;
 
-  // Debug logging to track initial state
-  console.log("=== FormInquiryMod Debug ===");
-  console.log("kddept state:", kddept);
-  console.log("unit state:", unit);
-  console.log("kddekon state:", kddekon);
-  console.log("=== End FormInquiryMod Debug ===");
-
   // Modal handlers
   const openModalKedua = () => {
     setShowModalKedua(true);
@@ -379,34 +372,7 @@ const InquiryMod = () => {
 
   // **UNIFIED QUERY GENERATION** - All functions now use the same query builder
   const generateUnifiedQuery = () => {
-    // Debug: Log the current inquiry state before generating SQL
-    console.log("🔍 generateUnifiedQuery - Debug inquiry state:", {
-      jenlap: inquiry.jenlap,
-      akumulatif: inquiry.akumulatif,
-      dept: inquiry.dept,
-      kddept: inquiry.kddept,
-      unit: inquiry.unit,
-      kddekon: inquiry.kddekon,
-      dekon: inquiry.dekon,
-      thang: inquiry.thang,
-      cutoff: inquiry.cutoff,
-      // Add Kegiatan Prioritas debug
-      KdKegPP: inquiry.KdKegPP,
-      kegiatanprioritas: inquiry.kegiatanprioritas,
-      kegiatanprioritasradio: inquiry.kegiatanprioritasradio,
-      type: typeof inquiry.akumulatif,
-      timestamp: new Date().toISOString(),
-    });
-
     const sql = buildQuery(); // Use buildQuery() to get the complete SQL string
-
-    // Safety check to ensure sql is a valid string before using substring
-    if (typeof sql === "string" && sql.length > 0) {
-      console.log("🔄 Query Generated:", sql.substring(0, 600)); // Debug log (show more characters)
-    } else {
-      console.log("🔄 Query Generated: (empty or invalid)"); // Debug log for empty/invalid queries
-    }
-
     return sql;
   };
 
@@ -422,14 +388,6 @@ const InquiryMod = () => {
   };
   // **UPDATED** - SQL preview handler now uses unified query generation
   const handlegetQuerySQL = () => {
-    // Debug: Log the current akumulatif state before generating SQL
-    console.log("🔍 handlegetQuerySQL - Debug inquiry state:", {
-      jenlap: inquiry.jenlap,
-      akumulatif: inquiry.akumulatif,
-      type: typeof inquiry.akumulatif,
-      timestamp: new Date().toISOString(),
-    });
-
     const latestSql = generateUnifiedQuery(); // Same query as execute
     inquiry.setSql(latestSql); // update global state
     setShowModalsql(true); // open modal
@@ -652,17 +610,14 @@ const InquiryMod = () => {
   // Helper to fetch data from backend using current filters/query
   // **UPDATED** - Export data fetcher now uses unified query generation
   async function fetchExportData() {
-    console.log("fetchExportData called"); // Debug log to confirm function call
     // Use the same query builder as execute and show SQL
     const sql = generateUnifiedQuery(); // Consistent with all other operations
     if (!sql || typeof sql !== "string" || sql.trim() === "") {
       Pesan("Query tidak valid, silakan cek filter dan parameter.");
-      console.error("Export aborted: SQL query is empty or invalid.", { sql });
       return [];
     }
     // If not logged in, return empty array
     if (!statusLogin) {
-      console.log("Not logged in, cannot export data.");
       return [];
     }
 
@@ -681,8 +636,6 @@ const InquiryMod = () => {
           },
         }
       );
-      // Debug: Log the full backend response
-      console.log("[Export Debug] Backend response:", response.data);
       // If backend supports returning all data for export, use that.
       // Otherwise, you may need to adjust API/backend to support full export.
       if (response.data && Array.isArray(response.data.data)) {
@@ -691,12 +644,6 @@ const InquiryMod = () => {
       return [];
     } catch (e) {
       console.error("Export API error:", e);
-      if (e && e.response) {
-        console.error(
-          "[Export Debug] Backend error response:",
-          e.response.data
-        );
-      }
       return [];
     }
   }

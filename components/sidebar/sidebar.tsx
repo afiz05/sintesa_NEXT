@@ -24,6 +24,7 @@ import { useSidebarContext } from "../layout/layout-context";
 import { usePathname } from "next/navigation";
 import { EpaHorizontalDD } from "./epa-hrzntl-dropdown";
 import { EpaVertikalDD } from "./epa-vrtkl-dropdown";
+import { TkdHorizontalDD } from "./tkd-horizontal";
 
 export const SidebarWrapper = () => {
   const pathname = usePathname();
@@ -174,7 +175,7 @@ export const SidebarWrapper = () => {
               >
                 <ChevronDown size={20} strokeWidth={2.5} />
               </EpaHorizontalDD>
-              <SidebarItem
+              {/* <SidebarItem
                 isActive={pathname === "/test-belanja"}
                 title="Spending Review"
                 icon={
@@ -189,7 +190,21 @@ export const SidebarWrapper = () => {
                 activeBgColor="bg-teal-100"
                 activeColor="text-teal-500"
                 hoverColor="hover:bg-teal-100"
-              />
+              /> */}
+              <TkdHorizontalDD
+                icon={
+                  <Database
+                    className="text-secondary"
+                    strokeWidth={2.5}
+                    size={26}
+                  />
+                }
+                items={["DAU", "Upload Laporan"]}
+                title="TKD"
+                isActive={pathname.startsWith("/tkd")}
+              >
+                <ChevronDown size={20} strokeWidth={2.5} />
+              </TkdHorizontalDD>
               <InqHorizontalDD
                 icon={
                   <Database
