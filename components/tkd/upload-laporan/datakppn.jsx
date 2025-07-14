@@ -71,9 +71,6 @@ export default function DataKppn() {
           <h1 className="text-xl sm:text-2xl font-bold">
             Laporan Transfer Daerah
           </h1>
-          <nav className="text-sm text-gray-600 mt-1">
-            <span>TKD</span> / <span className="text-gray-800">Upload</span>
-          </nav>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
           {role !== "2" && (
@@ -125,11 +122,11 @@ export default function DataKppn() {
                 title={
                   <div className="flex items-center gap-1 sm:gap-2">
                     <FileText size={14} className="sm:w-4 sm:h-4" />
-                    <span className="text-xs sm:text-sm">
-                      <span className="hidden sm:inline">
+                    <span className="font-semibold text-xs sm:text-base">
+                      <span className="hidden sm:inline ">
                         Laporan Keuangan KPPN
                       </span>
-                      <span className="sm:hidden">Keuangan</span>
+                      <span className="sm:hidden">Keuangan KPPN</span>
                     </span>
                   </div>
                 }
@@ -139,7 +136,7 @@ export default function DataKppn() {
                 title={
                   <div className="flex items-center gap-1 sm:gap-2">
                     <BarChart3 size={14} className="sm:w-4 sm:h-4" />
-                    <span className="text-xs sm:text-sm">
+                    <span className="font-semibold text-xs sm:text-base">
                       <span className="hidden sm:inline">
                         Laporan Monev KPPN
                       </span>
@@ -156,7 +153,7 @@ export default function DataKppn() {
               title={
                 <div className="flex items-center gap-1 sm:gap-2">
                   <Building2 size={14} className="sm:w-4 sm:h-4" />
-                  <span className="text-xs sm:text-sm">
+                  <span className="font-semibold text-xs sm:text-base">
                     <span className="hidden sm:inline">
                       Laporan Monev Kanwil
                     </span>

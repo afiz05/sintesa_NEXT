@@ -3,19 +3,33 @@
 import React, { useState, useContext, useEffect } from "react";
 import {
   Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
   Card,
-  OverlayTrigger,
+  CardBody,
   Tooltip,
   Spinner,
-  Modal,
-  ModalBody,
-  Form,
-  Row,
-  Col,
-} from "react-bootstrap";
+  Select,
+  SelectItem,
+  Button,
+  Chip,
+} from "@heroui/react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import moment from "moment";
 import numeral from "numeral";
+import {
+  Download,
+  Trash2,
+  Calendar,
+  Building,
+  FileText,
+  Clock,
+  Hash,
+  Settings,
+} from "lucide-react";
 
 import MyContext from "../../../utils/Context";
 import Encrypt from "../../../utils/Random";
@@ -139,9 +153,8 @@ export default function LaporanKeuanganList() {
     fetchData(0, true);
   }, [selectedPeriode]);
 
-  const handlePeriodeChange = (e) => {
-    const newPeriode = e.target.value;
-    setSelectedPeriode(newPeriode);
+  const handlePeriodeChange = (value) => {
+    setSelectedPeriode(value);
     // Data akan direset melalui useEffect
   };
 
@@ -266,245 +279,217 @@ export default function LaporanKeuanganList() {
     }
   };
   return (
-    <>
-      <div className="mb-4 mt-2 fade-in">
-        <Row className="align-items-center">
-          <Col md={12}>
-            <div className="d-flex justify-content-end align-items-center gap-3">
-              {loading && (
-                <Spinner
-                  animation="border"
-                  size="sm"
-                  className="ms-2 text-primary"
-                />
-              )}
-              <Form.Group className="d-flex align-items-center mb-0">
-                <Form.Label className="me-3 mb-0 text-nowrap">
-                  <strong>Filter Periode:</strong>
-                </Form.Label>
-                <Form.Select
-                  value={selectedPeriode}
-                  onChange={handlePeriodeChange}
-                  style={{ width: "220px", fontSize: "16px" }}
-                  disabled={loading}
-                  className={loading ? "opacity-50" : ""}
-                >
-                  {periodeOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Form.Group>
-              <div className="text-muted ms-auto">
-                <small>
-                  <i className="bi bi-files me-1"></i>
-                  Total: <strong>{data.length}</strong> data
-                </small>
-              </div>
-            </div>
-          </Col>
-        </Row>
+    <div className="w-full space-y-4">
+      {/* Filter Section */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border">
+        <div className="flex items-center gap-3">
+          {loading && <Spinner size="sm" color="primary" />}
+          <div className="flex items-center gap-2">
+            <Calendar size={18} className="text-primary" />
+            <span className="text-sm font-medium text-gray-700">
+              Filter Periode:
+            </span>
+          </div>
+          <Select
+            value={selectedPeriode}
+            onChange={(value) => setSelectedPeriode(value)}
+            className="w-60"
+            size="sm"
+            isDisabled={loading}
+            placeholder="Pilih Periode"
+          >
+            {periodeOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </Select>
+        </div>
+
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <FileText size={16} />
+          <span>
+            Total:{" "}
+            <span className="font-semibold text-primary">{data.length}</span>{" "}
+            data
+          </span>
+        </div>
       </div>
 
-      <Card className="mt-0" bg="light">
-        <div
-          id="scrollableDiv"
-          style={{
-            height: "50vh",
-            overflow: "auto",
-            position: "relative",
-          }}
-        >
-          <InfiniteScroll
-            dataLength={data.length}
-            next={() => {
-              if (!loading) fetchData();
-            }}
-            hasMore={hasMoreData}
-            loader={
-              <p className="text-center my-3">
-                Loading data Laporan Keuangan...
-              </p>
-            }
-            scrollableTarget="scrollableDiv"
-          >
-            <Table bordered striped hover className="mt-0 mb-0">
-              <thead
-                style={{
-                  position: "sticky",
-                  top: "0px",
-                  backgroundColor: "#0d6efd",
-                  zIndex: 1030,
-                  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                }}
+      {/* Table Card */}
+      <Card className="w-full">
+        <CardBody className="p-0">
+          <div id="scrollableDiv" className="h-[50vh] overflow-auto">
+            <InfiniteScroll
+              dataLength={data.length}
+              next={() => {
+                if (!loading) fetchData();
+              }}
+              hasMore={hasMoreData}
+              loader={
+                <div className="flex justify-center items-center py-4">
+                  <Spinner size="sm" color="primary" />
+                  <span className="ml-2 text-sm text-gray-600">
+                    Loading data Laporan Keuangan...
+                  </span>
+                </div>
+              }
+              scrollableTarget="scrollableDiv"
+            >
+              <Table
+                aria-label="Laporan Keuangan Table"
+                className="min-w-full"
+                // removeWrapper
               >
-                <tr>
-                  <th
-                    className="text-center align-middle"
-                    style={{
-                      width: "50px",
-                      backgroundColor: "#0d6efd",
-                      color: "white",
-                      border: "1px solid #dee2e6",
-                      padding: "12px 8px",
-                    }}
-                  >
-                    <i className="bi bi-hash"></i>
-                  </th>
-                  <th
-                    className="text-center align-middle"
-                    style={{
-                      backgroundColor: "#0d6efd",
-                      color: "white",
-                      border: "1px solid #dee2e6",
-                      padding: "12px 8px",
-                    }}
-                  >
-                    <i className="bi bi-calendar2"></i> Tahun
-                  </th>
-                  <th
-                    className="text-center align-middle"
-                    style={{
-                      backgroundColor: "#0d6efd",
-                      color: "white",
-                      border: "1px solid #dee2e6",
-                      padding: "12px 8px",
-                    }}
-                  >
-                    <i className="bi bi-building"></i> KPPN
-                  </th>
-                  <th
-                    className="text-center align-middle"
-                    style={{
-                      backgroundColor: "#0d6efd",
-                      color: "white",
-                      border: "1px solid #dee2e6",
-                      padding: "12px 8px",
-                    }}
-                  >
-                    <i className="bi bi-journals"></i> Jenis
-                  </th>
-                  <th
-                    className="text-center align-middle"
-                    style={{
-                      backgroundColor: "#0d6efd",
-                      color: "white",
-                      border: "1px solid #dee2e6",
-                      padding: "12px 8px",
-                    }}
-                  >
-                    <i className="bi bi-clock-history"></i> Periode
-                  </th>
-                  <th
-                    className="text-center align-middle"
-                    style={{
-                      width: "200px",
-                      backgroundColor: "#0d6efd",
-                      color: "white",
-                      border: "1px solid #dee2e6",
-                      padding: "12px 8px",
-                    }}
-                  >
-                    <i className="bi bi-file-earmark-text"></i> Uraian
-                  </th>
-                  <th
-                    className="text-center align-middle"
-                    style={{
-                      backgroundColor: "#0d6efd",
-                      color: "white",
-                      border: "1px solid #dee2e6",
-                      padding: "12px 8px",
-                    }}
-                  >
-                    <i className="bi bi-upload"></i> Uploaded
-                  </th>
-                  <th
-                    className="text-center align-middle"
-                    style={{
-                      backgroundColor: "#0d6efd",
-                      color: "white",
-                      border: "1px solid #dee2e6",
-                      padding: "12px 8px",
-                    }}
-                  >
-                    <i className="bi bi-gear"></i> Opsi
-                  </th>
-                </tr>
-              </thead>
+                <TableHeader>
+                  <TableColumn className="text-center bg-primary text-white">
+                    <div className="flex items-center justify-center gap-1">
+                      <Hash size={14} />
+                      <span className="text-xs font-medium">No</span>
+                    </div>
+                  </TableColumn>
+                  <TableColumn className="text-center bg-primary text-white">
+                    <div className="flex items-center justify-center gap-1">
+                      <Calendar size={14} />
+                      <span className="text-xs font-medium">Tahun</span>
+                    </div>
+                  </TableColumn>
+                  <TableColumn className="text-center bg-primary text-white">
+                    <div className="flex items-center justify-center gap-1">
+                      <Building size={14} />
+                      <span className="text-xs font-medium">KPPN</span>
+                    </div>
+                  </TableColumn>
+                  <TableColumn className="text-center bg-primary text-white">
+                    <div className="flex items-center justify-center gap-1">
+                      <FileText size={14} />
+                      <span className="text-xs font-medium">Jenis</span>
+                    </div>
+                  </TableColumn>
+                  <TableColumn className="text-center bg-primary text-white">
+                    <div className="flex items-center justify-center gap-1">
+                      <Clock size={14} />
+                      <span className="text-xs font-medium">Periode</span>
+                    </div>
+                  </TableColumn>
+                  <TableColumn className="text-center bg-primary text-white w-48">
+                    <div className="flex items-center justify-center gap-1">
+                      <FileText size={14} />
+                      <span className="text-xs font-medium">Uraian</span>
+                    </div>
+                  </TableColumn>
+                  <TableColumn className="text-center bg-primary text-white">
+                    <div className="flex items-center justify-center gap-1">
+                      <Clock size={14} />
+                      <span className="text-xs font-medium">Uploaded</span>
+                    </div>
+                  </TableColumn>
+                  <TableColumn className="text-center bg-primary text-white">
+                    <div className="flex items-center justify-center gap-1">
+                      <Settings size={14} />
+                      <span className="text-xs font-medium">Opsi</span>
+                    </div>
+                  </TableColumn>
+                </TableHeader>
 
-              <tbody className="text-center">
-                {data.map((row, index) => (
-                  <tr key={`${row.id}-${index}`}>
-                    <td>{offset - LIMIT + index + 1}</td>
-                    <td>{row.tahun}</td>
-                    <td>{row.nmkppn}</td>
-                    <td>{row.nmjenis}</td>
-                    <td>
-                      {row.nmperiode}{" "}
-                      {row.nmsubperiode && (
-                        <span className="text-muted">({row.nmsubperiode})</span>
-                      )}
-                    </td>
-                    <td>
-                      <OverlayTrigger
-                        key={`tooltip-${row.id}`}
-                        placement="top"
-                        overlay={
-                          <Tooltip>
-                            <strong>
-                              {row.catatan || "Tidak ada catatan"}
-                            </strong>
+                <TableBody>
+                  {data.map((row, index) => (
+                    <TableRow
+                      key={`${row.id}-${index}`}
+                      className="hover:bg-gray-50"
+                    >
+                      <TableCell className="text-center">
+                        <Chip size="sm" variant="flat" color="default">
+                          {offset - LIMIT + index + 1}
+                        </Chip>
+                      </TableCell>
+                      <TableCell className="text-center font-medium">
+                        {row.tahun}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div className="text-sm">
+                          <div className="font-medium text-gray-900">
+                            {row.nmkppn}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Chip size="sm" variant="flat" color="primary">
+                          {row.nmjenis}
+                        </Chip>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div className="text-sm">
+                          <div className="font-medium">{row.nmperiode}</div>
+                          {row.nmsubperiode && (
+                            <div className="text-xs text-gray-500">
+                              ({row.nmsubperiode})
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center max-w-48">
+                        <Tooltip
+                          content={row.catatan || "Tidak ada catatan"}
+                          placement="top"
+                        >
+                          <div className="text-sm text-gray-700 truncate">
+                            {row.catatan
+                              ? row.catatan.slice(0, 30) + "..."
+                              : "-"}
+                          </div>
+                        </Tooltip>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div className="text-sm text-gray-600">
+                          {moment(row.waktu).format("DD-MM-YYYY")}
+                          <div className="text-xs text-gray-400">
+                            {moment(row.waktu).format("HH:mm:ss")}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div className="flex justify-center items-center gap-1">
+                          <Tooltip content="Download File" placement="top">
+                            <Button
+                              size="sm"
+                              variant="flat"
+                              color="primary"
+                              isIconOnly
+                              onPress={() => handleShowDownloadModal(row)}
+                            >
+                              <Download size={14} />
+                            </Button>
                           </Tooltip>
-                        }
-                      >
-                        <span>
-                          {row.catatan ? row.catatan.slice(0, 30) + " ..." : ""}
-                        </span>
-                      </OverlayTrigger>
-                    </td>
-                    <td>{moment(row.waktu).format("DD-MM-YYYY HH:mm:ss")}</td>
-                    <td>
-                      <div className="d-flex justify-content-center gap-2">
-                        <OverlayTrigger
-                          placement="top"
-                          overlay={<Tooltip>Download File</Tooltip>}
-                        >
-                          <button
-                            className="btn btn-outline-primary btn-sm"
-                            onClick={() => handleShowDownloadModal(row)}
-                          >
-                            <i className="bi bi-download"></i>
-                          </button>
-                        </OverlayTrigger>
-                        <OverlayTrigger
-                          placement="top"
-                          overlay={<Tooltip>Hapus Data</Tooltip>}
-                        >
-                          <button
-                            className="btn btn-outline-danger btn-sm"
-                            onClick={() => handleHapusdata(row.id)}
-                          >
-                            <i className="bi bi-trash"></i>
-                          </button>
-                        </OverlayTrigger>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </InfiniteScroll>
-          {/* {loading && <Spinner animation="border" />} */}
-        </div>{" "}
-        <DownloadModal
-          show={showDownloadModal}
-          onHide={handleCloseDownloadModal}
-          fileInfo={selectedFile}
-          onDownload={handleDownloadFile}
-          onGetInfo={getFileInfo}
-        />
+                          <Tooltip content="Hapus Data" placement="top">
+                            <Button
+                              size="sm"
+                              variant="flat"
+                              color="danger"
+                              isIconOnly
+                              onPress={() => handleHapusdata(row.id)}
+                            >
+                              <Trash2 size={14} />
+                            </Button>
+                          </Tooltip>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </InfiniteScroll>
+          </div>
+        </CardBody>
       </Card>
-    </>
+
+      <DownloadModal
+        show={showDownloadModal}
+        onHide={handleCloseDownloadModal}
+        fileInfo={selectedFile}
+        onDownload={handleDownloadFile}
+        onGetInfo={getFileInfo}
+      />
+    </div>
   );
 }

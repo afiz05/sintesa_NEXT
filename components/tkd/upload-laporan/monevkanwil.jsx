@@ -1,12 +1,29 @@
 "use client";
 import React, { useState, useEffect, useContext } from "react";
 import {
-  Container,
-  OverlayTrigger,
   Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Card,
+  CardBody,
   Tooltip,
   Spinner,
-} from "react-bootstrap";
+  Button,
+  Chip,
+} from "@heroui/react";
+import {
+  Download,
+  Trash2,
+  Calendar,
+  Building,
+  FileText,
+  Clock,
+  Hash,
+  Settings,
+} from "lucide-react";
 
 import MyContext from "../../../utils/Context";
 import { handleHttpError } from "../../notifikasi/toastError";
@@ -145,81 +162,147 @@ const MonevKanwil = ({ cekMonev }) => {
   };
 
   return (
-    <Container fluid>
+    <div className="w-full space-y-4">
+      {/* Header Section */}
+      <div className="p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg border">
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <Building size={16} />
+          <span>Data Laporan Monev Kanwil</span>
+        </div>
+      </div>
+
       {loading ? (
-        <div
-          className="d-flex justify-content-center align-items-center"
-          style={{ marginTop: "100px" }}
-        >
-          <Spinner animation="border" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </Spinner>
+        <div className="flex justify-center items-center py-20">
+          <div className="flex flex-col items-center gap-3">
+            <Spinner size="lg" color="secondary" />
+            <span className="text-sm text-gray-600">Loading data...</span>
+          </div>
         </div>
       ) : (
-        <Table bordered striped className="mt-3">
-          <thead className="is-sticky-datauser bg-secondary">
-            <tr>
-              <th rowSpan="2" className="text-center align-middle">
-                No
-              </th>
-              <th rowSpan="2" className="text-center align-middle">
-                Tahun
-              </th>
-              <th rowSpan="2" className="text-center align-middle">
-                KANWIL
-              </th>
+        <Card className="w-full">
+          <CardBody className="p-0">
+            <Table
+              aria-label="Monev Kanwil Table"
+              className="min-w-full"
+              // removeWrapper
+            >
+              <TableHeader>
+                <TableColumn className="text-center bg-secondary text-white">
+                  <div className="flex items-center justify-center gap-1">
+                    <Hash size={14} />
+                    <span className="text-xs font-medium">No</span>
+                  </div>
+                </TableColumn>
+                <TableColumn className="text-center bg-secondary text-white">
+                  <div className="flex items-center justify-center gap-1">
+                    <Calendar size={14} />
+                    <span className="text-xs font-medium">Tahun</span>
+                  </div>
+                </TableColumn>
+                <TableColumn className="text-center bg-secondary text-white">
+                  <div className="flex items-center justify-center gap-1">
+                    <Building size={14} />
+                    <span className="text-xs font-medium">KANWIL</span>
+                  </div>
+                </TableColumn>
+                <TableColumn className="text-center bg-secondary text-white">
+                  <div className="flex items-center justify-center gap-1">
+                    <FileText size={14} />
+                    <span className="text-xs font-medium">Jenis Laporan</span>
+                  </div>
+                </TableColumn>
+                <TableColumn className="text-center bg-secondary text-white">
+                  <div className="flex items-center justify-center gap-1">
+                    <Clock size={14} />
+                    <span className="text-xs font-medium">Periode</span>
+                  </div>
+                </TableColumn>
+                <TableColumn className="text-center bg-secondary text-white">
+                  <div className="flex items-center justify-center gap-1">
+                    <Clock size={14} />
+                    <span className="text-xs font-medium">Uploaded</span>
+                  </div>
+                </TableColumn>
+                <TableColumn className="text-center bg-secondary text-white">
+                  <div className="flex items-center justify-center gap-1">
+                    <Settings size={14} />
+                    <span className="text-xs font-medium">Opsi</span>
+                  </div>
+                </TableColumn>
+              </TableHeader>
 
-              <th colSpan="1" className="text-center align-middle">
-                Jenis Laporan
-              </th>
-              <th rowSpan="2" className="text-center align-middle">
-                Periode
-              </th>
-              <th rowSpan="2" className="text-center align-middle">
-                Uploaded
-              </th>
-
-              <th rowSpan="2" className="text-center align-middle">
-                Opsi
-              </th>
-            </tr>
-          </thead>
-          <tbody className="text-center">
-            {data.map((row, index) => (
-              <tr key={index}>
-                <td>{index + 1}</td>
-                <td>{row.tahun}</td>
-                <td>{row.nmkanwil}</td>
-                <td>{row.nmjenis}</td>
-                <td>{row.nmperiode}</td>
-                <td>{moment(row.waktu).format("DD-MM-YYYY HH:mm:ss")}</td>
-
-                <td>
-                  <OverlayTrigger
-                    placement="top"
-                    overlay={<Tooltip>Download File</Tooltip>}
-                  >
-                    <a href={row.file} download>
-                      <i className="bi bi-cloud-download-fill"></i>
-                    </a>
-                  </OverlayTrigger>
-                  <OverlayTrigger
-                    placement="top"
-                    overlay={<Tooltip>Hapus Data </Tooltip>}
-                  >
-                    <i
-                      className="bi bi-trash-fill text-danger mx-2"
-                      onClick={() => handleHapusdata(row.id)}
-                      style={{ cursor: "pointer" }}
-                    ></i>
-                  </OverlayTrigger>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+              <TableBody>
+                {data.map((row, index) => (
+                  <TableRow key={index} className="hover:bg-gray-50">
+                    <TableCell className="text-center">
+                      <Chip size="sm" variant="flat" color="default">
+                        {index + 1}
+                      </Chip>
+                    </TableCell>
+                    <TableCell className="text-center font-medium">
+                      {row.tahun}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div className="text-sm">
+                        <div className="font-medium text-gray-900">
+                          {row.nmkanwil}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Chip size="sm" variant="flat" color="secondary">
+                        {row.nmjenis}
+                      </Chip>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Chip size="sm" variant="flat" color="warning">
+                        {row.nmperiode}
+                      </Chip>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div className="text-sm text-gray-600">
+                        {moment(row.waktu).format("DD-MM-YYYY")}
+                        <div className="text-xs text-gray-400">
+                          {moment(row.waktu).format("HH:mm:ss")}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div className="flex justify-center items-center gap-1">
+                        <Tooltip content="Download File" placement="top">
+                          <Button
+                            size="sm"
+                            variant="flat"
+                            color="secondary"
+                            isIconOnly
+                            as="a"
+                            href={row.file}
+                            download
+                          >
+                            <Download size={14} />
+                          </Button>
+                        </Tooltip>
+                        <Tooltip content="Hapus Data" placement="top">
+                          <Button
+                            size="sm"
+                            variant="flat"
+                            color="danger"
+                            isIconOnly
+                            onPress={() => handleHapusdata(row.id)}
+                          >
+                            <Trash2 size={14} />
+                          </Button>
+                        </Tooltip>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardBody>
+        </Card>
       )}
-    </Container>
+    </div>
   );
 };
 
