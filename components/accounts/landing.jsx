@@ -26,6 +26,7 @@ import MyContext from "@/utils/Context";
 
 import Encrypt from "@/utils/Random";
 import { useToast } from "../context/ToastContext";
+import TambahUser from "./TambahUser";
 
 // Enhanced loading spinner component
 const LoadingSpinner = () => (
@@ -66,8 +67,23 @@ const User = forwardRef((props, ref) => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isTambahUserOpen, setIsTambahUserOpen] = useState(false);
   const { showToast } = useToast(); // Remove type assertion
   const context = useContext(MyContext);
+
+  // Role mapping untuk menampilkan nama role yang sesuai
+  const roleOptions = [
+    { key: "0", label: "Admin" },
+    { key: "1", label: "Direktorat PA" },
+    { key: "2", label: "Kantor Pusat" },
+    { key: "3", label: "Kanwil" },
+    { key: "4", label: "KPPN" },
+  ];
+
+  const getRoleName = (roleKey) => {
+    const role = roleOptions.find((r) => r.key === String(roleKey));
+    return role ? role.label : roleKey;
+  };
 
   // Handle case where context might be undefined during initial render
   if (!context) {
@@ -80,28 +96,18 @@ const User = forwardRef((props, ref) => {
   // Remove frontend filtering, rely on backend search only
   const fetchData = async (pageNum, search = "") => {
     const offset = (pageNum - 1) * LIMIT;
-    let query = `SELECT id,username,name,email,role,kdkanwil,kdkppn,kdlokasi,active,status_update FROM v3_next.users`;
+    let query = `SELECT id,username,name,role,kdkanwil,kdkppn,kdlokasi,active,createdAt as status_update FROM v3_next.users`;
     if (search) {
       const keyword = search.toLowerCase().replace(/'/g, "''"); // escape single quotes
-      query += ` WHERE (LOWER(username) LIKE '%${keyword}%' OR LOWER(name) LIKE '%${keyword}%' OR LOWER(email) LIKE '%${keyword}%' OR LOWER(role) LIKE '%${keyword}%')`;
+      query += ` WHERE (LOWER(username) LIKE '%${keyword}%' OR LOWER(name) LIKE '%${keyword}%' OR LOWER(role) LIKE '%${keyword}%')`;
     }
     query += ` order by role desc LIMIT ${LIMIT} OFFSET ${offset}`;
 
     const encryptedQuery = Encrypt(query.trim());
     try {
-      if (!axiosJWT) {
-        throw new Error("Network connection not available");
-      }
-
-      const res = await axiosJWT.post(
-        process.env.NEXT_PUBLIC_GET_USERS ?? "",
-        { query: encryptedQuery },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await axiosJWT.post(process.env.NEXT_PUBLIC_GET_USERS ?? "", {
+        query: encryptedQuery,
+      });
 
       const result = res.data.result || [];
       if (result.length < LIMIT) setHasMore(false);
@@ -163,6 +169,15 @@ const User = forwardRef((props, ref) => {
     fetchData(1);
   };
 
+  const handleUserAdded = () => {
+    reloadData();
+    showToast("User berhasil ditambahkan", "success");
+  };
+
+  const handleTambahUser = () => {
+    setIsTambahUserOpen(true);
+  };
+
   // Expose reloadData to parent via ref
   useImperativeHandle(ref, () => ({
     reloadData,
@@ -172,7 +187,7 @@ const User = forwardRef((props, ref) => {
     // { name: "ID", uid: "id" },
     { name: "Username", uid: "username" },
     { name: "Name", uid: "name" },
-    { name: "Email", uid: "email" },
+
     { name: "Role", uid: "role" },
     { name: "Kanwil", uid: "kdkanwil" },
     { name: "KPPN", uid: "kdkppn" },
@@ -206,6 +221,7 @@ const User = forwardRef((props, ref) => {
               color="primary"
               variant="ghost"
               className="min-w-[140px] flex justify-center items-center"
+              onPress={handleTambahUser}
             >
               <svg
                 className="w-3 h-3"
@@ -301,10 +317,7 @@ const User = forwardRef((props, ref) => {
                         ? "200px"
                         : col.uid === "name"
                         ? "250px"
-                        : col.uid === "email"
-                        ? "auto"
-                        : col.uid === "role" ||
-                          col.uid === "kdkanwil" ||
+                        : col.uid === "kdkanwil" ||
                           col.uid === "kdkppn" ||
                           col.uid === "kdlokasi" ||
                           col.uid === "active" ||
@@ -340,10 +353,7 @@ const User = forwardRef((props, ref) => {
                             ? "200px"
                             : col.uid === "name"
                             ? "250px"
-                            : col.uid === "email"
-                            ? "auto"
-                            : col.uid === "role" ||
-                              col.uid === "kdkanwil" ||
+                            : col.uid === "kdkanwil" ||
                               col.uid === "kdkppn" ||
                               col.uid === "kdlokasi" ||
                               col.uid === "active" ||
@@ -393,13 +403,11 @@ const User = forwardRef((props, ref) => {
                   <TableCell>
                     <span className="break-words">{user.name}</span>
                   </TableCell>
-                  <TableCell>
-                    <span className="break-all">{user.email}</span>
-                  </TableCell>
+
                   <TableCell className="text-center" style={{ width: "100px" }}>
                     <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/50 dark:to-pink-900/50 text-purple-800 dark:text-purple-300">
                       <div className="w-1.5 h-1.5 rounded-full bg-purple-500 dark:bg-purple-400 mr-2 flex-shrink-0"></div>
-                      {user.role}
+                      {getRoleName(user.role)}
                     </span>
                   </TableCell>
                   <TableCell className="text-center" style={{ width: "80px" }}>
@@ -453,6 +461,13 @@ const User = forwardRef((props, ref) => {
           </Table>
         </div>
       </div>
+
+      {/* Modal Tambah User */}
+      <TambahUser
+        isOpen={isTambahUserOpen}
+        onClose={() => setIsTambahUserOpen(false)}
+        onUserAdded={handleUserAdded}
+      />
     </div>
   );
 });

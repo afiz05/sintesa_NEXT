@@ -54,13 +54,7 @@ const ModalPerforma = ({ isOpen, onClose }) => {
       const encryptedQuery = Encrypt(query);
       const response = await axiosJWT.post(
         `${process.env.NEXT_PUBLIC_GET_REFERENSI}`,
-        { query: encryptedQuery },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { query: encryptedQuery }
       );
 
       const resultData = response.data.result || [];

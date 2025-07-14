@@ -8,9 +8,27 @@ interface Props {
   icon: React.ReactNode;
   isActive?: boolean;
   href?: string;
+  // New props for customization
+  color?: string;
+  bgColor?: string;
+  hoverColor?: string;
+  activeColor?: string;
+  activeBgColor?: string;
+  className?: string;
 }
 
-export const SidebarItem = ({ icon, title, isActive, href = "" }: Props) => {
+export const SidebarItem = ({
+  icon,
+  title,
+  isActive,
+  href = "",
+  color = "text-default-900",
+  bgColor,
+  hoverColor = "hover:bg-default-100",
+  activeColor,
+  activeBgColor = "bg-primary-100",
+  className = "",
+}: Props) => {
   const { collapsed, setCollapsed } = useSidebarContext();
 
   const handleClick = () => {
@@ -18,6 +36,19 @@ export const SidebarItem = ({ icon, title, isActive, href = "" }: Props) => {
       setCollapsed();
     }
   };
+
+  // Build dynamic classes based on props
+  const getActiveClasses = () => {
+    if (isActive) {
+      const bgClass = bgColor || activeBgColor;
+      const iconClass = activeColor
+        ? `[&_svg]:stroke-${activeColor.replace("text-", "")}`
+        : "[&_svg]:stroke-primary-500";
+      return `${bgClass} ${iconClass}`;
+    }
+    return hoverColor;
+  };
+
   return (
     <NextLink
       href={href}
@@ -25,15 +56,14 @@ export const SidebarItem = ({ icon, title, isActive, href = "" }: Props) => {
     >
       <div
         className={clsx(
-          isActive
-            ? "bg-primary-100 [&_svg]:stroke-primary-500"
-            : "hover:bg-default-100",
-          "flex gap-2 w-full min-h-[44px] h-full items-center px-3.5 rounded-xl cursor-pointer transition-all duration-150 active:scale-[0.98]"
+          getActiveClasses(),
+          "flex gap-2 w-full min-h-[44px] h-full items-center px-3.5 rounded-xl cursor-pointer transition-all duration-150 active:scale-[0.98]",
+          className
         )}
         onClick={handleClick}
       >
         {icon}
-        <span className="text-default-900">{title}</span>
+        <span className={clsx(color)}>{title}</span>
       </div>
     </NextLink>
   );

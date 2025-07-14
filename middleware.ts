@@ -16,14 +16,18 @@ export function middleware(request: NextRequest) {
   const publicRoutes = ["/login", "/register", "/offline", "/debug/auth"];
   const isPublic = publicRoutes.includes(path);
 
-  // ✅ Redirect root "/" ke dashboard
-  if (path === "/") {
-    return NextResponse.redirect(new URL(`${basePath}/dashboard`, request.url));
-  }
-
   // ✅ Jika menuju halaman offline, selalu izinkan (tidak peduli status login)
   if (path === "/offline") {
     return NextResponse.next();
+  }
+
+  // ✅ Check backend status untuk semua route kecuali offline
+  // Note: Untuk production, sebaiknya implementasi ini di sisi client
+  // karena middleware edge runtime memiliki keterbatasan
+
+  // ✅ Redirect root "/" ke dashboard
+  if (path === "/") {
+    return NextResponse.redirect(new URL(`${basePath}/dashboard`, request.url));
   }
 
   // Cegah akses halaman private tanpa login

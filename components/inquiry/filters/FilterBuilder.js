@@ -110,10 +110,33 @@ class FilterBuilder {
     Object.entries(this.filters).forEach(([key, filter]) => {
       let enabled = false;
       if (key === "blokir") {
-        // Only enable blokir for jenlap 6
-        enabled = inquiryState.jenlap === 6;
+        // Only enable blokir for jenlap 7 (Pergerakan Blokir Bulanan per Jenis)
+        enabled = inquiryState.jenlap === "7";
+      } else if (key === "specialgrouping") {
+        // Always enable specialgrouping for jenlap 6 (Volume Output Kegiatan - Data Caput)
+        enabled = inquiryState.jenlap === "6";
       } else {
         enabled = this.isFilterEnabled(key, inquiryState);
+      }
+
+      // Debug special filters
+      if (
+        [
+          "inflasi",
+          "stunting",
+          "kemiskinan",
+          "pemilu",
+          "ikn",
+          "pangan",
+        ].includes(key)
+      ) {
+        console.log(`🔍 Special Filter Debug - ${key}:`, {
+          enabled,
+          jenlap: inquiryState.jenlap,
+          filterSwitch: this.getFilterSwitchValue(key, inquiryState),
+          radioValue: this.getFilterRadioValue(key, inquiryState),
+          optionValue: this.getFilterOptionValue(key, inquiryState),
+        });
       }
 
       if (!enabled) return;
@@ -202,6 +225,13 @@ class FilterBuilder {
       prioritas: "KdPRI",
       tema: "KdTema",
       megaproject: "KdMP",
+      // Special filters
+      inflasi: "kdInflasi",
+      stunting: "KdStunting",
+      kemiskinan: "kdKemiskinan",
+      pemilu: "KdPemilu",
+      ikn: "kdIkn",
+      pangan: "KdPangan",
     };
 
     const enabledField = enabledFields[filterName];
@@ -319,6 +349,63 @@ class FilterBuilder {
       groupByCount: filterResult.groupBy.length,
       validation,
     };
+  }
+
+  /**
+   * Get filter switch value for debugging
+   * @param {string} filterName - Name of the filter
+   * @param {object} inquiryState - Complete inquiry state
+   * @returns {any} - Filter switch value
+   */
+  getFilterSwitchValue(filterName, inquiryState) {
+    const enabledFields = {
+      inflasi: "kdInflasi",
+      stunting: "KdStunting",
+      kemiskinan: "kdKemiskinan",
+      pemilu: "KdPemilu",
+      ikn: "kdIkn",
+      pangan: "KdPangan",
+    };
+    const field = enabledFields[filterName];
+    return field ? inquiryState[field] : undefined;
+  }
+
+  /**
+   * Get filter radio value for debugging
+   * @param {string} filterName - Name of the filter
+   * @param {object} inquiryState - Complete inquiry state
+   * @returns {any} - Filter radio value
+   */
+  getFilterRadioValue(filterName, inquiryState) {
+    const radioFields = {
+      inflasi: "inflasiradio",
+      stunting: "stuntingradio",
+      kemiskinan: "kemiskinanradio",
+      pemilu: "pemiluradio",
+      ikn: "iknradio",
+      pangan: "panganradio",
+    };
+    const field = radioFields[filterName];
+    return field ? inquiryState[field] : undefined;
+  }
+
+  /**
+   * Get filter option value for debugging
+   * @param {string} filterName - Name of the filter
+   * @param {object} inquiryState - Complete inquiry state
+   * @returns {any} - Filter option value
+   */
+  getFilterOptionValue(filterName, inquiryState) {
+    const optionFields = {
+      inflasi: "Inflasi",
+      stunting: "Stunting",
+      kemiskinan: "Miskin",
+      pemilu: "Pemilu",
+      ikn: "Ikn",
+      pangan: "Pangan",
+    };
+    const field = optionFields[filterName];
+    return field ? inquiryState[field] : undefined;
   }
 }
 

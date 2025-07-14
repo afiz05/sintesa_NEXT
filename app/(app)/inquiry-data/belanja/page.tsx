@@ -1,14 +1,15 @@
+"use client";
 import React from "react";
-// import { Belanja } from "@/components/inquiry-data/belanja";
+import InquiryMod from "../../../../components/inquiry/formInquiryMod";
 
 // Simulate slow loading to test loading component
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+// const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const BelanjaPage = async () => {
+const InquiryBelanja = () => {
   // Add 2 second delay to see loading animation
-  await delay(2000);
+  // await delay(2000);
 
-  // return <Belanja />;
+  return <InquiryMod />;
 };
 
-export default BelanjaPage;
+export default InquiryBelanja;

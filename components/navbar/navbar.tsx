@@ -1,10 +1,10 @@
-import { Input, Link, Navbar, NavbarContent } from "@heroui/react";
-import React, { useState } from "react";
+import { Link, Navbar, NavbarContent } from "@heroui/react";
+import React from "react";
 import { DarkModeSwitch } from "./darkmodeswitch";
 import { FeedbackIcon } from "../icons/navbar/feedback-icon";
 import { GithubIcon } from "../icons/navbar/github-icon";
-import { SearchIcon } from "../icons/searchicon";
 import { BurguerButton } from "./burguer-button";
+import { PencarianSatker } from "../pencarian/PencarianSatker.jsx";
 
 import NotificationBell from "@/components/navbar/NotificationBellFixed";
 import NotificationTester from "@/components/navbar/NotificationTester";
@@ -19,13 +19,11 @@ interface Props {
 }
 
 export const NavbarWrapper = ({ children }: Props) => {
-  const [searchValue, setSearchValue] = useState("");
-
   return (
     <div className="w-full relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
       <Navbar
         isBordered
-        className="w-full"
+        className="w-full fixed top-0 z-50 bg-white dark:bg-black"
         classNames={{
           wrapper: "w-full max-w-full",
         }}
@@ -39,18 +37,7 @@ export const NavbarWrapper = ({ children }: Props) => {
         </NavbarContent>
         <NavbarContent className="xl:hidden" justify="center">
           <div className="flex-1">
-            <Input
-              startContent={<SearchIcon />}
-              isClearable
-              value={searchValue}
-              onValueChange={setSearchValue}
-              className="w-full"
-              classNames={{
-                input: "w-full",
-                mainWrapper: "w-full",
-              }}
-              placeholder="Search..."
-            />
+            <PencarianSatker />
           </div>
           <NotificationBell />
           <DarkModeSwitch />
@@ -63,18 +50,7 @@ export const NavbarWrapper = ({ children }: Props) => {
             <SintesaLogoDark className="h-6 w-auto block dark:hidden" />
             <SintesaLogoLight className="h-6 w-auto hidden dark:block" />
           </span>
-          <Input
-            startContent={<SearchIcon />}
-            isClearable
-            value={searchValue}
-            onValueChange={setSearchValue}
-            className="w-full"
-            classNames={{
-              input: "w-full",
-              mainWrapper: "w-full",
-            }}
-            placeholder="Search Kode..."
-          />
+          <PencarianSatker placeholder="Ketik Kode atau Nama Satker..." />
         </NavbarContent>
         <NavbarContent
           justify="end"
@@ -97,7 +73,7 @@ export const NavbarWrapper = ({ children }: Props) => {
           <UserDropdownjsx />
         </NavbarContent>
       </Navbar>
-      {children}
+      <div className="pt-16">{children}</div>
     </div>
   );
 };

@@ -77,8 +77,7 @@ export default function TrenApbn({ selectedKanwil, selectedKddept }) {
       setLoading(true);
       const response = await axiosJWT.post(
         process.env.NEXT_PUBLIC_GET_REFERENSI,
-        { query: encryptedQuery },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { query: encryptedQuery }
       );
       setDataRencanaReal(response.data.result || []);
     } catch (err) {

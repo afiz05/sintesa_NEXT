@@ -17,12 +17,6 @@ const KodePP = (props) => {
       : data;
 
   // Debug log to verify filtering
-  console.log(
-    "KdPP - kdPN:",
-    props.kdPN,
-    "filteredData length:",
-    filteredData.length
-  );
 
   // Ensure we have a valid selectedKeys Set
   const selectedKeys =
@@ -32,6 +26,7 @@ const KodePP = (props) => {
 
   return (
     <Select
+      aria-label="Pilih Program Prioritas"
       selectedKeys={new Set(selectedKeys)}
       onSelectionChange={(keys) => {
         const value = Array.from(keys)[0];
@@ -39,7 +34,7 @@ const KodePP = (props) => {
       }}
       size="sm"
       placeholder="Pilih Program Prioritas"
-      className="max-w-xs mb-1"
+      className="max-w-full"
     >
       <SelectItem key="00" value="00" textValue="Semua Program Prioritas">
         Semua Program Prioritas

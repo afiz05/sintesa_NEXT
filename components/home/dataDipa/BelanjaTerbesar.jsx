@@ -95,14 +95,7 @@ GROUP BY jenbel;`
 
       const response = await axiosJWT.post(
         `${process.env.NEXT_PUBLIC_GET_REFERENSI}`,
-        { query: encryptedQuery },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json, text/plain, */*",
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { query: encryptedQuery }
       );
 
       const resultData = response.data.result || [];

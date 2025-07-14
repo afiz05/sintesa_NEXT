@@ -63,7 +63,7 @@ export const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isPinLoading, setIsPinLoading] = useState(false);
   const [pinValue, setPinValue] = useState("");
-  const [chap, setChap] = useState("");
+  const [chap, setChap] = useState("0");
   const [captcha, setCaptcha] = useState("");
   const [recaptchaValue, setRecaptchaValue] = useState("");
   const [error, setError] = useState("");
@@ -124,26 +124,27 @@ export const Login = () => {
     return output;
   };
 
-  // Check captcha mode from backend
-  const cekMode = async () => {
-    try {
-      const response = await axios.get(
-        process.env.NEXT_PUBLIC_LOCAL_CEKMODE || ""
-      );
-      setChap(response.data.capcay);
-    } catch (error) {
-      console.log(error);
-      setError("Captcha mode check failed");
-      setChap("0");
-      setOffline(true);
-      window.location.href = "/v3/next/offline";
-      showToast("Mode Offline", "error");
-    }
-  };
+  // // Check captcha mode from backend
+  // const cekMode = async () => {
+  //   try {
+  //     const response = await axios.get(
+  //       process.env.NEXT_PUBLIC_LOCAL_CEKMODE || ""
+  //     );
+  //     setChap(response.data.capcay);
+  //     console.log(response.data.capcay);
+  //   } catch (error) {
+  //     console.log(error);
+  //     setError("Captcha mode check failed");
+  //     setChap("0");
+  //     setOffline(true);
+  //     window.location.href = "/v3/next/offline";
+  //     showToast("Mode Offline", "error");
+  //   }
+  // };
 
-  useEffect(() => {
-    cekMode();
-  }, []);
+  // useEffect(() => {
+  //   cekMode();
+  // }, []);
 
   useEffect(() => {
     if (chap === "0") {
@@ -203,11 +204,11 @@ export const Login = () => {
         } else {
           resetState();
 
-          const decrypted = decryptData(data.tokenSetLogin);
+          const decrypted = decryptData(data.data.token);
           const decoded = jwtDecode(decrypted);
-
+          console.log(data.data.token);
           setTelp(decoded.telp);
-          setToken(data.tokenSetLogin);
+          setToken(data.token);
           setstatusLogin(true);
           setLoading(false);
           setName(decoded.name);
@@ -230,13 +231,13 @@ export const Login = () => {
 
           setShowSuccessAnimation(true);
           localStorage.setItem("status", "true");
-          localStorage.setItem("token", data.tokenSetLogin); // Persist token for refresh
-          await createAuthCookie("token", data.tokenSetLogin); // Gunakan token sebenarnya
+          localStorage.setItem("token", data.data.token); // Persist token for refresh
+          await createAuthCookie("token", data.data.token); // Gunakan token sebenarnya
         }
       } catch (error) {
         console.log(error);
 
-        showToast("Login failed. Please try again.", "error");
+        showToast("Login Gagal", "error");
       } finally {
         setIsLoading(false);
       }

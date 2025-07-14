@@ -843,7 +843,7 @@ const FilterSection = ({ inquiryState }) => {
   return (
     <>
       {/* Filter Options Card - Modern design with gradient and rounded corners */}
-      <div className="w-full p-3 mb-4 sm:p-4 bg-white dark:bg-zinc-900 shadow-sm rounded-2xl">
+      <div className="w-full p-3 mb-4 sm:p-4 bg-gradient-to-r from-sky-100 to-teal-100 dark:from-zinc-900 dark:to-zinc-900 shadow-none rounded-2xl">
         {/* <div className="flex items-center gap-3 mb-4">
           <h5 className="text-lg font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
             Filter Options

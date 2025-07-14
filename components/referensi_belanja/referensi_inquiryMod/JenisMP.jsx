@@ -11,6 +11,7 @@ const JenisMP = (props) => {
 
   return (
     <Select
+      aria-label="Pilih Major Project"
       selectedKeys={new Set(selectedKeys)}
       onSelectionChange={(keys) => {
         const value = Array.from(keys)[0];
@@ -18,7 +19,7 @@ const JenisMP = (props) => {
       }}
       size="sm"
       placeholder="Pilih Major Project"
-      className="max-w-xs mb-1"
+      className="max-w-full"
     >
       <SelectItem key="00" value="00" textValue="Semua Major Project">
         Semua Major Project
