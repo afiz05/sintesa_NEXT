@@ -110,9 +110,7 @@ export default function LaporanKeuanganList() {
       const encryptedQuery = Encrypt(cleanedQuery);
 
       const response = await axiosJWT.get(
-        `${
-          import.meta.env.VITE_REACT_APP_LOCAL_SPENDING_ALOKASI
-        }${encryptedQuery}`,
+        `${process.env.NEXT_PUBLIC_LOCAL_SPENDING_ALOKASI}${encryptedQuery}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -191,9 +189,7 @@ export default function LaporanKeuanganList() {
       if (result.isConfirmed) {
         try {
           await axiosJWT.delete(
-            `${
-              import.meta.env.VITE_REACT_APP_LOCAL_INQUIRY_UPLOADKPPN
-            }/delete/${id}`,
+            `${process.env.NEXT_PUBLIC_LOCAL_INQUIRY_UPLOADKPPN}/delete/${id}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -223,9 +219,7 @@ export default function LaporanKeuanganList() {
 
       // Call download API
       const response = await axiosJWT.get(
-        `${
-          import.meta.env.VITE_REACT_APP_LOCAL_DOWNLOAD_API
-        }download/${fileId}`,
+        `${process.env.NEXT_PUBLIC_LOCAL_DOWNLOAD_API}download/${fileId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -263,9 +257,7 @@ export default function LaporanKeuanganList() {
   const getFileInfo = async (fileId) => {
     try {
       const response = await axiosJWT.get(
-        `${
-          import.meta.env.VITE_REACT_APP_LOCAL_DOWNLOAD_API
-        }file-info/${fileId}`,
+        `${process.env.NEXT_PUBLIC_LOCAL_DOWNLOAD_API}file-info/${fileId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

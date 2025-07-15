@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
-import MyContext from "../../../auth/Context";
-import { Encrypt } from "../../utils/Encrypt";
-import { handleHttpError } from "../../aplikasi/notifikasi/toastError";
+import MyContext from "../../../utils/Context";
+import Encrypt from "../../../utils/Encrypt";
+import { handleHttpError } from "../../notifikasi/toastError";
 // import { Button, Container, Spinner, Form } from "react-bootstrap";
 
 const CekKppn25 = (props) => {
@@ -64,22 +64,19 @@ const CekKppn25 = (props) => {
     }
   };
   return (
-    <Form.Group controlId="inputState">
-      <Form.Control
-        value={props.kppn}
-        as="select"
-        className="form-select form-select-md text-select"
-        name={props.name}
-        onChange={(e) => props.onChange(e.target.value)}
-      >
-        <option value="">-- Pilih KPPN --</option>
-        {data.map((dau, index) => (
-          <option key={index} value={dau.KDKPPN}>
-            {dau.NMKPPN} ({dau.KDKPPN})
-          </option>
-        ))}
-      </Form.Control>
-    </Form.Group>
+    <select
+      className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white"
+      value={props.kppn}
+      name={props.name}
+      onChange={(e) => props.onChange(e.target.value)}
+    >
+      <option value="">-- Pilih KPPN --</option>
+      {data.map((dau, index) => (
+        <option key={index} value={dau.KDKPPN}>
+          {dau.NMKPPN} ({dau.KDKPPN})
+        </option>
+      ))}
+    </select>
   );
 };
 

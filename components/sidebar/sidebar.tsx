@@ -213,7 +213,7 @@ export const SidebarWrapper = () => {
                     size={26}
                   />
                 }
-                items={["DAU", "Upload Laporan"]}
+                items={["DAU 2024", "DAU 2025", "Upload Laporan"]}
                 title="TKD"
                 isActive={pathname.startsWith("/tkd")}
               >
